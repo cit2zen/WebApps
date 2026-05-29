@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEON TETRIS</title>
+  <link rel="icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Chivo+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-level="1">
+  <div class="scanlines"></div>
+  <main class="game">
+    <aside class="panel panel--left">
+      <h1 class="logo">TETRIS</h1>
+      <section class="box hold-box">
+        <h2>HOLD</h2>
+        <canvas id="hold" width="118" height="90"></canvas>
+      </section>
+      <section class="box stats">
+        <div><span>SCORE</span><strong id="score">0</strong></div>
+        <div><span>LINES</span><strong id="lines">0</strong></div>
+        <div><span>LEVEL</span><strong id="level">1</strong></div>
+      </section>
+    </aside>
+
+    <div class="stage">
+      <canvas id="board" width="280" height="560" class="board"></canvas>
+    </div>
+
+    <aside class="panel panel--right">
+      <section class="box">
+        <h2>NEXT</h2>
+        <canvas id="next" width="118" height="210"></canvas>
+      </section>
+      <section class="box help">
+        <h2>CONTROLS</h2>
+        <ul>
+          <li><kbd>←</kbd><kbd>→</kbd><i>move</i></li>
+          <li><kbd>↓</kbd><i>soft drop</i></li>
+          <li><kbd>↑</kbd><kbd>X</kbd><i>rotate</i></li>
+          <li><kbd>Z</kbd><i>rotate ccw</i></li>
+          <li><kbd>Space</kbd><i>hard drop</i></li>
+          <li><kbd>C</kbd><i>hold</i></li>
+          <li><kbd>P</kbd><i>pause</i></li>
+          <li><kbd>R</kbd><i>restart</i></li>
+          <li><kbd>M</kbd><i>mute</i></li>
+        </ul>
+      </section>
+      <section class="box volume">
+        <h2>VOLUME</h2>
+        <label class="vol-row">
+          <span>BGM</span>
+          <input id="vol-music" type="range" min="0" max="100" value="50" />
+        </label>
+        <label class="vol-row">
+          <span>SFX</span>
+          <input id="vol-sfx" type="range" min="0" max="100" value="70" />
+        </label>
+      </section>
+      <button id="mute" class="mute">♪ ON</button>
+    </aside>
+  </main>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
