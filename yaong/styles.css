@@ -1,0 +1,176 @@
+:root {
+  --sky-top: #aee4ff;
+  --sky-bot: #e8f7ff;
+  --ink: #3a4a63;
+  --pink: #ff9bb3;
+  --pink-deep: #ff6f91;
+  --cream: #fff6e9;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: #cdeeff;
+  font-family: "Segoe UI", "Apple SD Gothic Neo", system-ui, sans-serif;
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+#stage {
+  position: relative;
+  width: min(96vw, 800px);
+  aspect-ratio: 16 / 9;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(74, 110, 150, 0.35);
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: auto;
+}
+
+/* HUD */
+#hud {
+  position: absolute;
+  inset: 0 0 auto 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  pointer-events: none;
+  font-weight: 800;
+}
+#lives { font-size: clamp(18px, 3.5vw, 26px); letter-spacing: 2px; }
+#score {
+  font-size: clamp(16px, 3vw, 24px);
+  color: #fff;
+  text-shadow: 0 2px 0 rgba(110, 150, 190, 0.6);
+}
+
+/* Overlays */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(120, 180, 220, 0.28);
+  backdrop-filter: blur(3px);
+  z-index: 5;
+}
+.panel {
+  width: min(82%, 380px);
+  background: var(--cream);
+  border-radius: 26px;
+  padding: 28px 26px 24px;
+  text-align: center;
+  box-shadow: 0 12px 0 #f0d9bd, 0 22px 40px rgba(74, 110, 150, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+h1 { font-size: clamp(30px, 7vw, 44px); color: var(--pink-deep); }
+h2 { font-size: clamp(24px, 6vw, 34px); color: var(--pink-deep); }
+.sub { font-size: 15px; opacity: 0.85; }
+.hint { font-size: 13px; line-height: 1.6; opacity: 0.7; }
+.result { font-size: 18px; font-weight: 700; }
+.result span { color: var(--pink-deep); font-size: 26px; }
+.best { font-size: 13px; opacity: 0.7; min-height: 16px; }
+
+.btn {
+  border: none;
+  border-radius: 16px;
+  padding: 13px 18px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.08s ease, filter 0.15s ease;
+  font-family: inherit;
+}
+.btn:active { transform: translateY(2px); }
+.btn.primary {
+  background: var(--pink);
+  color: #fff;
+  box-shadow: 0 5px 0 var(--pink-deep);
+}
+.btn.primary:hover { filter: brightness(1.04); }
+.btn.ghost {
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 4px 0 #e3e9f0;
+}
+
+/* Settings */
+.field {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 6px 10px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 14px;
+}
+.field > span:first-child { grid-column: 1 / -1; }
+input[type="range"] {
+  grid-column: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 10px;
+  border-radius: 6px;
+  background: #ffe0e8;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--pink-deep);
+  border: 3px solid #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+.val { font-variant-numeric: tabular-nums; color: var(--pink-deep); }
+
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 14px;
+  text-align: left;
+}
+.toggle input { width: 20px; height: 20px; accent-color: var(--pink-deep); cursor: pointer; }
+
+.meter-wrap { text-align: left; margin-top: 4px; }
+.meter-label { font-size: 12px; font-weight: 700; opacity: 0.7; }
+.meter {
+  position: relative;
+  height: 18px;
+  border-radius: 10px;
+  background: #ffe9ef;
+  overflow: hidden;
+  margin-top: 4px;
+}
+#meter-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0%;
+  background: linear-gradient(90deg, #8be0a8, #ffd76b, var(--pink-deep));
+  transition: width 0.05s linear;
+}
+#meter-threshold {
+  position: absolute;
+  top: -2px; bottom: -2px;
+  width: 3px;
+  background: #3a4a63;
+  left: 50%;
+}
+.mic-status { font-size: 12px; min-height: 16px; color: var(--pink-deep); font-weight: 700; }
+
+.hidden { display: none !important; }

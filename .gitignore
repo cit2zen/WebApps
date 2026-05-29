@@ -1,0 +1,6 @@
+# 이 저장소(WebApps)는 각 웹앱을 하위 폴더로 추적한다.
+# C:\factory 의 추적 대상이 아닌 콘텐츠(스크린샷 등)는 모두 제외.
+/*
+!/.gitignore
+!/CLAUDE.md
+!/yaong
