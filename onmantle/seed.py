@@ -1,17 +1,18 @@
 """온맨틀 데이터 시드: SQLite(_data/onmantle_deploy.db.gz) → Postgres(pgvector).
 
 홈서버 VM(또는 공유 Postgres에 접근 가능한 곳)에서 1회 실행한다.
-사전계산 similarities 테이블은 옮기지 않는다 — 유사도는 런타임에 즉석 계산.
+사전계산 similarities 테이블은 옮기지 않는다 — 유사도는 런타임에 pgvector로 즉석 계산.
+numpy 비의존(stdlib array로 float32 파싱).
 
   DATABASE_URL=postgresql://... python seed.py
 """
+import array
 import gzip
 import os
 import shutil
 import sqlite3
 import tempfile
 
-import numpy as np
 from sqlalchemy import create_engine, text
 
 from config import DATABASE_URL
@@ -26,6 +27,12 @@ def _decompress() -> str:
     with gzip.open(GZ, "rb") as fi, open(tmp.name, "wb") as fo:
         shutil.copyfileobj(fi, fo)
     return tmp.name
+
+
+def _vec_literal(blob: bytes) -> str:
+    v = array.array("f")  # native float32 (리틀엔디안 x86)
+    v.frombytes(blob)
+    return "[" + ",".join(f"{x:.6f}" for x in v) + "]"
 
 
 def main() -> None:
@@ -50,8 +57,7 @@ def main() -> None:
         ins_w = text("INSERT INTO words (word, vec) VALUES (:w, CAST(:v AS vector))")
         batch, total = [], 0
         for r in sq.execute("SELECT word, vec FROM words"):
-            v = np.frombuffer(r["vec"], dtype=np.float32)
-            batch.append({"w": r["word"], "v": "[" + ",".join(f"{x:.6f}" for x in v) + "]"})
+            batch.append({"w": r["word"], "v": _vec_literal(r["vec"])})
             if len(batch) >= BATCH:
                 cx.execute(ins_w, batch); total += len(batch); batch = []
         if batch:

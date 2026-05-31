@@ -1,14 +1,13 @@
 import unicodedata
 from datetime import datetime
 
-import numpy as np
 import pytz
 from flask import Blueprint, request, jsonify
+from sqlalchemy import text
 
-from models import db, Word, Secret, Nearest, Score, LunchPick
+from models import db, Secret, Nearest, Score, LunchPick
 from puzzle import get_current_puzzle_number, get_current_slot, get_next_change_time
 from hints import get_hint
-from similarity import compute_score
 
 KST = pytz.timezone("Asia/Seoul")
 
@@ -49,18 +48,18 @@ def guess():
     if secret is None:
         return jsonify({"error": "퍼즐 데이터 없음"}), 500
 
-    guess_row = db.session.get(Word, word)
-    if guess_row is None:
+    # pgvector 코사인 즉석 계산 (<=> = 코사인 거리). 추측 단어가 없으면 row 없음 → 404.
+    row = db.session.execute(
+        text(
+            "SELECT 1 - (w.vec <=> s.vec) AS sim "
+            "FROM words w, words s WHERE w.word = :g AND s.word = :sec"
+        ),
+        {"g": word, "sec": secret.word},
+    ).first()
+    if row is None:
         return jsonify({"error": "알 수 없는 단어"}), 404
-    secret_row = db.session.get(Word, secret.word)
-    if secret_row is None:
-        return jsonify({"error": "퍼즐 데이터 없음"}), 500
 
-    # 즉석 코사인 유사도 (사전계산 테이블 불필요)
-    similarity = compute_score(
-        np.asarray(guess_row.vec, dtype=np.float32),
-        np.asarray(secret_row.vec, dtype=np.float32),
-    )
+    similarity = round(float(row.sim) * 100, 2)
     is_correct = (word == secret.word)
 
     result = {"word": word, "similarity": similarity, "is_correct": is_correct}

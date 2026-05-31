@@ -1,14 +1,13 @@
 from flask_sqlalchemy import SQLAlchemy
-from pgvector.sqlalchemy import Vector
 
 db = SQLAlchemy()
 
 
 class Word(db.Model):
-    """어휘 단어와 300차원 FastText 벡터 (pgvector)."""
+    """어휘 단어. vec(vector(300)) 컬럼은 seed.py가 생성·관리한다.
+    (런타임 numpy/pgvector-python 의존을 없애려고 ORM에 비매핑 — 유사도는 SQL로 계산.)"""
     __tablename__ = "words"
     word = db.Column(db.Text, primary_key=True)
-    vec = db.Column(Vector(300), nullable=False)
 
 
 class Secret(db.Model):
