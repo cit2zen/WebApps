@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Aurora Hands — interactive hand-motion simulation</title>
+<link rel="stylesheet" href="../cityzen-ui.css">
 <style>
   :root { color-scheme: dark; }
   html, body {
@@ -79,6 +80,15 @@
     border:1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04);
     color:#cfd6ec;
   }
+  /* cityzen common header: float above the fixed fullscreen canvas/overlay,
+     and nudge the in-game UI chrome below it so nothing is obscured.
+     (Canvas/#stage spans the full viewport untouched — game sizing logic intact.) */
+  .cz-gamehead {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 30;
+    background: rgba(5,6,10,0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  #ui { top: 60px; }
+  #overlay .card { margin-top: 52px; }
 </style>
 </head>
 <body>
@@ -806,6 +816,11 @@ function animate() {
   requestAnimationFrame(animate);
 }
 animate();
+</script>
+
+<script type="module">
+  import { czHeader } from '../cityzen-ui.js';
+  czHeader({ title: 'Aurora Hands' });
 </script>
 </body>
 </html>

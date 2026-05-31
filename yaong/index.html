@@ -5,7 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>야옹! — 목소리로 점프하는 고양이</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🐱</text></svg>" />
+  <link rel="stylesheet" href="../cityzen-ui.css" />
   <link rel="stylesheet" href="styles.css" />
+  <!-- cz 헤더가 화면 상단에 놓이고 게임 스테이지는 남은 공간 중앙에 유지되도록 body 레이아웃만 보정(게임 캔버스 크기 계산은 미변경) -->
+  <style>
+    body { display: flex; flex-direction: column; }
+    #stage { margin: auto; }
+  </style>
 </head>
 <body>
   <div id="stage">
@@ -89,5 +95,9 @@
   </div>
 
   <script type="module" src="js/main.js"></script>
+  <script type="module">
+    import { czHeader } from '../cityzen-ui.js';
+    czHeader({ title: 'Yaong' });
+  </script>
 </body>
 </html>

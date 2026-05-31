@@ -9,6 +9,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Chivo+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../cityzen-ui.css" />
+  <style>
+    /* cityzen header integration: body is a centering flex container
+       (align-items/justify-content:center). Switch to a column so the
+       prepended .cz-gamehead sits on top and the game stays centered
+       in the remaining space. Layout-only; no game/canvas logic touched. */
+    body { flex-direction: column; }
+    body > .cz-gamehead { flex: 0 0 auto; align-self: stretch; }
+    body > .game { flex: 1 1 auto; }
+  </style>
 </head>
 <body data-level="1">
   <div class="scanlines"></div>
@@ -64,5 +74,9 @@
     </aside>
   </main>
   <script type="module" src="main.js"></script>
+  <script type="module">
+    import { czHeader } from '../cityzen-ui.js';
+    czHeader({ title: 'Neon Tetris' });
+  </script>
 </body>
 </html>

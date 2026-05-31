@@ -3,39 +3,49 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>cityzen games</title>
+  <title>cityzen games — 네온 아케이드</title>
+  <meta name="description" content="cityzen 홈서버에서 운영하는 브라우저 게임 모음. 광고 없이, 빠르게." />
+  <link rel="stylesheet" href="./cityzen-ui.css" />
   <style>
-    :root { color-scheme: dark; }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; min-height: 100vh; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      background: radial-gradient(1200px 600px at 50% -10%, #1e293b, #0b1120 70%); color: #e2e8f0;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem;
-    }
-    h1 { font-size: clamp(2rem, 6vw, 3rem); margin: 0 0 .25rem; }
-    p.sub { color: #94a3b8; margin: 0 0 2.5rem; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; width: min(640px, 100%); }
-    a.card {
-      display: flex; flex-direction: column; align-items: center; gap: .5rem; padding: 1.6rem 1rem;
-      background: #111827; border: 1px solid #1f2937; border-radius: 14px; text-decoration: none; color: #e2e8f0;
-      transition: transform .12s ease, border-color .12s ease, background .12s ease;
-    }
-    a.card:hover { transform: translateY(-3px); border-color: #6366f1; background: #161e2e; }
-    .emoji { font-size: 2.4rem; }
-    .name { font-weight: 600; }
-    footer { margin-top: 2.5rem; color: #64748b; font-size: .85rem; }
-    footer a { color: #818cf8; text-decoration: none; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{min-height:100vh;overflow-x:hidden;padding-bottom:60px}
+    footer{position:relative;z-index:2;text-align:center;color:var(--cz-tx-mute);font-size:.82rem;margin-top:40px}
+    footer a{color:var(--cz-vio);text-decoration:none}
+    footer a:hover{color:#fff}
   </style>
 </head>
-<body>
-  <h1>🎮 cityzen games</h1>
-  <p class="sub">바닐라 JS로 만든 브라우저 게임 모음</p>
-  <nav class="grid">
-    <a class="card" href="./pacman/"><span class="emoji">👻</span><span class="name">Pac-Man</span></a>
-    <a class="card" href="./tetris/"><span class="emoji">🧱</span><span class="name">Tetris</span></a>
-    <a class="card" href="./apple-game/"><span class="emoji">🍎</span><span class="name">Apple Game</span></a>
-    <a class="card" href="./yaong/"><span class="emoji">🐱</span><span class="name">Yaong</span></a>
+<body class="cz-root">
+  <nav class="cz-nav">
+    <a class="cz-logo" href="https://cityzen.kr">city<b>zen</b></a>
+    <span class="cz-navlinks">
+      <a href="https://cityzen.kr">Apps</a>
+      <a href="./">Games</a>
+      <a class="cz-cta" href="https://cityzen.kr/login">Sign in</a>
+    </span>
   </nav>
-  <footer><a href="https://cityzen.kr">← cityzen.kr</a></footer>
+
+  <div class="cz-wrap">
+    <section class="cz-hero">
+      <div class="cz-kicker"><span class="cz-dot"></span>self-hosted · home server</div>
+      <h1>브라우저에서 즐기는<br><span class="cz-glow">cityzen 게임</span></h1>
+      <p>설치 없이 바로 플레이하는 바닐라 JS 게임 모음. 광고 없이, 빠르게.</p>
+    </section>
+
+    <div class="cz-label">게임 선택</div>
+    <nav class="cz-grid-games">
+      <a class="cz-tile" href="./pacman/"><span class="cz-e">👻</span><span class="cz-n">PAC-MAN</span></a>
+      <a class="cz-tile" href="./tetris/"><span class="cz-e">🧱</span><span class="cz-n">TETRIS</span></a>
+      <a class="cz-tile" href="./apple-game/"><span class="cz-e">🍎</span><span class="cz-n">APPLE 10</span></a>
+      <a class="cz-tile" href="./yaong/"><span class="cz-e">🐱</span><span class="cz-n">YAONG</span></a>
+      <a class="cz-tile" href="./aurora-hands/"><span class="cz-e">✋</span><span class="cz-n">AURORA</span></a>
+    </nav>
+  </div>
+
+  <footer><a href="https://cityzen.kr">← cityzen.kr</a> · 홈서버에서 운영</footer>
+
+  <script type="module">
+    import { czFx } from './cityzen-ui.js';
+    czFx();
+  </script>
 </body>
 </html>
