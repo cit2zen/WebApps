@@ -597,3 +597,24 @@ footer a:hover { text-decoration: underline; }
     .feedback-form { flex-direction: column; }
     .feedback-form input { width: 100%; }
 }
+
+/* ===== cityzen Neon 정렬 (다크 테마 액센트를 생태계 팔레트로) ===== */
+[data-theme="dark"] {
+    --bg: #06060b;
+    --card: #0c0c14;
+    --card-border: rgba(255,255,255,0.08);
+    --text: #eef0ff;
+    --text-sub: #b8b8d4;
+    --text-muted: #64647e;
+    --input-bg: #13131c;
+    --input-border: rgba(255,255,255,0.10);
+    --accent: #5ef2ff;
+    --accent-light: #a98bff;
+    --accent-bg: rgba(94,242,255,0.07);
+    --green: #39ff96;
+    --pink: #ff4fc8;
+    --red: #ff6b6b;
+}
+/* 공통 헤더가 게임 레이아웃 위에 자연스럽게 얹히도록 */
+body:has(> .cz-gamehead) { padding-top: 0; }
+.cz-gamehead { margin-bottom: 4px; }

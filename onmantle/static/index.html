@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>온맨틀 - 단어 유사도 추측 게임</title>
+    <link rel="stylesheet" href="cityzen-ui.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -155,5 +156,9 @@
     </div>
 
     <script src="js/script.js"></script>
+    <script type="module">
+      import { czHeader } from './cityzen-ui.js';
+      czHeader({ title: '온맨틀' });
+    </script>
 </body>
 </html>
