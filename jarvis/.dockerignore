@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.gitignore
+e2e
+tests
+test-results
+playwright.config.ts
+vitest.config.ts
+docs
+*.md
+.env
+.env.*
+npm-debug.log*
+tsconfig.tsbuildinfo

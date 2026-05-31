@@ -1,0 +1,37 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# next.js
+/.next/
+/out/
+/build
+next-env.d.ts
+
+# production
+/dist
+
+# env / secrets
+.env*
+!.env.example
+
+# app data (memory, runtime)
+/data/
+
+# brainstorming visual companion (local only)
+/.superpowers/
+
+# logs / os / editor
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# test artifacts
+/coverage
+/playwright-report
+/test-results
+tsconfig.tsbuildinfo
+e2e/__screens__/

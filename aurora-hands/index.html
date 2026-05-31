@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Aurora Hands — interactive hand-motion simulation</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body {
+    margin: 0; padding: 0; height: 100%; width: 100%;
+    background: #05060a; overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #e6e9f5;
+  }
+  #stage { position: fixed; inset: 0; }
+  canvas, video { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #video { opacity: 0; pointer-events: none; }
+  #fx { display: block; }
+  #ui {
+    position: fixed; left: 16px; top: 14px; z-index: 10;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    background: rgba(10,14,24,0.45);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 10px 14px; border-radius: 12px;
+    font-size: 12.5px; line-height: 1.45; max-width: 360px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+  }
+  #ui h1 {
+    margin: 0 0 6px 0; font-size: 13.5px; font-weight: 600;
+    letter-spacing: 0.4px;
+    background: linear-gradient(90deg,#7df9ff,#b388ff,#ff6ec7);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  #ui small { color: #95a0bd; }
+  #ui .row { display:flex; align-items:center; gap: 8px; margin-top: 6px; flex-wrap: wrap;}
+  #ui button {
+    appearance: none; border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06); color: #e6e9f5;
+    padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 12px;
+    transition: background .15s ease, transform .15s ease;
+  }
+  #ui button:hover { background: rgba(255,255,255,0.12); }
+  #ui button:active { transform: translateY(1px); }
+  #status { color:#8fb4ff; font-variant-numeric: tabular-nums; font-size:11.5px; }
+  #hint {
+    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+    z-index: 10; color: #9aa6c7; font-size: 12px; letter-spacing:.3px;
+    background: rgba(10,14,24,0.35); padding: 6px 12px; border-radius: 999px;
+    border:1px solid rgba(255,255,255,0.06); white-space: nowrap;
+  }
+  #overlay {
+    position: fixed; inset: 0; z-index: 20; display: grid; place-items: center;
+    background: radial-gradient(1200px 600px at 50% 30%, rgba(80,40,160,.35), rgba(0,0,0,.85));
+    transition: opacity .4s ease; opacity: 1; pointer-events: auto;
+  }
+  #overlay.hidden { opacity: 0; pointer-events: none; }
+  #overlay .card {
+    text-align: center; padding: 28px 30px; border-radius: 18px;
+    background: rgba(15,18,30,0.65); border:1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 30px 80px rgba(0,0,0,.6);
+    max-width: 460px;
+  }
+  #overlay h2 {
+    margin: 0 0 6px 0; font-size: 22px;
+    background: linear-gradient(90deg,#7df9ff,#b388ff,#ff6ec7);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  #overlay p { color:#b4bbd1; font-size: 13.5px; margin: 6px 0 18px; }
+  #overlay button {
+    appearance:none; border: 1px solid rgba(255,255,255,0.15);
+    background: linear-gradient(135deg, rgba(125,249,255,.18), rgba(255,110,199,.18));
+    color: #fff; font-size: 14px; padding: 10px 18px; border-radius: 10px; cursor: pointer;
+  }
+  #overlay button:hover { filter: brightness(1.15); }
+  #err { color:#ff8a8a; font-size:12px; margin-top:10px; min-height: 16px; }
+  .gtag {
+    display:inline-block; padding: 2px 7px; border-radius: 6px;
+    font-size: 11px; letter-spacing: .4px; text-transform: uppercase;
+    border:1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04);
+    color:#cfd6ec;
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <video id="video" autoplay playsinline muted></video>
+  <canvas id="fx"></canvas>
+</div>
+
+<div id="ui">
+  <h1>Aurora Hands</h1>
+  <small>Move your hand in front of the camera. Different gestures trigger different effects.</small>
+  <div class="row">
+    <button id="modeBtn">Palette: Nebula</button>
+    <button id="mirrorBtn">Mirror: Off</button>
+    <select id="camSelect" style="display:none; background:rgba(255,255,255,0.06); color:#e6e9f5; border:1px solid rgba(255,255,255,0.12); padding:5px 8px; border-radius:8px; font-size:12px;"></select>
+    <span id="status">—</span>
+  </div>
+  <div class="row" id="gestureRow">
+    <span class="gtag" id="g0">—</span>
+    <span class="gtag" id="g1">—</span>
+  </div>
+</div>
+
+<div id="hint">✋ open = shockwave · ✊ fist = implode · ☝ point = jet · 🤏 pinch = singularity · two hands = bridge</div>
+
+<div id="overlay">
+  <div class="card">
+    <h2>Aurora Hands</h2>
+    <p>A real-time 3D particle field that responds to your hand gestures. Uses your webcam locally — no video leaves your device.</p>
+    <button id="startBtn">Enable camera</button>
+    <div id="err"></div>
+  </div>
+</div>
+
+<!-- MediaPipe Hands (global) -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+<!-- Three.js via importmap -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+// ───────────────────────────────────────────────────────────── DOM refs
+const video    = document.getElementById('video');
+const canvas   = document.getElementById('fx');
+const overlay  = document.getElementById('overlay');
+const startBtn = document.getElementById('startBtn');
+const errEl    = document.getElementById('err');
+const statusEl = document.getElementById('status');
+const modeBtn  = document.getElementById('modeBtn');
+const mirrorBtn= document.getElementById('mirrorBtn');
+const gTags    = [document.getElementById('g0'), document.getElementById('g1')];
+
+let MIRROR = false; // user requested non-mirrored view by default
+
+// ───────────────────────────────────────────────────────────── Three.js setup
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.setClearColor(0x05060a, 1);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x05060a, 0.06);
+
+const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+camera.position.set(0, 0, 8);
+camera.lookAt(0, 0, 0);
+
+// Subtle backdrop nebula (huge dim sphere with gradient — gives depth)
+{
+  const bg = new THREE.Mesh(
+    new THREE.SphereGeometry(40, 32, 24),
+    new THREE.ShaderMaterial({
+      side: THREE.BackSide,
+      uniforms: { uTime: { value: 0 } },
+      vertexShader: `
+        varying vec3 vPos;
+        void main() {
+          vPos = position;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+        }`,
+      fragmentShader: `
+        varying vec3 vPos;
+        uniform float uTime;
+        void main() {
+          vec3 n = normalize(vPos);
+          float h = 0.5 + 0.5 * n.y;
+          vec3 top = vec3(0.05, 0.04, 0.13);
+          vec3 bot = vec3(0.02, 0.01, 0.04);
+          vec3 col = mix(bot, top, h);
+          float r = length(n.xy);
+          col += vec3(0.10, 0.06, 0.18) * smoothstep(1.0, 0.0, r) * 0.6;
+          gl_FragColor = vec4(col, 1.0);
+        }`,
+    })
+  );
+  scene.add(bg);
+}
+
+// Visible world bounds at z=0 (so we can map screen to world)
+const WORLD = { x: 6, y: 4, z: 2.5 };
+function recomputeWorld() {
+  const aspect = window.innerWidth / window.innerHeight;
+  camera.aspect = aspect;
+  camera.updateProjectionMatrix();
+  const visibleH = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  const visibleW = visibleH * aspect;
+  WORLD.x = visibleW / 2;
+  WORLD.y = visibleH / 2;
+}
+
+function resize() {
+  renderer.setSize(window.innerWidth, window.innerHeight, false);
+  recomputeWorld();
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ───────────────────────────────────────────────────────────── Particle field
+const N = 6000;
+const positions  = new Float32Array(N * 3);
+const velocities = new Float32Array(N * 3);
+const colors     = new Float32Array(N * 3);
+const baseColors = new Float32Array(N * 3);
+const sizes      = new Float32Array(N);
+const lives      = new Float32Array(N);  // 0..1, how recent (1=just spawned)
+
+const palettes = {
+  Nebula: [[0.49,0.97,1.0],[0.70,0.53,1.0],[1.0,0.43,0.78],[1.0,0.78,0.47]],
+  Aurora: [[0.31,1.0,0.71],[0.47,0.78,1.0],[0.71,1.0,0.86],[0.24,0.71,1.0]],
+  Ember:  [[1.0,0.71,0.31],[1.0,0.35,0.16],[1.0,0.86,0.55],[0.78,0.16,0.31]],
+};
+const paletteNames = Object.keys(palettes);
+let paletteIdx = 0;
+
+function pickColor() {
+  const p = palettes[paletteNames[paletteIdx]];
+  return p[(Math.random() * p.length) | 0];
+}
+
+function seedAt(i, x, y, z, fresh = false) {
+  positions[i*3+0] = x; positions[i*3+1] = y; positions[i*3+2] = z;
+  velocities[i*3+0] = (Math.random()-0.5) * 0.2;
+  velocities[i*3+1] = (Math.random()-0.5) * 0.2;
+  velocities[i*3+2] = (Math.random()-0.5) * 0.2;
+  const c = pickColor();
+  baseColors[i*3+0] = c[0]; baseColors[i*3+1] = c[1]; baseColors[i*3+2] = c[2];
+  colors[i*3+0] = c[0]; colors[i*3+1] = c[1]; colors[i*3+2] = c[2];
+  sizes[i] = 0.04 + Math.random() * 0.06;
+  lives[i] = fresh ? 1.0 : Math.random();
+}
+for (let i=0;i<N;i++){
+  seedAt(i,
+    (Math.random()-0.5) * WORLD.x*2,
+    (Math.random()-0.5) * WORLD.y*2,
+    (Math.random()-0.5) * WORLD.z*2);
+}
+
+const geom = new THREE.BufferGeometry();
+geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+geom.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
+geom.setAttribute('aSize',    new THREE.BufferAttribute(sizes, 1));
+geom.setAttribute('aLife',    new THREE.BufferAttribute(lives, 1));
+
+const pointsMat = new THREE.ShaderMaterial({
+  vertexColors: true,
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+  uniforms: {
+    uPxScale: { value: renderer.getPixelRatio() * 300.0 },
+  },
+  vertexShader: `
+    attribute float aSize;
+    attribute float aLife;
+    varying vec3  vColor;
+    varying float vLife;
+    uniform float uPxScale;
+    void main() {
+      vColor = color;
+      vLife  = aLife;
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      // Size = base * boost(life) * perspective falloff
+      float boost = 1.0 + aLife * 1.8;
+      gl_PointSize = aSize * boost * uPxScale / max(0.1, -mv.z);
+      gl_Position = projectionMatrix * mv;
+    }
+  `,
+  fragmentShader: `
+    varying vec3  vColor;
+    varying float vLife;
+    void main() {
+      vec2 uv = gl_PointCoord - 0.5;
+      float d = length(uv) * 2.0;
+      if (d > 1.0) discard;
+      float core = pow(1.0 - d, 4.0);
+      float halo = pow(1.0 - d, 1.2);
+      float a = core * 0.95 + halo * 0.18;
+      vec3 c = vColor * (1.0 + core * 1.6 + vLife * 0.8);
+      gl_FragColor = vec4(c, a);
+    }
+  `,
+});
+const points = new THREE.Points(geom, pointsMat);
+scene.add(points);
+
+// ───────────────────────────────────────────────────────────── Bridge line (two hands)
+const bridgeMaxPts = 32;
+const bridgePositions = new Float32Array(bridgeMaxPts * 3);
+const bridgeGeom = new THREE.BufferGeometry();
+bridgeGeom.setAttribute('position', new THREE.BufferAttribute(bridgePositions, 3));
+const bridgeMat = new THREE.LineBasicMaterial({ color: 0xb388ff, transparent: true, opacity: 0.0, blending: THREE.AdditiveBlending, depthWrite:false });
+const bridge = new THREE.Line(bridgeGeom, bridgeMat);
+scene.add(bridge);
+
+// ───────────────────────────────────────────────────────────── Hand state
+const hands = [makeHandState(), makeHandState()];
+function makeHandState() {
+  return {
+    active: false,
+    lm: null,            // raw landmarks (21)
+    world: null,         // landmarks in world coords
+    palm: {x:0,y:0,z:0},
+    pinchPos: {x:0,y:0,z:0},
+    indexTip: {x:0,y:0,z:0},
+    pointDir: {x:0,y:0,z:1},
+    palmSize: 0.1,
+    pinch: 0,            // 0..1
+    extended: [false,false,false,false,false],
+    gesture: 'idle',     // idle | pinch | open | fist | point
+    gesturePrev: 'idle',
+    gestureSince: 0,     // perf.now when gesture began
+  };
+}
+const TIPS  = [4, 8, 12, 16, 20];
+const BASES = [2, 5, 9, 13, 17];
+const CONNECTIONS = [
+  [0,1],[1,2],[2,3],[3,4],
+  [0,5],[5,6],[6,7],[7,8],
+  [5,9],[9,10],[10,11],[11,12],
+  [9,13],[13,14],[14,15],[15,16],
+  [13,17],[17,18],[18,19],[19,20],
+  [0,17],
+];
+
+function landmarkToWorld(p) {
+  // p.x in [0,1] left→right of raw frame; MIRROR flips it.
+  const nx = MIRROR ? (1 - p.x) : p.x;
+  return {
+    x: (nx - 0.5) * WORLD.x * 2,
+    y: -(p.y - 0.5) * WORLD.y * 2,   // MediaPipe y goes down; flip for Three's +Y up
+    z: -p.z * 5,                     // amplify depth a touch
+  };
+}
+
+function dist3(a, b) { const dx=a.x-b.x, dy=a.y-b.y, dz=a.z-b.z; return Math.hypot(dx,dy,dz); }
+function dist2(a, b) { const dx=a.x-b.x, dy=a.y-b.y; return Math.hypot(dx,dy); }
+
+function detectHand(h, lm) {
+  // World-space landmarks
+  const w = lm.map(landmarkToWorld);
+  h.lm = lm; h.world = w;
+  h.palm = w[0];
+  const palmSize = dist3(w[0], w[9]) || 0.5;
+  h.palmSize = palmSize;
+
+  // Extension: distance from tip to wrist normalized by palm size
+  for (let f=0; f<5; f++) {
+    const tip = w[TIPS[f]];
+    const d = dist3(tip, w[0]) / palmSize;
+    h.extended[f] = d > (f===0 ? 1.4 : 1.8);
+  }
+  const extCount = h.extended.reduce((s,v)=>s+(v?1:0), 0);
+
+  // Pinch
+  const pd = dist3(w[4], w[8]) / palmSize;
+  h.pinch = Math.max(0, 1 - Math.min(1, pd / 0.55));
+
+  // Index tip + point direction (for jet)
+  h.indexTip = w[8];
+  const baseW = w[5];
+  let dx = w[8].x - baseW.x, dy = w[8].y - baseW.y, dz = w[8].z - baseW.z;
+  const dl = Math.hypot(dx,dy,dz) || 1;
+  h.pointDir = { x: dx/dl, y: dy/dl, z: dz/dl };
+
+  // Pinch position (midpoint of thumb+index tips)
+  h.pinchPos = {
+    x: (w[4].x + w[8].x) * 0.5,
+    y: (w[4].y + w[8].y) * 0.5,
+    z: (w[4].z + w[8].z) * 0.5,
+  };
+
+  // Classify gesture (priority: pinch > point > fist > open > idle)
+  let g = 'idle';
+  if (h.pinch > 0.65) g = 'pinch';
+  else if (h.extended[1] && !h.extended[2] && !h.extended[3] && !h.extended[4]) g = 'point';
+  else if (extCount === 0) g = 'fist';
+  else if (extCount >= 4) g = 'open';
+
+  if (g !== h.gesture) {
+    h.gesturePrev = h.gesture;
+    h.gesture = g;
+    h.gestureSince = performance.now();
+    onGestureChange(h);
+  }
+}
+
+const gestureColor = {
+  pinch: [1.0, 0.82, 0.45],
+  open:  [0.55, 1.00, 0.95],
+  fist:  [1.0, 0.36, 0.30],
+  point: [0.85, 0.95, 1.00],
+  idle:  null,
+};
+
+// One-shot effects on gesture transitions
+let burstQueue = [];
+function onGestureChange(h) {
+  // Pinch released → outward burst (recoil from singularity)
+  if (h.gesturePrev === 'pinch' && h.gesture !== 'pinch') {
+    burstQueue.push({ pos: h.pinchPos, kind: 'explosion', t: performance.now() });
+  }
+  // Fist → open: shockwave with extra punch
+  if (h.gesturePrev === 'fist' && h.gesture === 'open') {
+    burstQueue.push({ pos: h.palm, kind: 'shockwave', t: performance.now() });
+  }
+}
+
+// ───────────────────────────────────────────────────────────── Simulation
+const clock = new THREE.Clock();
+let lastFrameMs = performance.now(), fpsAvg = 60;
+
+function applyBursts(dtm) {
+  // Recycle a batch of particles at the burst location
+  const now = performance.now();
+  for (const b of burstQueue) {
+    const count = b.kind === 'explosion' ? 320 : 220;
+    for (let k=0; k<count; k++) {
+      const i = (Math.random() * N) | 0;
+      seedAt(i, b.pos.x, b.pos.y, b.pos.z, true);
+      // Outward velocity
+      const a = Math.random() * Math.PI * 2;
+      const u = Math.random() * 2 - 1;
+      const s = Math.sqrt(1 - u*u);
+      const speed = b.kind === 'explosion' ? 4 + Math.random()*4 : 3 + Math.random()*3;
+      velocities[i*3+0] = s * Math.cos(a) * speed;
+      velocities[i*3+1] = s * Math.sin(a) * speed;
+      velocities[i*3+2] = u * speed * 0.6;
+      // Brighten
+      const gc = gestureColor[b.kind === 'explosion' ? 'pinch' : 'open'];
+      if (gc) {
+        colors[i*3+0] = Math.min(1, gc[0] * 1.4);
+        colors[i*3+1] = Math.min(1, gc[1] * 1.4);
+        colors[i*3+2] = Math.min(1, gc[2] * 1.4);
+      }
+    }
+  }
+  burstQueue.length = 0;
+}
+
+function simulate(dt) {
+  // Hand-driven force fields
+  const h0 = hands[0].active ? hands[0] : null;
+  const h1 = hands[1].active ? hands[1] : null;
+  const activeHands = [h0, h1].filter(Boolean);
+
+  // Two-hand bridge handling
+  let bridgeOn = false;
+  if (h0 && h1) {
+    bridgeOn = true;
+    // Build smooth arc between the two palms
+    const a = h0.palm, b = h1.palm;
+    for (let k=0; k<bridgeMaxPts; k++) {
+      const t = k / (bridgeMaxPts - 1);
+      const x = a.x*(1-t) + b.x*t;
+      const y = a.y*(1-t) + b.y*t + Math.sin(t*Math.PI) * 0.4;
+      const z = a.z*(1-t) + b.z*t;
+      bridgePositions[k*3+0] = x;
+      bridgePositions[k*3+1] = y;
+      bridgePositions[k*3+2] = z;
+    }
+    bridgeGeom.attributes.position.needsUpdate = true;
+    // Spawn glowing particles along the arc
+    for (let k=0;k<6;k++){
+      const i = (Math.random() * N) | 0;
+      const t = Math.random();
+      const x = a.x*(1-t) + b.x*t + (Math.random()-0.5)*0.15;
+      const y = a.y*(1-t) + b.y*t + Math.sin(t*Math.PI) * 0.4 + (Math.random()-0.5)*0.15;
+      const z = a.z*(1-t) + b.z*t + (Math.random()-0.5)*0.15;
+      seedAt(i, x, y, z, true);
+      velocities[i*3+0] = (Math.random()-0.5) * 0.6;
+      velocities[i*3+1] = (Math.random()-0.5) * 0.6;
+      velocities[i*3+2] = (Math.random()-0.5) * 0.6;
+      colors[i*3+0] = 0.8; colors[i*3+1] = 0.7; colors[i*3+2] = 1.0;
+    }
+  }
+  bridgeMat.opacity += ((bridgeOn ? 0.55 : 0.0) - bridgeMat.opacity) * 0.15;
+
+  const damp = Math.exp(-1.5 * dt);
+
+  for (let i=0; i<N; i++) {
+    const ix = i*3, iy = ix+1, iz = ix+2;
+    let x = positions[ix], y = positions[iy], z = positions[iz];
+    let vx = velocities[ix], vy = velocities[iy], vz = velocities[iz];
+    let fx = 0, fy = 0, fz = 0;
+
+    // Ambient swirl (gives the field life when idle)
+    const sw = 0.4;
+    fx += (-y) * sw * 0.06;
+    fy += ( x) * sw * 0.06;
+    fz += Math.sin(x*0.4 + y*0.3) * 0.08;
+
+    // Color drift back to base
+    colors[ix] += (baseColors[ix] - colors[ix]) * 0.08;
+    colors[iy] += (baseColors[iy] - colors[iy]) * 0.08;
+    colors[iz] += (baseColors[iz] - colors[iz]) * 0.08;
+
+    // Per-hand forces
+    for (const h of activeHands) {
+      const px = h.palm.x, py = h.palm.y, pz = h.palm.z;
+      const dx = px - x, dy = py - y, dz = pz - z;
+      const d2 = dx*dx + dy*dy + dz*dz + 0.05;
+      const d = Math.sqrt(d2);
+
+      const g = h.gesture;
+      if (g === 'pinch') {
+        // Singularity at pinch point — strong inverse-square attractor + tangential swirl
+        const ppx = h.pinchPos.x, ppy = h.pinchPos.y, ppz = h.pinchPos.z;
+        const ax = ppx - x, ay = ppy - y, az = ppz - z;
+        const ad2 = ax*ax + ay*ay + az*az + 0.04;
+        const ad  = Math.sqrt(ad2);
+        const G = 14.0 * h.pinch;
+        fx += ax * G / ad2;
+        fy += ay * G / ad2;
+        fz += az * G / ad2;
+        // tangential (perpendicular to (ax,ay,az), using arbitrary up)
+        const tx = -ay, ty = ax, tz = 0;
+        const tlen = Math.hypot(tx,ty,tz) || 1;
+        const swirl = 3.0 * h.pinch / Math.max(0.3, ad);
+        fx += tx/tlen * swirl;
+        fy += ty/tlen * swirl;
+        fz += tz/tlen * swirl;
+        // Brighten if close
+        if (ad < 2.0) {
+          const k = (1 - ad/2.0) * 0.4;
+          const gc = gestureColor.pinch;
+          colors[ix] += (gc[0] - colors[ix]) * k;
+          colors[iy] += (gc[1] - colors[iy]) * k;
+          colors[iz] += (gc[2] - colors[iz]) * k;
+        }
+      } else if (g === 'open') {
+        // Continuous outward push within radius
+        const R = 3.2;
+        if (d < R) {
+          const push = (1 - d/R) * 10.0;
+          fx -= dx / d * push;
+          fy -= dy / d * push;
+          fz -= dz / d * push;
+          // spin around palm
+          fx += (-dy/d) * (1 - d/R) * 2.0;
+          fy += ( dx/d) * (1 - d/R) * 2.0;
+          // tint
+          const k = (1 - d/R) * 0.25;
+          const gc = gestureColor.open;
+          colors[ix] += (gc[0] - colors[ix]) * k;
+          colors[iy] += (gc[1] - colors[iy]) * k;
+          colors[iz] += (gc[2] - colors[iz]) * k;
+        }
+      } else if (g === 'fist') {
+        // Strong gravity to palm — implodes the field into a tight cluster
+        const G = 9.0;
+        fx += dx * G / d2;
+        fy += dy * G / d2;
+        fz += dz * G / d2;
+        if (d < 2.0) {
+          const k = (1 - d/2.0) * 0.35;
+          const gc = gestureColor.fist;
+          colors[ix] += (gc[0] - colors[ix]) * k;
+          colors[iy] += (gc[1] - colors[iy]) * k;
+          colors[iz] += (gc[2] - colors[iz]) * k;
+        }
+      } else if (g === 'point') {
+        // Directional jet along index direction
+        const tip = h.indexTip;
+        const vxv = x - tip.x, vyv = y - tip.y, vzv = z - tip.z;
+        const along = vxv * h.pointDir.x + vyv * h.pointDir.y + vzv * h.pointDir.z;
+        if (along > 0 && along < 5.0) {
+          const px2 = vxv - along * h.pointDir.x;
+          const py2 = vyv - along * h.pointDir.y;
+          const pz2 = vzv - along * h.pointDir.z;
+          const perp = Math.hypot(px2, py2, pz2);
+          const coneR = 0.4 + along * 0.35;
+          if (perp < coneR) {
+            const f = 12.0 * (1 - perp/coneR) * (1 - along/5.0);
+            fx += h.pointDir.x * f;
+            fy += h.pointDir.y * f;
+            fz += h.pointDir.z * f;
+            const k = (1 - perp/coneR) * 0.5;
+            const gc = gestureColor.point;
+            colors[ix] += (gc[0] - colors[ix]) * k;
+            colors[iy] += (gc[1] - colors[iy]) * k;
+            colors[iz] += (gc[2] - colors[iz]) * k;
+          }
+        }
+      } else {
+        // idle: gentle attraction + tangential swirl around palm
+        const G = 0.8;
+        fx += dx * G / d2;
+        fy += dy * G / d2;
+        fz += dz * G / d2;
+        fx += (-dy / d) * 1.4 / d;
+        fy += ( dx / d) * 1.4 / d;
+      }
+    }
+
+    // Integrate
+    vx = (vx + fx * dt) * damp;
+    vy = (vy + fy * dt) * damp;
+    vz = (vz + fz * dt) * damp;
+    // Clamp velocity to prevent runaway
+    const vlen = Math.hypot(vx,vy,vz);
+    const VMAX = 12;
+    if (vlen > VMAX) { const s = VMAX/vlen; vx*=s; vy*=s; vz*=s; }
+
+    x += vx * dt; y += vy * dt; z += vz * dt;
+
+    // Decay life (used by shader to brighten fresh particles)
+    lives[i] = Math.max(0, lives[i] - dt * 0.6);
+
+    // Boundary: respawn out-of-bounds particles on a wrap
+    const BX = WORLD.x * 1.4, BY = WORLD.y * 1.4, BZ = WORLD.z * 2.5;
+    if (Math.abs(x) > BX || Math.abs(y) > BY || Math.abs(z) > BZ) {
+      // Respawn somewhere far from current hands
+      x = (Math.random()-0.5) * WORLD.x * 2;
+      y = (Math.random()-0.5) * WORLD.y * 2;
+      z = (Math.random()-0.5) * WORLD.z * 2;
+      vx = (Math.random()-0.5) * 0.2;
+      vy = (Math.random()-0.5) * 0.2;
+      vz = (Math.random()-0.5) * 0.2;
+      const c = pickColor();
+      baseColors[ix]=c[0]; baseColors[iy]=c[1]; baseColors[iz]=c[2];
+      colors[ix]=c[0]; colors[iy]=c[1]; colors[iz]=c[2];
+    }
+
+    positions[ix] = x; positions[iy] = y; positions[iz] = z;
+    velocities[ix] = vx; velocities[iy] = vy; velocities[iz] = vz;
+  }
+
+  geom.attributes.position.needsUpdate = true;
+  geom.attributes.color.needsUpdate    = true;
+  geom.attributes.aLife.needsUpdate    = true;
+}
+
+// ───────────────────────────────────────────────────────────── MediaPipe Hands
+let mpHands = null, sending = false, rafId = 0;
+
+function onResults(results) {
+  const now = performance.now();
+  const dt = Math.max(1, now - lastFrameMs);
+  fpsAvg = fpsAvg * 0.9 + (1000 / dt) * 0.1;
+  lastFrameMs = now;
+
+  for (const h of hands) h.active = false;
+
+  if (results.multiHandLandmarks && results.multiHandLandmarks.length) {
+    for (let i = 0; i < Math.min(2, results.multiHandLandmarks.length); i++) {
+      const lm = results.multiHandLandmarks[i];
+      hands[i].active = true;
+      detectHand(hands[i], lm);
+    }
+  }
+
+  // Status & gesture tags
+  statusEl.textContent = `${Math.round(fpsAvg)} fps · hands:${hands.filter(h=>h.active).length}`;
+  for (let i=0; i<2; i++) {
+    const t = gTags[i];
+    if (hands[i].active) { t.textContent = hands[i].gesture; t.style.opacity = '1'; }
+    else { t.textContent = '—'; t.style.opacity = '0.45'; }
+  }
+}
+
+async function pumpFrames() {
+  if (!sending && video.readyState >= 2 && mpHands) {
+    sending = true;
+    try { await mpHands.send({ image: video }); }
+    catch (e) { console.warn('hands.send failed', e); }
+    sending = false;
+  }
+  rafId = requestAnimationFrame(pumpFrames);
+}
+
+// ───────────────────────────────────────────────────────────── Camera + start
+function explainCameraError(e) {
+  const name = (e && e.name) || '';
+  const msg  = (e && e.message) || String(e);
+  if (name === 'NotAllowedError' || /permission/i.test(msg)) {
+    return "Camera permission denied. If you opened this in VS Code's Simple Browser, " +
+           "open it in Chrome/Edge instead (the Simple Browser can't access webcams). " +
+           "Otherwise: click the 🔒 in the address bar → set Camera = Allow → reload.";
+  }
+  if (name === 'NotFoundError' || name === 'OverconstrainedError') return 'No webcam detected.';
+  if (name === 'NotReadableError') return 'Webcam in use by another app. Close it and retry.';
+  if (location.protocol !== 'https:' && !['localhost','127.0.0.1'].includes(location.hostname)) {
+    return 'Webcam requires HTTPS or http://localhost. Currently on: ' + location.origin;
+  }
+  return name ? `${name}: ${msg}` : msg;
+}
+
+const camSelect = document.getElementById('camSelect');
+let currentStream = null;
+let chosenDeviceId = null;
+
+async function tryGetUserMedia(deviceId) {
+  // Cascade: most-specific → least, so we recover from OverconstrainedError automatically.
+  const attempts = [];
+  if (deviceId) {
+    attempts.push({ video: { deviceId: { exact: deviceId }, width: { ideal: 960 }, height: { ideal: 540 } }, audio: false });
+    attempts.push({ video: { deviceId: { exact: deviceId } }, audio: false });
+  } else {
+    attempts.push({ video: { width: { ideal: 960 }, height: { ideal: 540 } }, audio: false });
+  }
+  attempts.push({ video: true, audio: false }); // last resort, no constraints
+  let lastErr = null;
+  for (const c of attempts) {
+    try { return await navigator.mediaDevices.getUserMedia(c); }
+    catch (e) { lastErr = e; console.warn('getUserMedia failed for', c, e); }
+  }
+  throw lastErr;
+}
+
+async function populateCameraList() {
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cams = devices.filter(d => d.kind === 'videoinput');
+    camSelect.innerHTML = '';
+    cams.forEach((d, i) => {
+      const opt = document.createElement('option');
+      opt.value = d.deviceId;
+      opt.textContent = d.label || `Camera ${i+1}`;
+      if (d.deviceId === chosenDeviceId) opt.selected = true;
+      camSelect.appendChild(opt);
+    });
+    camSelect.style.display = cams.length > 1 ? '' : 'none';
+  } catch (e) { console.warn('enumerateDevices failed', e); }
+}
+
+async function switchCamera(deviceId) {
+  chosenDeviceId = deviceId;
+  if (currentStream) currentStream.getTracks().forEach(t => t.stop());
+  const stream = await tryGetUserMedia(deviceId);
+  currentStream = stream;
+  video.srcObject = stream;
+  await video.play().catch(()=>{});
+}
+
+camSelect.addEventListener('change', async () => {
+  try { await switchCamera(camSelect.value); }
+  catch (e) { errEl.textContent = explainCameraError(e); }
+});
+
+async function startCamera() {
+  errEl.textContent = '';
+  startBtn.disabled = true; startBtn.textContent = 'Requesting camera…';
+  try {
+    if (!navigator.mediaDevices?.getUserMedia) throw new Error('getUserMedia not available.');
+
+    const stream = await tryGetUserMedia(null);
+    currentStream = stream;
+    chosenDeviceId = stream.getVideoTracks()[0]?.getSettings()?.deviceId || null;
+    video.srcObject = stream;
+    await new Promise((res) => {
+      video.onloadedmetadata = () => res();
+      setTimeout(res, 3000);
+    });
+    await video.play().catch(()=>{});
+
+    // After permission, labels become available
+    await populateCameraList();
+
+    startBtn.textContent = 'Loading model…';
+    if (typeof Hands === 'undefined') throw new Error('MediaPipe failed to load. Check network.');
+    mpHands = new Hands({ locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
+    mpHands.setOptions({
+      maxNumHands: 2,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.6,
+      minTrackingConfidence: 0.5,
+    });
+    mpHands.onResults(onResults);
+
+    cancelAnimationFrame(rafId);
+    pumpFrames();
+
+    overlay.classList.add('hidden');
+  } catch (e) {
+    console.error(e);
+    errEl.textContent = explainCameraError(e);
+    startBtn.disabled = false; startBtn.textContent = 'Retry';
+  }
+}
+
+// ───────────────────────────────────────────────────────────── UI events
+startBtn.addEventListener('click', startCamera);
+modeBtn.addEventListener('click', () => {
+  paletteIdx = (paletteIdx + 1) % paletteNames.length;
+  modeBtn.textContent = 'Palette: ' + paletteNames[paletteIdx];
+});
+mirrorBtn.addEventListener('click', () => {
+  MIRROR = !MIRROR;
+  mirrorBtn.textContent = 'Mirror: ' + (MIRROR ? 'On' : 'Off');
+});
+
+// ───────────────────────────────────────────────────────────── Render loop
+function animate() {
+  const dt = Math.min(0.05, clock.getDelta());
+  applyBursts(dt);
+  simulate(dt);
+  renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>
