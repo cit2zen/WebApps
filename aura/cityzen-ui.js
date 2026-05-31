@@ -7,6 +7,7 @@ export function czFx(target){
   if (host.querySelector(':scope > .cz-fx')) return;
   const fx = document.createElement('div');
   fx.className = 'cz-fx';
+  fx.setAttribute('aria-hidden', 'true'); // 장식 레이어 — 보조기술에서 숨김
   fx.innerHTML =
     '<div class="cz-orbs"><div class="cz-orb o1"></div><div class="cz-orb o2"></div><div class="cz-orb o3"></div></div>'+
     '<div class="cz-grid"></div><div class="cz-scan"></div>';

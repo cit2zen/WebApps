@@ -5,11 +5,64 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join, normalize } from "node:path";
+import { spawn } from "node:child_process";
 import { query } from "@anthropic-ai/claude-agent-sdk";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3000;
 const MODEL = process.env.AURA_MODEL || "sonnet";
+const TTS_WORKER = join(ROOT, "tts-worker.mjs");
+
+// 경량 IP 레이트리밋: 공개 엔드포인트가 소유자 Claude 구독을 무제한 소비하지 않도록.
+// 인메모리 슬라이딩 윈도(5분). Cloudflare 뒤이므로 cf-connecting-ip 우선.
+const RL_WINDOW_MS = 5 * 60 * 1000;
+const RL_MAX = { chat: 30, tts: 80 };
+const rlHits = new Map(); // key `${ip}:${kind}` → number[] timestamps
+function clientIp(req) {
+  return (
+    req.headers["cf-connecting-ip"] ||
+    String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() ||
+    req.socket.remoteAddress ||
+    "unknown"
+  );
+}
+function rateLimited(req, kind) {
+  const now = Date.now();
+  const key = `${clientIp(req)}:${kind}`;
+  const arr = (rlHits.get(key) || []).filter((t) => now - t < RL_WINDOW_MS);
+  if (arr.length >= RL_MAX[kind]) {
+    rlHits.set(key, arr);
+    return true;
+  }
+  arr.push(now);
+  rlHits.set(key, arr);
+  return false;
+}
+
+// 고품질 신경망 TTS(Edge Neural)를 깨끗한 자식 프로세스에서 합성 → mp3 Buffer.
+// 동일 프로세스(agent SDK 로드됨)에서 직접 합성하면 오디오 메시지가 간헐 소실되어
+// 합성만 격리한다. text를 자식 stdin으로 전달(argv 이스케이프 회피).
+function synthTTS(text) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [TTS_WORKER], {
+      stdio: ["pipe", "pipe", "pipe"],
+      env: process.env,
+    });
+    const out = [];
+    let err = "";
+    const timer = setTimeout(() => { child.kill("SIGKILL"); reject(new Error("tts timeout")); }, 22_000);
+    child.stdout.on("data", (c) => out.push(c));
+    child.stderr.on("data", (c) => (err += c));
+    child.on("error", (e) => { clearTimeout(timer); reject(e); });
+    child.on("close", (code) => {
+      clearTimeout(timer);
+      const buf = Buffer.concat(out);
+      if (code === 0 && buf.length > 0) resolve(buf);
+      else reject(new Error(`tts worker exit ${code}: ${err.slice(0, 200)}`));
+    });
+    child.stdin.end(text, "utf-8");
+  });
+}
 
 const SYSTEM = [
   '너는 "Aura"라는 이름의 감성적인 음성 동반자다.',
@@ -95,6 +148,11 @@ async function serveStatic(req, res) {
 
 const server = createServer(async (req, res) => {
   if (req.method === "POST" && req.url === "/api/chat") {
+    if (rateLimited(req, "chat")) {
+      res.writeHead(429, { "Content-Type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify({ error: "조금 천천히 말해줄래요? 잠시 후 다시 시도해 주세요." }));
+      return;
+    }
     let raw = "";
     req.on("data", (c) => {
       raw += c;
@@ -112,6 +170,41 @@ const server = createServer(async (req, res) => {
         res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
         res.end(JSON.stringify(out));
       } catch (e) {
+        console.error("[chat] error", e instanceof Error ? e.message : String(e));
+        res.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ error: "잠시 마음을 가다듬고 있어요. 다시 한 번 말해줄래요?" }));
+      }
+    });
+    return;
+  }
+  if (req.method === "POST" && req.url === "/api/tts") {
+    if (rateLimited(req, "tts")) {
+      res.writeHead(429, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "rate limited" }));
+      return;
+    }
+    let raw = "";
+    req.on("data", (c) => {
+      raw += c;
+      if (raw.length > 1e5) req.destroy();
+    });
+    req.on("end", async () => {
+      try {
+        const { text } = JSON.parse(raw || "{}");
+        if (!text || typeof text !== "string") {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "text required" }));
+          return;
+        }
+        const audio = await synthTTS(text.slice(0, 800));
+        res.writeHead(200, {
+          "Content-Type": "audio/mpeg",
+          "Content-Length": audio.length,
+          "Cache-Control": "no-store",
+        });
+        res.end(audio);
+      } catch (e) {
+        // 합성 실패 시 500 → 프런트가 브라우저 speechSynthesis로 폴백.
         res.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
         res.end(JSON.stringify({ error: e instanceof Error ? e.message : String(e) }));
       }

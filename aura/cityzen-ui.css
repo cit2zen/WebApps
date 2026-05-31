@@ -1,6 +1,9 @@
 /* cityzen-ui — Neon Arcade design system.  SOURCE OF TRUTH: WebApps/cityzen-ui.css
    다른 레포(cityzen-web, onmantle 등)는 이 파일의 동기 사본을 둔다. 변경 시 함께 갱신. */
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700;900&family=Geist+Mono:wght@400;700&display=swap');
+
+/* 회전 네온 보더 각도 — @property 등록 없이는 custom prop이 보간되지 않아 카드 호버 애니가 침묵 실패한다. */
+@property --a{syntax:'<angle>';inherits:false;initial-value:0deg}
 
 :root{
   --cz-bg:#06060b; --cz-bg-card:rgba(255,255,255,.03);
@@ -59,7 +62,7 @@
 /* service card (gradient neon border + shine) */
 .cz-grid-svc{display:grid;grid-template-columns:1fr;gap:13px;position:relative;z-index:2}
 @media(min-width:680px){.cz-grid-svc{grid-template-columns:1fr 1fr}}
-.cz-card{position:relative;padding:1px;border-radius:var(--cz-r);text-decoration:none;color:inherit;background:linear-gradient(var(--cz-bg-card),var(--cz-bg-card)) padding-box,conic-gradient(from var(--a,0deg),transparent 60%,var(--cz-cyan),var(--cz-mag),transparent) border-box;border:1px solid transparent;transition:.18s;overflow:hidden}
+.cz-card{position:relative;padding:1px;border-radius:var(--cz-r);text-decoration:none;color:inherit;background:linear-gradient(var(--cz-bg-card),var(--cz-bg-card)) padding-box,conic-gradient(from var(--a,0deg),transparent 60%,var(--cz-cyan),var(--cz-mag),transparent) border-box;border:1px solid transparent;transition:transform .18s,box-shadow .18s,--a .6s ease;overflow:hidden}
 .cz-card .cz-inner{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:calc(var(--cz-r) - 1px);background:#0c0c14;position:relative;overflow:hidden}
 .cz-card .cz-inner::after{content:'';position:absolute;top:0;left:-60%;width:50%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.08),transparent);transition:.5s}
 .cz-card:hover{transform:translateY(-4px);--a:360deg}
@@ -84,7 +87,7 @@
 .cz-tile::before{content:'';position:absolute;inset:0;background:conic-gradient(from 0deg,transparent 70%,rgba(255,79,200,.5),transparent);opacity:0;transition:.3s;animation:cz-spin 4s linear infinite}
 .cz-tile:hover::before{opacity:.5}
 .cz-tile .cz-e{font-size:2.4rem;z-index:1;transition:.25s}
-.cz-tile .cz-n{font-family:var(--cz-mono);font-size:.64rem;letter-spacing:.1em;color:var(--cz-tx-dim);z-index:1}
+.cz-tile .cz-n{font-family:var(--cz-mono);font-size:.68rem;font-weight:500;letter-spacing:.08em;color:var(--cz-tx);opacity:.92;z-index:1}
 .cz-tile:hover{transform:translateY(-5px) scale(1.02);border-color:rgba(255,79,200,.5);box-shadow:0 0 34px rgba(255,79,200,.28)}
 .cz-tile:hover .cz-e{transform:scale(1.18) translateY(-2px);filter:drop-shadow(0 0 16px rgba(255,79,200,.7))}
 .cz-tile:hover .cz-n{color:#fff;text-shadow:0 0 10px rgba(255,79,200,.6)}
@@ -97,4 +100,25 @@
 .cz-gamehead .cz-hud b{color:var(--cz-cyan);text-shadow:0 0 8px rgba(94,242,255,.5)}
 
 .cz-wrap{max-width:1080px;margin:0 auto;padding:0 clamp(14px,3vw,28px);position:relative;z-index:2}
-@media(prefers-reduced-motion:reduce){.cz-orb,.cz-grid,.cz-glow,.cz-tile::before,.cz-badge .cz-bdot,.cz-kicker .cz-dot,.cz-label::before{animation:none!important}}
+
+/* keyboard focus ring — 전 정적앱 일괄 적용(WCAG 2.4.7). 마우스 클릭엔 안 뜸(:focus-visible). */
+.cz-tile:focus-visible,.cz-card:focus-visible,.cz-btn:focus-visible,.cz-cta:focus-visible,
+.cz-navlinks a:focus-visible,.cz-back:focus-visible,.cz-logo:focus-visible,
+.cz-input:focus-visible,.cz-input:focus{outline:2px solid var(--cz-cyan);outline-offset:3px;border-radius:8px}
+
+/* 공용 폼 컴포넌트 — cityzen-web·onmantle·shopscout 등 입력/CTA 브랜드 일관화 */
+.cz-input{width:100%;font-family:var(--cz-font);font-size:.96rem;color:var(--cz-tx);background:rgba(255,255,255,.03);border:1px solid var(--cz-line);border-radius:var(--cz-rs);padding:12px 14px;transition:border-color .15s,box-shadow .15s;outline:none}
+.cz-input::placeholder{color:var(--cz-tx-mute)}
+.cz-input:focus{border-color:var(--cz-cyan);box-shadow:0 0 0 3px rgba(94,242,255,.18)}
+.cz-cta{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--cz-font);font-weight:700;font-size:.95rem;padding:13px 22px;border-radius:var(--cz-rs);border:1px solid transparent;cursor:pointer;text-decoration:none;background:linear-gradient(90deg,var(--cz-cyan),var(--cz-vio));color:#06060a;box-shadow:0 0 24px rgba(94,242,255,.4);transition:transform .18s,box-shadow .18s}
+.cz-cta:hover{transform:translateY(-2px);box-shadow:0 0 38px rgba(169,139,255,.7)}
+.cz-cta.ghost{background:rgba(255,255,255,.02);border-color:rgba(94,242,255,.25);color:var(--cz-tx);box-shadow:none}
+.cz-cta.ghost:hover{border-color:var(--cz-cyan);color:#fff;box-shadow:0 0 18px rgba(94,242,255,.22);transform:none}
+.cz-cta:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+
+@media(prefers-reduced-motion:reduce){
+  .cz-orb,.cz-grid,.cz-glow,.cz-tile::before,.cz-badge .cz-bdot,.cz-kicker .cz-dot,.cz-label::before{animation:none!important}
+  .cz-card,.cz-card:hover{transition:none!important}
+  .cz-card:hover .cz-inner::after{transition:none!important;left:-60%!important}
+  .cz-tile:hover,.cz-card:hover{transform:none!important}
+}
