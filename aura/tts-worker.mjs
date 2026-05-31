@@ -37,14 +37,14 @@ async function main() {
   const text = (await readStdin()).trim().slice(0, 800);
   if (!text) process.exit(2);
   let lastErr;
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 2; i++) {
     try {
       const buf = await synthOnce(text);
       process.stdout.write(buf, () => process.exit(0));
       return;
     } catch (e) {
       lastErr = e;
-      await new Promise((r) => setTimeout(r, 150 * (i + 1)));
+      await new Promise((r) => setTimeout(r, 200));
     }
   }
   process.stderr.write(String(lastErr?.message || lastErr || "tts failed"));

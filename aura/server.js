@@ -39,10 +39,8 @@ function rateLimited(req, kind) {
   return false;
 }
 
-// 고품질 신경망 TTS(Edge Neural)를 깨끗한 자식 프로세스에서 합성 → mp3 Buffer.
-// 동일 프로세스(agent SDK 로드됨)에서 직접 합성하면 오디오 메시지가 간헐 소실되어
-// 합성만 격리한다. text를 자식 stdin으로 전달(argv 이스케이프 회피).
-function synthTTS(text) {
+// 한 worker 프로세스로 1회 합성. text는 stdin으로(argv 이스케이프 회피).
+function spawnWorker(text) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [TTS_WORKER], {
       stdio: ["pipe", "pipe", "pipe"],
@@ -58,10 +56,27 @@ function synthTTS(text) {
       clearTimeout(timer);
       const buf = Buffer.concat(out);
       if (code === 0 && buf.length > 0) resolve(buf);
-      else reject(new Error(`tts worker exit ${code}: ${err.slice(0, 200)}`));
+      else reject(new Error(`worker exit ${code}: ${err.slice(0, 120)}`));
     });
     child.stdin.end(text, "utf-8");
   });
+}
+
+// 고품질 신경망 TTS(Edge Neural)를 격리 자식 프로세스에서 합성 → mp3 Buffer.
+// 동일 프로세스(agent SDK 로드됨) 직접 합성은 오디오 메시지가 소실되어 worker로 격리.
+// 또한 콜드스타트 시 첫 worker가 빈 오디오를 반환하는 일이 있어(다음 worker는 성공) —
+// worker 내부 재시도 + 여기서 새 worker 재스폰까지 이중 방어한다.
+async function synthTTS(text) {
+  let lastErr;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      return await spawnWorker(text);
+    } catch (e) {
+      lastErr = e;
+      await new Promise((r) => setTimeout(r, 250));
+    }
+  }
+  throw lastErr || new Error("tts failed");
 }
 
 const SYSTEM = [
@@ -220,9 +235,4 @@ const server = createServer(async (req, res) => {
 
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`Aura listening on http://0.0.0.0:${PORT} (model=${MODEL})`);
-  // 콜드스타트 예열: 첫 사용자 요청 전에 TTS 경로(DNS/TLS/MS 연결)를 데워둔다.
-  synthTTS("준비됐어요").then(
-    () => console.log("[tts] warmup ok"),
-    (e) => console.error("[tts] warmup failed (무해, 폴백 가능):", e?.message || e)
-  );
 });
