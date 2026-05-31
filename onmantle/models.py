@@ -3,30 +3,29 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
-class Word(db.Model):
-    """어휘 단어. vec(vector(300)) 컬럼은 seed.py가 생성·관리한다.
-    (런타임 numpy/pgvector-python 의존을 없애려고 ORM에 비매핑 — 유사도는 SQL로 계산.)"""
-    __tablename__ = "words"
+class Similarity(db.Model):
+    """사전계산된 (시크릿, 단어) 유사도·순위. 추측은 이 테이블 조회로 처리."""
+    __tablename__ = "similarities"
+    secret_idx = db.Column(db.Integer, primary_key=True)
     word = db.Column(db.Text, primary_key=True)
+    similarity = db.Column(db.Float, nullable=False)
+    rank = db.Column(db.Integer)  # 상위 1000위만 채워짐(그 외 NULL)
 
 
 class Secret(db.Model):
+    """시크릿 단어 (seed가 similarities의 similarity=100 행에서 유도)."""
     __tablename__ = "secrets"
     idx = db.Column(db.Integer, primary_key=True)
-    word = db.Column(db.Text, db.ForeignKey("words.word"), nullable=False)
-    pos = db.Column(db.Text)
+    word = db.Column(db.Text, nullable=False)
 
 
 class Nearest(db.Model):
-    """시크릿별 상위 1000개 근접 단어 (순위 표시·힌트용)."""
+    """시크릿별 상위 1000개 근접 단어 (순위 기준값·힌트용)."""
     __tablename__ = "nearest"
     secret_idx = db.Column(db.Integer, primary_key=True)
     rank = db.Column(db.Integer, primary_key=True)
     word = db.Column(db.Text, nullable=False)
     similarity = db.Column(db.Float, nullable=False)
-    __table_args__ = (
-        db.Index("ix_nearest_secret_word", "secret_idx", "word"),
-    )
 
 
 class Score(db.Model):

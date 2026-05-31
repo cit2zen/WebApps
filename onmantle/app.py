@@ -1,5 +1,4 @@
 from flask import Flask, send_from_directory
-from sqlalchemy import text
 
 from config import DATABASE_URL
 from models import db
@@ -23,12 +22,8 @@ def create_app(test_config: dict | None = None) -> Flask:
         return send_from_directory(app.static_folder, "index.html")
 
     with app.app_context():
-        try:
-            db.session.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
-            db.session.commit()
-        except Exception:
-            db.session.rollback()  # 권한 없으면 seed.py에서 처리
-        # words/secrets/nearest는 seed.py로 적재. scores/lunch_picks는 여기서 보장.
+        # 게임 데이터(similarities/secrets/nearest)는 seed.py로 적재.
+        # scores/lunch_picks는 여기서 보장(없으면 생성).
         db.create_all()
 
     return app
