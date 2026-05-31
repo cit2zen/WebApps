@@ -16,22 +16,39 @@ function readStdin() {
   });
 }
 
-async function main() {
-  const text = (await readStdin()).trim().slice(0, 800);
-  if (!text) process.exit(2);
+// 한 번 합성. 빈 오디오/에러는 throw(상위에서 재시도).
+async function synthOnce(text) {
   const tts = new MsEdgeTTS();
   await tts.setMetadata(VOICE, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
   const { audioStream } = tts.toStream(text, { rate: RATE, pitch: PITCH });
   const chunks = [];
   await new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error("timeout")), 18_000);
+    const timer = setTimeout(() => reject(new Error("timeout")), 15_000);
     audioStream.on("data", (c) => chunks.push(c));
     audioStream.on("end", () => { clearTimeout(timer); resolve(); });
     audioStream.on("error", (e) => { clearTimeout(timer); reject(e); });
   });
   const buf = Buffer.concat(chunks);
-  if (buf.length === 0) process.exit(3);
-  process.stdout.write(buf, () => process.exit(0));
+  if (buf.length === 0) throw new Error("empty audio"); // 콜드스타트 레이스 → 재시도
+  return buf;
+}
+
+async function main() {
+  const text = (await readStdin()).trim().slice(0, 800);
+  if (!text) process.exit(2);
+  let lastErr;
+  for (let i = 0; i < 4; i++) {
+    try {
+      const buf = await synthOnce(text);
+      process.stdout.write(buf, () => process.exit(0));
+      return;
+    } catch (e) {
+      lastErr = e;
+      await new Promise((r) => setTimeout(r, 150 * (i + 1)));
+    }
+  }
+  process.stderr.write(String(lastErr?.message || lastErr || "tts failed"));
+  process.exit(3);
 }
 
 main().catch((e) => {

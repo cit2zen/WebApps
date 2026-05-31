@@ -220,4 +220,9 @@ const server = createServer(async (req, res) => {
 
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`Aura listening on http://0.0.0.0:${PORT} (model=${MODEL})`);
+  // 콜드스타트 예열: 첫 사용자 요청 전에 TTS 경로(DNS/TLS/MS 연결)를 데워둔다.
+  synthTTS("준비됐어요").then(
+    () => console.log("[tts] warmup ok"),
+    (e) => console.error("[tts] warmup failed (무해, 폴백 가능):", e?.message || e)
+  );
 });
