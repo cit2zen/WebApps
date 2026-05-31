@@ -5,7 +5,7 @@ import pytz
 from flask import Blueprint, request, jsonify
 from sqlalchemy import text
 
-from models import db, Secret, Nearest, Score, LunchPick
+from models import db, Secret, Nearest, Similarity, Score, LunchPick
 from puzzle import get_current_puzzle_number, get_current_slot, get_next_change_time
 from hints import get_hint
 
@@ -48,25 +48,25 @@ def guess():
     if secret is None:
         return jsonify({"error": "퍼즐 데이터 없음"}), 500
 
-    # pgvector 코사인 즉석 계산 (<=> = 코사인 거리). 추측 단어가 없으면 row 없음 → 404.
+    # 사전계산 similarities 테이블 직접 조회. 없는 단어면 row 없음 → 404.
     row = db.session.execute(
         text(
-            "SELECT 1 - (w.vec <=> s.vec) AS sim "
-            "FROM words w, words s WHERE w.word = :g AND s.word = :sec"
+            "SELECT similarity, rank FROM similarities "
+            "WHERE secret_idx = :n AND word = :w"
         ),
-        {"g": word, "sec": secret.word},
+        {"n": puzzle_number, "w": word},
     ).first()
     if row is None:
         return jsonify({"error": "알 수 없는 단어"}), 404
 
-    similarity = round(float(row.sim) * 100, 2)
+    # similarity는 이미 -100~100 스케일이므로 ×100 하지 않는다.
+    similarity = round(float(row.similarity), 2)
     is_correct = (word == secret.word)
 
     result = {"word": word, "similarity": similarity, "is_correct": is_correct}
-    # 상위 1000위 안이면 순위 제공
-    rank_row = Nearest.query.filter_by(secret_idx=puzzle_number, word=word).first()
-    if rank_row is not None:
-        result["rank"] = rank_row.rank
+    # 상위 1000위 안이면 순위 제공(similarities.rank 인라인)
+    if row.rank is not None:
+        result["rank"] = int(row.rank)
     return jsonify(result)
 
 

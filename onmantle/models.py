@@ -20,6 +20,18 @@ class Nearest(db.Model):
     similarity = db.Column(db.Float, nullable=False)
 
 
+class Similarity(db.Model):
+    """시크릿별 전체 어휘 사전계산 유사도 (추측 조회 전담, seed가 raw SQL로 적재).
+
+    similarity는 -100~100 스케일(자기 자신=100.0). rank는 상위 1000위만 1..1000, 그 외 NULL.
+    """
+    __tablename__ = "similarities"
+    secret_idx = db.Column(db.Integer, primary_key=True)
+    word = db.Column(db.Text, primary_key=True)
+    similarity = db.Column(db.Float, nullable=False)
+    rank = db.Column(db.Integer)
+
+
 class Score(db.Model):
     __tablename__ = "scores"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

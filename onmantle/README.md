@@ -5,9 +5,9 @@ Flask 백엔드가 정적 프론트(`static/`)와 `/api`를 같은 오리진에�
 
 ## 구조
 - `static/` — 프론트(바닐라 JS). API는 같은 오리진 `/api/*` 호출.
-- `app.py` `routes.py` `models.py` — Flask + SQLAlchemy + pgvector.
-- 유사도: 런타임에 단어 벡터 코사인 즉석 계산(`similarity.py`). 순위는 `nearest`(상위 1000) 조회.
-- `seed.py` — 단어 벡터·시크릿·근접단어를 Postgres로 1회 적재.
+- `app.py` `routes.py` `models.py` — Flask + SQLAlchemy + Postgres.
+- 유사도: 사전계산된 `similarities` 테이블(시크릿별 전체 어휘 × 유사도, 약 385만 행)을 직접 조회. 값은 이미 -100~100 스케일(자기 자신=100.0). 순위는 같은 테이블의 `rank`(상위 1000위만 채워짐)와 `nearest`(상위 1000) 조회. pgvector·런타임 벡터 계산 불필요.
+- `seed.py` — `secrets`·`nearest`·`similarities`를 SQLite에서 Postgres로 1회 적재.
 
 ## 로컬 실행
 ```
@@ -20,5 +20,5 @@ python app.py      # http://localhost:5000
 ## 배포 (홈서버 Coolify)
 - 빌드팩 **Nixpacks** (Python), 시작: `gunicorn wsgi:app --bind 0.0.0.0:$PORT` (Procfile 동봉).
 - Base Directory `onmantle`, FQDN `http://onmantle.cityzen.kr` (Force HTTPS OFF), 터널 ingress+DNS 추가.
-- `DATABASE_URL`은 Coolify Env에만. 공유 Postgres에 `onmantle` DB 생성 후 **seed.py 1회 실행**(VM에서, `_data/*.gz` 동반).
+- `DATABASE_URL`은 Coolify Env에만. 공유 Postgres에 `onmantle` DB 생성 후 **seed.py 1회 실행**(VM에서, `_data/*.gz` 동반). 약 385만 행이라 수 분 소요될 수 있음.
 - `_data/`·`.env`·`*.db*`는 git 비추적.
