@@ -4,7 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DOOMBLAST — 3D Shooter</title>
+  <link rel="stylesheet" href="../cityzen-ui.css" />
   <link rel="stylesheet" href="./style.css" />
+  <style>
+    /* cityzen 공통 헤더가 전체화면 캔버스/오버레이 위에 보이도록 보정 (게임 로직 무관) */
+    .cz-gamehead { position: fixed; top: 0; left: 0; right: 0; z-index: 30; }
+  </style>
   <script type="importmap">
   {
     "imports": {
@@ -61,5 +66,9 @@
   </div>
 
   <script type="module" src="./js/game.js"></script>
+  <script type="module">
+    import { czHeader } from '../cityzen-ui.js';
+    czHeader({ title: 'DOOMBLAST' });
+  </script>
 </body>
 </html>

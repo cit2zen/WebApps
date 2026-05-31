@@ -9,6 +9,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,300..600&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../cityzen-ui.css" />
+  <style>
+    /* cityzen 공통 헤더: 앱이 fixed로 화면을 꽉 채우므로 헤더만 상단에 띄움 (앱 레이아웃·캔버스 미변경) */
+    .cz-gamehead { position: fixed; top: 0; left: 0; right: 0; z-index: 30; background: linear-gradient(90deg, rgba(94,242,255,.05), rgba(2,3,10,.55)); backdrop-filter: blur(6px); }
+    .wordmark { top: 64px; }
+  </style>
 </head>
 <body data-phase="idle" data-running="false">
   <canvas id="stage"></canvas>
@@ -58,5 +64,9 @@
   </dialog>
 
   <script type="module" src="src/main.js"></script>
+  <script type="module">
+    import { czHeader } from '../cityzen-ui.js';
+    czHeader({ title: 'Aura' });
+  </script>
 </body>
 </html>
