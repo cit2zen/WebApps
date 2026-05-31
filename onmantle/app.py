@@ -22,10 +22,9 @@ def create_app(test_config: dict | None = None) -> Flask:
         return send_from_directory(app.static_folder, "index.html")
 
     with app.app_context():
-        # 게임 데이터(words/secrets/nearest)는 seed.py가 raw SQL로 적재한다.
-        #   - words: 모델 없음 → create_all이 만들지 않음(정상, seed 전담).
-        #   - secrets/nearest: 모델 스키마가 seed의 raw SQL과 일치 → create_all은
-        #     이미 존재하면 건너뛰므로 충돌 없음.
+        # 게임 데이터(secrets/nearest/similarities)는 seed.py가 raw SQL로 적재한다.
+        #   - 모델 스키마가 seed의 raw SQL과 일치 → create_all은 이미 존재하면
+        #     건너뛰므로(checkfirst 기본값) 충돌 없음.
         # create_all의 실제 목적은 scores/lunch_picks 테이블 보장(없으면 생성).
         db.create_all()
 
