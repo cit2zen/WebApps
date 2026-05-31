@@ -152,6 +152,11 @@ class Game {
           // 목숨이 남으면 시작 위치로 돌아가지 않고 그 자리에서 재개.
           // 즉사 방지를 위해 유령만 집으로 되돌린다.
           for (const gh of this.ghosts) gh.reset();
+          // 죽은 지점이 타일 중심이 아니면 정렬해 둔다. 스냅하지 않으면
+          // dir=NONE 상태에서 advance()가 decide()를 영영 호출하지 못해
+          // 입력이 먹지 않고 팩맨이 그 자리에 영구 정지한다(=한 번 맞으면 멈춤).
+          this.pac.x = this.pac.col;
+          this.pac.y = this.pac.row;
           this.pac.dir = DIR.NONE;
           this.input.requested = DIR.NONE;
           this.hud.hideOverlay();
