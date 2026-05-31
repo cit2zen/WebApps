@@ -4,7 +4,7 @@ import { createGrid, collides, lockCells, clearLines } from './board.js';
 import { TYPES, cellsOf, spawnPiece, getKicks, ROWS, COLS } from './piece.js';
 
 const LOCK_DELAY = 500; // ms grounded before locking
-const MAX_LOCK_RESETS = 15; // 바닥에서 이동/회전으로 고정을 미룰 수 있는 최대 횟수
+const MAX_LOCK_TIME = 1000; // 바닥에 처음 닿은 뒤 강제로 고정되기까지의 누적 시간 상한
 const gravityMs = (level) =>
   Math.max(Math.pow(0.8 - (level - 1) * 0.007, level - 1) * 1000, 1);
 
@@ -20,7 +20,8 @@ export function createGame() {
     state: 'playing', // playing | paused | over
     gravityTimer: 0,
     lockTimer: 0,
-    lockResets: 0,
+    lockStarted: false,
+    groundedElapsed: 0,
     canHold: true,
     lastRotation: false,
     lastKick: 0,
@@ -55,7 +56,8 @@ export function spawnNext(g) {
   refill(g);
   g.current = spawnPiece(g.queue.shift());
   g.lockTimer = 0;
-  g.lockResets = 0;
+  g.lockStarted = false;
+  g.groundedElapsed = 0;
   g.lastRotation = false;
   if (collides(g.grid, cellsOf(g.current))) {
     g.state = 'over';
@@ -68,12 +70,9 @@ function onGround(g) {
 }
 
 function resetLockIfGround(g) {
-  // 바닥에서 이동/회전 시 락 타이머를 리셋하되 횟수를 제한해,
-  // 무한히 좌우 이동·회전으로 고정을 미루지 못하게 한다.
-  if (onGround(g) && g.lockResets < MAX_LOCK_RESETS) {
-    g.lockTimer = 0;
-    g.lockResets++;
-  }
+  // 이동/회전 시 락 타이머(마지막 조작 후 0.5초)는 리셋해 조작 여유를 주되,
+  // 누적 체류 시간(groundedElapsed)은 tick에서 따로 쌓여 상한을 강제한다.
+  if (onGround(g)) g.lockTimer = 0;
 }
 
 export function move(g, dx, dy) {
@@ -131,7 +130,8 @@ export function hold(g) {
     g.hold = cur;
     g.lastRotation = false;
     g.lockTimer = 0;
-    g.lockResets = 0;
+    g.lockStarted = false;
+    g.groundedElapsed = 0;
     if (collides(g.grid, cellsOf(g.current))) {
       g.state = 'over';
       emit(g, 'gameover');
@@ -160,11 +160,19 @@ export function tick(g, dt) {
       g.lastRotation = false;
     }
   }
-  if (onGround(g)) {
+  const ground = onGround(g);
+  if (ground) {
+    g.lockStarted = true;
     g.lockTimer += dt;
-    if (g.lockTimer >= LOCK_DELAY) lockDown(g);
   } else {
     g.lockTimer = 0;
+  }
+  // 바닥에 한 번 닿은 뒤로는 공중에 떠 있어도 누적 시간을 잰다.
+  // 이동·회전(킥 부양 포함)으로 lockTimer를 아무리 리셋해도
+  // 누적 시간이 상한을 넘으면 강제로 고정 → 무한 지연 불가.
+  if (g.lockStarted) g.groundedElapsed += dt;
+  if (ground && (g.lockTimer >= LOCK_DELAY || g.groundedElapsed >= MAX_LOCK_TIME)) {
+    lockDown(g);
   }
 }
 
