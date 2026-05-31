@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,300..600&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="../cityzen-ui.css" />
+  <link rel="stylesheet" href="/cityzen-ui.css" />
   <style>
     /* cityzen 공통 헤더: 앱이 fixed로 화면을 꽉 채우므로 헤더만 상단에 띄움 (앱 레이아웃·캔버스 미변경) */
     .cz-gamehead { position: fixed; top: 0; left: 0; right: 0; z-index: 30; background: linear-gradient(90deg, rgba(94,242,255,.05), rgba(2,3,10,.55)); backdrop-filter: blur(6px); }
@@ -38,34 +38,13 @@
           <path d="M12 17v4M9 21h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
       </button>
-      <p id="status" class="status">키를 설정하고 시작을 누르세요</p>
+      <p id="status" class="status">시작을 누르세요</p>
     </div>
   </main>
 
-  <button id="gear" class="gear" aria-label="설정">
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="1.5"/>
-      <path d="M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1M18.7 18.7l-2.1-2.1M7.4 7.4 5.3 5.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-    </svg>
-  </button>
-
-  <dialog id="settings">
-    <form method="dialog" class="settings-form">
-      <h2>설정</h2>
-      <label>Anthropic API 키
-        <input id="apikey" type="password" placeholder="sk-ant-..." autocomplete="off" />
-      </label>
-      <p class="hint">키는 이 브라우저(localStorage)에만 저장됩니다. 서버로 전송되지 않습니다.</p>
-      <menu>
-        <button value="cancel" class="ghost">취소</button>
-        <button id="save-key" value="default" class="primary">저장</button>
-      </menu>
-    </form>
-  </dialog>
-
   <script type="module" src="src/main.js"></script>
   <script type="module">
-    import { czHeader } from '../cityzen-ui.js';
+    import { czHeader } from '/cityzen-ui.js';
     czHeader({ title: 'Aura' });
   </script>
 </body>

@@ -1,30 +1,13 @@
-const KEY = 'aura.anthropic_key';
+// API 키 방식 폐기 — 구독(서버 백엔드) 인증을 쓰므로 키가 필요 없다.
+// 하위 호환을 위해 인터페이스만 유지하고, 항상 "준비됨"으로 동작한다.
+export function getKey() { return 'subscription'; }
+export function setKey() { /* no-op */ }
+export function hasKey() { return true; }
 
-export function getKey() {
-  return localStorage.getItem(KEY) || '';
-}
-export function setKey(v) {
-  if (v) localStorage.setItem(KEY, v.trim());
-  else localStorage.removeItem(KEY);
-}
-export function hasKey() {
-  return !!getKey();
-}
-
-// 설정 dialog 배선. onSaved(key) 콜백을 저장 시 호출.
-export function initSettings(onSaved) {
+// 설정 dialog는 더 이상 키 입력을 받지 않는다. gear 버튼이 있으면 안내용으로만 연다.
+export function initSettings() {
   const dialog = document.getElementById('settings');
   const gear = document.getElementById('gear');
-  const input = document.getElementById('apikey');
-  const saveBtn = document.getElementById('save-key');
-
-  gear.addEventListener('click', () => {
-    input.value = getKey();
-    dialog.showModal();
-  });
-  saveBtn.addEventListener('click', () => {
-    setKey(input.value);
-    onSaved?.(getKey());
-  });
-  return { open: () => dialog.showModal() };
+  if (gear && dialog) gear.addEventListener('click', () => dialog.showModal());
+  return { open: () => dialog?.showModal() };
 }
