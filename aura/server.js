@@ -33,16 +33,15 @@ function ext(p) {
 }
 
 // 한 턴 실행 후 최종 텍스트와 세션 id를 모아 반환(비스트리밍, 단순).
-async function runAura(message, sessionId, signal) {
+async function runAura(message, sessionId) {
   // 구독(OAuth) 강제: API 키가 있으면 그쪽이 우선 청구되므로 제거.
   delete process.env.ANTHROPIC_API_KEY;
   delete process.env.ANTHROPIC_AUTH_TOKEN;
 
+  // 응답 폭주 방지용 타임아웃만 둔다(요청 스트림 신호엔 연결하지 않음 — 본문 수신 완료 시
+  // 조기 abort되어 "process aborted by user"가 나던 문제 회피).
   const abort = new AbortController();
-  if (signal) {
-    if (signal.aborted) abort.abort();
-    else signal.addEventListener("abort", () => abort.abort(), { once: true });
-  }
+  const timer = setTimeout(() => abort.abort(), 60_000);
 
   const q = query({
     prompt: message,
@@ -59,15 +58,19 @@ async function runAura(message, sessionId, signal) {
 
   let text = "";
   let session = sessionId;
-  for await (const msg of q) {
-    if (msg?.session_id) session = msg.session_id;
-    if (msg?.type === "assistant" && msg.message?.content) {
-      for (const b of msg.message.content) {
-        if (b?.type === "text" && b.text) text += b.text;
+  try {
+    for await (const msg of q) {
+      if (msg?.session_id) session = msg.session_id;
+      if (msg?.type === "assistant" && msg.message?.content) {
+        for (const b of msg.message.content) {
+          if (b?.type === "text" && b.text) text += b.text;
+        }
+      } else if (msg?.type === "result" && typeof msg.result === "string" && !text) {
+        text = msg.result;
       }
-    } else if (msg?.type === "result" && typeof msg.result === "string" && !text) {
-      text = msg.result;
     }
+  } finally {
+    clearTimeout(timer);
   }
   return { text: text.trim(), sessionId: session };
 }
@@ -105,7 +108,7 @@ const server = createServer(async (req, res) => {
           res.end(JSON.stringify({ error: "message required" }));
           return;
         }
-        const out = await runAura(message.slice(0, 2000), sessionId, req.signal);
+        const out = await runAura(message.slice(0, 2000), sessionId);
         res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
         res.end(JSON.stringify(out));
       } catch (e) {
