@@ -1,0 +1,12 @@
+{
+  "marketplace": "쿠팡",
+  "url": "https://coupang.com/vp/products/123",
+  "title": "무선 기계식 키보드 적축 10만원",
+  "price": "98,000원",
+  "shipping": "무료배송",
+  "seller": "키보드월드",
+  "rating": "4.5",
+  "reviewCount": "1,234",
+  "images": ["https://img/1.jpg"],
+  "specs": { "축": "적축", "연결": "무선" }
+}
