@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>온맨틀 - 단어 유사도 추측 게임</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="layout">
+        <div class="main-panel">
+            <header>
+                <button id="dark-toggle" class="dark-toggle" title="다크 모드">🌙</button>
+                <button id="reset-btn" class="reset-btn" title="게임 초기화">단어 목록 초기화하기</button>
+                <h1>온맨틀 <span class="subtitle">- 단어 유사도 추측 게임</span></h1>
+                <div class="puzzle-info">
+                    <span id="puzzle-number">퍼즐 #-</span>
+                    <span id="timer">다음 교체: --:--:--</span>
+                </div>
+                <div id="rank-info" class="rank-info"></div>
+            </header>
+
+            <main>
+                <div class="input-area">
+                    <input type="text" id="guess-input" placeholder="단어를 입력하세요"
+                           autocomplete="off" autofocus>
+                    <button id="guess-btn">추측</button>
+                </div>
+
+                <div id="error-msg" class="error hidden"></div>
+                <div id="success-msg" class="success hidden"></div>
+
+                <!-- 이름 등록 -->
+                <div id="register-area" class="register hidden">
+                    <p>기록을 남겨보세요!</p>
+                    <div class="register-form">
+                        <input type="text" id="name-input" placeholder="이름 (최대 20자)" maxlength="20">
+                        <button id="register-btn">등록</button>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button id="sort-toggle" class="small-btn">유사도순</button>
+                    <button id="hint-btn" class="small-btn">힌트</button>
+                    <div id="guess-count" class="guess-count"></div>
+                    <button id="share-btn" class="small-btn hidden">공유</button>
+                </div>
+
+                <div id="hints-area" class="hints hidden">
+                    <div class="hint-buttons">
+                        <button class="hint-level locked" data-level="1" disabled>품사 (50회)</button>
+                        <button class="hint-level locked" data-level="2" disabled>글자수 (100회)</button>
+                        <button class="hint-level locked" data-level="3" disabled>초성 (200회)</button>
+                        <button class="hint-level locked" data-level="4" disabled>1위 (400회)</button>
+                        <button class="hint-level locked" data-level="5" disabled>첫글자 (500회)</button>
+                    </div>
+                    <div id="hint-results"></div>
+                </div>
+
+                <div id="latest-guess" class="latest-guess-block hidden"></div>
+
+                <div id="scroll-down-wrap" class="scroll-btn-wrap hidden">
+                    <button id="scroll-bottom-btn" class="scroll-btn" title="아래로 이동">↓ 아래로</button>
+                </div>
+
+                <div class="guess-list" id="guess-list">
+                    <div class="guess-header">
+                        <span class="col-num">순서</span>
+                        <span class="col-word">단어</span>
+                        <span class="col-sim">유사도</span>
+                        <span class="col-rank">순위</span>
+                        <span class="col-bar"></span>
+                    </div>
+                    <div id="guesses"></div>
+                </div>
+
+                <div id="scroll-up-wrap" class="scroll-btn-wrap hidden">
+                    <button id="scroll-top-btn" class="scroll-btn" title="위로 이동">↑ 위로</button>
+                </div>
+            </main>
+
+            <footer>
+                <p><a href="https://semantle.com/" target="_blank">Semantle</a>의 클론인 <a href="https://semantle-ko.newsjel.ly/" target="_blank">꼬맨틀</a>의 클론</p>
+            </footer>
+
+            <div class="lunch-section">
+                <h3>오늘의 점메추</h3>
+                <div class="lunch-form">
+                    <input type="text" id="lunch-nick" placeholder="닉네임" maxlength="20">
+                    <input type="text" id="lunch-menu" placeholder="메뉴 추천" maxlength="30">
+                    <button id="lunch-submit-btn">추천!</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="side-panel">
+            <div class="leaderboard">
+                <h2>순위표</h2>
+                <div id="leaderboard-content">
+                    <p class="leaderboard-empty">단어를 맞추어 순위를 남겨보세요!</p>
+                </div>
+            </div>
+
+            <div class="lunch-board">
+                <h2>점메추 순위</h2>
+                <div id="lunch-content">
+                    <p class="leaderboard-empty">오늘의 점심을 추천해주세요!</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="about-section">
+        <h2>온맨틀은 무엇인가요?</h2>
+        <div class="about-content">
+            <div class="about-block">
+                <p>온맨틀은 오늘의 단어를 맞히는 게임입니다. 정답 단어를 추측하면, 추측한 단어가 정답 단어와 얼마나 유사한지 유사도 점수로 알려줍니다. 가장 유사한 단어의 유사도와 가까운 단어를 추측하면서, 정답 단어를 맞혀보세요.</p>
+            </div>
+
+            <div class="about-block">
+                <h3>정답 단어에는 어떤 단어가 포함되어 있나요?</h3>
+                <p>정답 단어는 명사만 해당하며, 2~3글자 단어입니다.</p>
+                <p class="about-example">예시) 행복, 사랑, 까치, 도형, 한글</p>
+                <p>정답 단어는 Hunspell 한국어 사전과 FastText 어휘의 교집합에서 명사를 추출하여 임의 선택합니다. 정답 단어는 모두 두 글자 이상이지만, 전략적인 이유로 한 글자 단어나 자모(ㅋㅋ, ㅎㅎ 등)를 추측해볼 수 있습니다.</p>
+            </div>
+
+            <div class="about-block">
+                <h3>유사도는 무엇인가요?</h3>
+                <p>온맨틀에서 추측한 단어와 정답 단어가 의미·맥락적으로 얼마나 비슷한지에 대한 정도를 -100에서 +100까지의 숫자로 계산한 점수입니다. +이면서, 숫자가 클수록 유사한 정도가 크다고 이해할 수 있습니다.</p>
+                <p>유사도 추정을 위해 온맨틀에서는 Common Crawl 및 Wikipedia 데이터로 사전 훈련된 FastText를 사용하였습니다. 훈련된 데이터에 따라 편향이 있을 수 있습니다.</p>
+                <p>온맨틀에서는 정답 단어와 가장 비슷한 1,000개의 단어 안에 추측한 단어가 있을 때, 단어의 유사도 순위를 함께 제공합니다.</p>
+            </div>
+
+            <div class="about-block">
+                <h3>꼬맨틀과 다른 점은 무엇인가요?</h3>
+                <p>온맨틀은 하루 3번(08시, 16시, 24시) 퍼즐이 교체되며, 5단계 힌트 시스템(추측 횟수에 따라 해금)과 순위표, 점메추 기능을 제공합니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="credit-section">
+        <p>이 사이트는 고려대학교 성우동아리 온보이싱 회원들을 위해 제작되었습니다. (<a href="https://www.youtube.com/@OnVoicing" target="_blank">온보이싱 유튜브</a>)</p>
+    </div>
+
+    <div class="feedback-section">
+        <h2>피드백</h2>
+        <p class="feedback-subtitle">개발자에게 큰 힘이 됩니다</p>
+        <div class="feedback-form">
+            <input type="text" id="fb-nick" placeholder="닉네임" maxlength="20">
+            <textarea id="fb-text" placeholder="(개발자의 귀차니즘으로 인한)익명 게시판입니다.&#10;따듯한 말과 건설적인 피드백을 적어주세요."></textarea>
+            <button id="feedback-submit-btn">전송</button>
+        </div>
+        <div id="feedback-list" class="feedback-list"></div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

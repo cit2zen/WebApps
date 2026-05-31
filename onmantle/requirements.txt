@@ -1,0 +1,8 @@
+flask
+gunicorn
+flask-sqlalchemy
+psycopg2-binary
+pgvector
+numpy
+pytz
+python-dotenv
