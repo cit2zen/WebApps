@@ -5,6 +5,8 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions: {}
+
 concurrency:
   group: deploy-${{ github.ref }}
   cancel-in-progress: true
@@ -14,10 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Join Tailscale (ephemeral)
-        uses: tailscale/github-action@v3
+        uses: tailscale/github-action@6cae46e2d796f265265cfcf628b72a32b4d7cade # v3.3.0
         with:
           authkey: ${{ secrets.TS_AUTHKEY }}
-          version: latest
 
       - name: Trigger Coolify deploy
         run: |

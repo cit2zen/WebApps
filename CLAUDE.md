@@ -18,17 +18,8 @@
 - 브라우저 확인/검증은 반드시 Playwright MCP를 활용한다.
 - 페이지 열기, 스크린샷 캡처, console 에러 확인 등 모든 동작 검증에 Playwright MCP를 사용한다.
 
-## Git / 배포
-- 원격 저장소: https://github.com/cit2zen/WebApps (브랜치 `main`)
-- 모든 웹앱 프로젝트는 이 저장소에 푸시한다. **각 프로젝트는 자기 하위 폴더**에 둔다 (예: `yaong/`).
-- `.gitignore`는 화이트리스트 방식 — 새 프로젝트를 추가하면 `!/<폴더명>` 한 줄을 더한다.
-- 스크린샷 PNG 등 산출물은 커밋하지 않는다.
-
-### "배포해줘" 동작 (자동 수행)
-사용자가 "배포"/"배포해줘"라고 하면 별도 질문 없이 다음을 수행한다:
-1. 새 프로젝트 폴더면 `.gitignore`에 `!/<폴더명>` 추가.
-2. 해당 프로젝트 폴더 + 변경된 `.gitignore`/`CLAUDE.md`를 `git add`.
-3. `git commit` (메시지는 작업 내용 요약, 한국어).
-4. `git push origin main`.
-5. 푸시 성공 후 GitHub Pages URL 형태를 안내한다: `https://cit2zen.github.io/WebApps/<폴더명>/`
-   (Pages가 아직 활성화돼 있지 않으면 저장소 Settings → Pages에서 `main` 브랜치 활성화가 필요함을 안내.)
+## Git / 배포 (홈서버 일원화)
+- 원격 저장소: https://github.com/cit2zen/WebApps (브랜치 `main`). **각 프로젝트는 자기 하위 폴더** (예: `yaong/`).
+- `.gitignore`는 화이트리스트 — 새 프로젝트면 `!/<폴더명>` 한 줄 추가. 스크린샷 등 산출물 커밋 금지.
+- 배포 대상은 **cityzen 홈서버**(Coolify 폴더별 서비스 → `<폴더명>.cityzen.kr`). GitHub Pages는 폐지.
+- **전체 워크플로·인프라 고정값·"배포해줘" 자동 동작은 루트 `C:\factory\CLAUDE.md` 참조** (단일 출처).
