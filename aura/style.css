@@ -1,13 +1,14 @@
 @property --accent {
   syntax: '<color>';
   inherits: true;
-  initial-value: #57c8ff;
+  initial-value: #5ef2ff;
 }
 
 :root {
-  --ink: #eef1ff;
-  --muted: #9aa3c7;
-  --accent: #57c8ff;
+  /* cityzen Neon Arcade 토큰 정렬 */
+  --ink: #eef0ff;
+  --muted: #9a9ac0;
+  --accent: #5ef2ff;
   --serif: "Gowun Batang", serif;
   --sans: "Gowun Dodum", system-ui, sans-serif;
   --display: "Fraunces", serif;
@@ -17,18 +18,18 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
 body {
-  background: #02030a;
+  background: #06060b;
   color: var(--ink);
   font-family: var(--sans);
   overflow: hidden;
   cursor: default;
 }
 
-/* 상태 = 강조색 (캔버스 팔레트와 호응) */
-body[data-phase="idle"]      { --accent: #6cc6ff; }
-body[data-phase="listening"] { --accent: #38e6d0; }
-body[data-phase="thinking"]  { --accent: #b18cff; }
-body[data-phase="speaking"]  { --accent: #ff7ab0; }
+/* 상태 = 강조색 (cz 토큰: cyan/green/violet/magenta) */
+body[data-phase="idle"]      { --accent: #5ef2ff; }
+body[data-phase="listening"] { --accent: #39ff96; }
+body[data-phase="thinking"]  { --accent: #a98bff; }
+body[data-phase="speaking"]  { --accent: #ff4fc8; }
 
 #stage { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
 
@@ -48,17 +49,7 @@ body[data-phase="speaking"]  { --accent: #ff7ab0; }
   60%{transform:translate(-4%,-3%)} 80%{transform:translate(6%,5%)} 100%{transform:translate(0,0)}
 }
 
-/* ── 워드마크 ── */
-.wordmark {
-  position: fixed; top: 26px; left: 34px; z-index: 5;
-  font-family: var(--display); font-style: italic; font-weight: 400;
-  font-size: 30px; letter-spacing: .04em;
-  color: transparent;
-  background: linear-gradient(180deg, var(--ink), color-mix(in srgb, var(--accent) 70%, var(--ink)));
-  -webkit-background-clip: text; background-clip: text;
-  opacity: .82; user-select: none;
-  transition: color 1s ease;
-}
+/* 워드마크는 cz 헤더로 일원화 — 중복 'Aura' 제거 (P1) */
 
 /* ── 중앙 UI ── */
 #ui {
@@ -101,6 +92,12 @@ body[data-phase="speaking"]  { --accent: #ff7ab0; }
 }
 .orb:hover { transform: scale(1.06); }
 .orb:active { transform: scale(.97); }
+/* 켜짐(대화 중) 상태: 테두리·글로우 상향으로 어포던스 강화 */
+.orb.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 56px color-mix(in srgb, var(--accent) 50%, transparent),
+              inset 0 0 30px color-mix(in srgb, var(--accent) 26%, transparent);
+}
 .orb .mic { width: 30px; height: 30px; position: relative; z-index: 2; transition: color 1s ease; }
 .orb-core {
   position: absolute; inset: 16px; border-radius: 50%; z-index: 1;
@@ -144,51 +141,13 @@ body[data-phase="speaking"] .orb-core { animation: breathe 1.6s ease-in-out infi
 }
 @keyframes blink { 0%,100%{opacity:.35} 50%{opacity:1} }
 
-/* ── 설정 톱니 ── */
-.gear {
-  position: fixed; top: 22px; right: 24px; z-index: 6;
-  width: 42px; height: 42px; border-radius: 50%;
-  display: grid; place-items: center; cursor: pointer;
-  color: var(--muted);
-  background: rgba(14,20,40,.4); border: 1px solid rgba(255,255,255,.08);
-  backdrop-filter: blur(6px); transition: color .3s, transform .4s, border-color .3s;
-}
-.gear:hover { color: var(--ink); transform: rotate(40deg); border-color: rgba(255,255,255,.2); }
-.gear svg { width: 20px; height: 20px; }
+/* 설정 톱니/다이얼로그 CSS는 키 방식 폐기로 삭제 (P2 죽은 코드) */
 
-/* ── 설정 다이얼로그 ── */
-dialog#settings {
-  margin: auto; border: 1px solid rgba(255,255,255,.12); border-radius: 18px;
-  background: linear-gradient(180deg, #0d1230, #080b1d);
-  color: var(--ink); padding: 26px; width: min(450px, 92vw);
-  box-shadow: 0 30px 90px rgba(0,0,0,.6);
+/* ── 모바일 반응형 (cz 헤더 단일화 후 상단 혼잡 완화) ── */
+@media (max-width: 560px) {
+  #ui { padding: 11vh 6vw 8vh; }
+  .caption { font-size: clamp(18px, 5vw, 28px); }
 }
-dialog#settings::backdrop { background: rgba(2,3,10,.66); backdrop-filter: blur(3px); }
-.settings-form { display: flex; flex-direction: column; gap: 14px; }
-.settings-form h2 { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 26px; }
-.settings-form label { font-size: 13px; letter-spacing: .04em; color: var(--muted); }
-.settings-form input {
-  width: 100%; padding: 12px 14px; border-radius: 11px; margin-top: 8px;
-  background: #05081a; border: 1px solid rgba(255,255,255,.14); color: var(--ink);
-  font-family: var(--sans); letter-spacing: .03em;
-}
-.settings-form input:focus {
-  outline: none; border-color: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
-}
-.settings-form .hint { color: var(--muted); font-size: 12px; line-height: 1.5; }
-.settings-form menu { display: flex; gap: 10px; justify-content: flex-end; padding: 0; margin-top: 4px; }
-.settings-form menu button {
-  padding: 9px 20px; border-radius: 10px; cursor: pointer; font-family: var(--sans); letter-spacing: .04em;
-  border: 1px solid rgba(255,255,255,.16); color: var(--ink); background: transparent;
-  transition: background .2s, border-color .2s;
-}
-.settings-form menu .ghost:hover { background: rgba(255,255,255,.06); }
-.settings-form menu .primary {
-  background: color-mix(in srgb, var(--accent) 30%, #1a2350);
-  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
-}
-.settings-form menu .primary:hover { background: color-mix(in srgb, var(--accent) 45%, #1a2350); }
 
 @media (prefers-reduced-motion: reduce) {
   .grain, .orb-core, .orb .ring, .status::before { animation: none !important; }

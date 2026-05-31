@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>온맨틀 - 단어 유사도 추측 게임</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap">
     <link rel="stylesheet" href="cityzen-ui.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -11,8 +14,10 @@
     <div class="layout">
         <div class="main-panel">
             <header>
-                <button id="dark-toggle" class="dark-toggle" title="다크 모드">🌙</button>
-                <button id="reset-btn" class="reset-btn" title="게임 초기화">단어 목록 초기화하기</button>
+                <div class="header-actions">
+                    <button id="dark-toggle" class="dark-toggle" type="button" title="테마 전환" aria-label="테마 전환" aria-pressed="true">🌙</button>
+                    <button id="reset-btn" class="reset-btn" type="button" title="게임 초기화">단어 목록 초기화하기</button>
+                </div>
                 <h1>온맨틀 <span class="subtitle">- 단어 유사도 추측 게임</span></h1>
                 <div class="puzzle-info">
                     <span id="puzzle-number">퍼즐 #-</span>
@@ -23,20 +28,26 @@
 
             <main>
                 <div class="input-area">
+                    <label for="guess-input" class="sr-only">추측할 단어</label>
                     <input type="text" id="guess-input" placeholder="단어를 입력하세요"
-                           autocomplete="off" autofocus>
-                    <button id="guess-btn">추측</button>
+                           aria-label="추측할 단어" autocomplete="off" autofocus>
+                    <button id="guess-btn" type="button">추측</button>
                 </div>
 
-                <div id="error-msg" class="error hidden"></div>
-                <div id="success-msg" class="success hidden"></div>
+                <div id="puzzle-retry-wrap" class="puzzle-retry-wrap hidden">
+                    <button id="puzzle-retry-btn" type="button" class="small-btn">다시 시도</button>
+                </div>
+
+                <div id="error-msg" class="error hidden" role="alert" aria-live="assertive"></div>
+                <div id="success-msg" class="success hidden" role="status" aria-live="polite"></div>
 
                 <!-- 이름 등록 -->
                 <div id="register-area" class="register hidden">
                     <p>기록을 남겨보세요!</p>
                     <div class="register-form">
-                        <input type="text" id="name-input" placeholder="이름 (최대 20자)" maxlength="20">
-                        <button id="register-btn">등록</button>
+                        <label for="name-input" class="sr-only">이름</label>
+                        <input type="text" id="name-input" placeholder="이름 (최대 20자)" aria-label="이름" maxlength="20">
+                        <button id="register-btn" type="button">등록</button>
                     </div>
                 </div>
 
@@ -70,7 +81,7 @@
                         <span class="col-word">단어</span>
                         <span class="col-sim">유사도</span>
                         <span class="col-rank">순위</span>
-                        <span class="col-bar"></span>
+                        <span class="col-bar"><span class="sr-only">유사도 막대</span></span>
                     </div>
                     <div id="guesses"></div>
                 </div>
@@ -87,9 +98,11 @@
             <div class="lunch-section">
                 <h3>오늘의 점메추</h3>
                 <div class="lunch-form">
-                    <input type="text" id="lunch-nick" placeholder="닉네임" maxlength="20">
-                    <input type="text" id="lunch-menu" placeholder="메뉴 추천" maxlength="30">
-                    <button id="lunch-submit-btn">추천!</button>
+                    <label for="lunch-nick" class="sr-only">닉네임</label>
+                    <input type="text" id="lunch-nick" placeholder="닉네임" aria-label="닉네임" maxlength="20">
+                    <label for="lunch-menu" class="sr-only">메뉴 추천</label>
+                    <input type="text" id="lunch-menu" placeholder="메뉴 추천" aria-label="메뉴 추천" maxlength="30">
+                    <button id="lunch-submit-btn" type="button">추천!</button>
                 </div>
             </div>
         </div>
@@ -148,16 +161,19 @@
         <h2>피드백</h2>
         <p class="feedback-subtitle">개발자에게 큰 힘이 됩니다</p>
         <div class="feedback-form">
-            <input type="text" id="fb-nick" placeholder="닉네임" maxlength="20">
-            <textarea id="fb-text" placeholder="(개발자의 귀차니즘으로 인한)익명 게시판입니다.&#10;따듯한 말과 건설적인 피드백을 적어주세요."></textarea>
-            <button id="feedback-submit-btn">전송</button>
+            <label for="fb-nick" class="sr-only">닉네임</label>
+            <input type="text" id="fb-nick" placeholder="닉네임" aria-label="닉네임" maxlength="20">
+            <label for="fb-text" class="sr-only">피드백 내용</label>
+            <textarea id="fb-text" aria-label="피드백 내용" placeholder="(개발자의 귀차니즘으로 인한)익명 게시판입니다.&#10;따듯한 말과 건설적인 피드백을 적어주세요."></textarea>
+            <button id="feedback-submit-btn" type="button">전송</button>
         </div>
         <div id="feedback-list" class="feedback-list"></div>
     </div>
 
     <script src="js/script.js"></script>
     <script type="module">
-      import { czHeader } from './cityzen-ui.js';
+      import { czFx, czHeader } from './cityzen-ui.js';
+      czFx();
       czHeader({ title: '온맨틀' });
     </script>
 </body>

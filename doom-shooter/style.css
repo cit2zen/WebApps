@@ -19,7 +19,8 @@ canvas { display: block; }
 }
 
 #topbar {
-  position: absolute; top: 14px; left: 0; right: 0;
+  /* cz-gamehead(고정 상단 ~44px) 아래로 내려 헤더 제목/백링크와 겹치지 않게 */
+  position: absolute; top: 52px; left: 0; right: 0;
   display: flex; justify-content: space-between; padding: 0 22px;
   font-size: 20px; letter-spacing: 2px; text-shadow: 2px 2px 0 #000;
 }
@@ -64,25 +65,8 @@ canvas { display: block; }
   background: radial-gradient(circle at 50% 40%, #2a0d06 0%, #0a0402 80%);
 }
 #overlay.hidden { display: none; }
-.panel {
-  text-align: center; max-width: 560px; padding: 40px 50px;
-  border: 3px solid #6b4423; background: rgba(20,8,4,.85);
-  box-shadow: 0 0 40px rgba(255,80,0,.25), inset 0 0 30px rgba(0,0,0,.7);
-}
-#o-title {
-  font-size: 64px; letter-spacing: 8px; color: #ff5a2c;
-  text-shadow: 0 0 24px #ff3000, 4px 4px 0 #000; margin-bottom: 16px;
-}
-#o-text { font-size: 17px; line-height: 1.7; color: #d8c694; margin-bottom: 20px; }
-#o-controls { list-style: none; font-size: 14px; color: #b9a66a; line-height: 2; margin-bottom: 26px; }
-#o-controls b { color: #ffd34d; }
-#o-btn {
-  font-family: inherit; font-size: 22px; font-weight: bold; letter-spacing: 2px;
-  padding: 14px 38px; cursor: pointer; color: #1a0a04; background: #ffae2e;
-  border: none; box-shadow: 0 4px 0 #a85c00; transition: transform .08s;
-}
-#o-btn:hover { background: #ffc24d; }
-#o-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #a85c00; }
+/* .panel / #o-title / #o-text / #o-controls / #o-btn 의 시각 정의는
+   아래 'Overlay / Menu polish' 섹션 단일 정의로 통합(중복 제거). */
 
 #settings {
   margin-top: 28px; padding-top: 20px; border-top: 1px solid #6b4423;
@@ -111,7 +95,7 @@ canvas { display: block; }
 /* ---- MiniMap ---- */
 #minimap {
   position: fixed;
-  top: 56px;
+  top: 92px;
   right: 18px;
   width: 150px;
   height: 150px;
@@ -125,13 +109,14 @@ canvas { display: block; }
 
 /* ---- Score / Combo ---- */
 #score {
-  position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+  /* cz-gamehead 아래로 내려 헤더 제목과 중앙 상단에서 겹치지 않게 */
+  position: fixed; top: 52px; left: 50%; transform: translateX(-50%);
   font-size: 22px; font-weight: bold; letter-spacing: 3px; color: #ffd34d;
   text-shadow: 2px 2px 0 #000, 0 0 12px #ff8a00;
   pointer-events: none; z-index: 11; white-space: nowrap;
 }
 #combo {
-  position: fixed; top: 42px; left: 50%; transform: translateX(-50%);
+  position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
   font-size: 16px; font-weight: bold; letter-spacing: 2px; color: #ff7a4d;
   text-shadow: 1px 1px 0 #000; pointer-events: none; z-index: 11;
   opacity: 0; transition: opacity .3s;
@@ -201,4 +186,21 @@ canvas { display: block; }
   display: block;
   font-size: 14px; color: #ff7a4d;
   letter-spacing: 3px; margin-bottom: 8px;
+}
+
+/* 터치/포인터-coarse 환경 안내(시작 오버레이) — 데스크톱 권장 */
+#touch-notice {
+  display: none;
+  margin: 4px 0 18px; padding: 10px 14px;
+  border: 1px solid #7a5030; border-radius: 8px;
+  background: rgba(255, 138, 77, .1);
+  color: #ffc24d; font-size: 14px; line-height: 1.6; letter-spacing: .4px;
+}
+
+/* 전정기관 민감 사용자 배려: 화면 전환/페이드 트랜지션 비활성.
+   (화면흔들림 shake·머리흔들림 bob는 game.js에서 감쇠) */
+@media (prefers-reduced-motion: reduce) {
+  #banner, #damage, #combo,
+  #o-btn, #o-btn:hover, #o-btn:active,
+  #hp-fill { transition: none !important; }
 }

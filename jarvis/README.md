@@ -22,6 +22,12 @@ Claude 두뇌(Agent SDK 구독 인증) + 브라우저 음성(STT/TTS) + react-th
 - 음성 대화(한국어), 웹검색·시간·메모리 도구, 리서치 에이전트 팀, 끼어들기(barge-in).
 - 상태 비주얼: 대기/듣는 중/사고 중/답변 중.
 
+## 접근 제어 (공개 배포)
+- `/api/chat`은 소유자 Claude 구독으로 동작 → 익명 무단 사용 차단을 위한 경량 게이트:
+  - `middleware.ts`가 httpOnly 쿠키(`jv_cid`) 발급, `lib/guard.ts`가 cid/IP당 레이트리밋(분당 `JARVIS_RATE_LIMIT`, 기본 8).
+  - sessionId 소유권: cid가 만든 세션만 resume(타인 대화 resume = IDOR 차단).
+- 더 강한 차단이 필요하면 Cloudflare Access(Google OAuth/Tailscale)로 `jarvis.cityzen.kr` 전체 게이트.
+
 ## 테스트
 - `npm test` (단위) · `npm run e2e` (시각 스냅샷)
 

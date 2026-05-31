@@ -1,6 +1,6 @@
 /* ShopScout — cityzen "Neon Arcade" reskin.
-   Tokens mirror WebApps/cityzen-ui.css (SOURCE OF TRUTH). Presentation only. */
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600;700&display=swap');
+   Tokens mirror WebApps/cityzen-ui.css (SOURCE OF TRUTH). Presentation only.
+   Fonts: Geist / Geist Mono self-hosted via next/font (layout.tsx) → CSS 변수로 주입. */
 
 :root {
   --cz-bg: #06060b;
@@ -18,8 +18,8 @@
   --cz-line: rgba(255, 255, 255, 0.08);
   --cz-r: 16px;
   --cz-rs: 12px;
-  --cz-font: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --cz-mono: 'Geist Mono', ui-monospace, monospace;
+  --cz-font: var(--font-geist, 'Geist'), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --cz-mono: var(--font-geist-mono, 'Geist Mono'), ui-monospace, monospace;
 }
 
 * {
@@ -171,11 +171,30 @@ body::before {
 
 /* recommendation summary panel */
 .ss-summary {
+  position: relative;
   border: 1px solid rgba(94, 242, 255, 0.22);
   background: linear-gradient(180deg, rgba(94, 242, 255, 0.07), rgba(94, 242, 255, 0.02));
   border-radius: var(--cz-rs);
-  padding: 14px 16px;
+  padding: 14px 16px 14px 18px;
   font-size: 0.95rem;
+  overflow: hidden;
+}
+/* 좌측 cyan 액센트 바 (이모지 글머리 대체) */
+.ss-summary::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--cz-cyan), var(--cz-vio));
+  box-shadow: 0 0 12px rgba(94, 242, 255, 0.4);
+}
+.ss-summary .ss-note,
+.ss-summary .ss-criteria {
+  display: flex;
+  gap: 7px;
+  align-items: baseline;
 }
 .ss-summary .ss-note {
   margin-top: 8px;
@@ -188,6 +207,25 @@ body::before {
   font-size: 0.72rem;
   letter-spacing: 0.02em;
   color: var(--cz-tx-mute);
+}
+/* 항목 라벨 pill (📋/🎯 이모지 대체) */
+.ss-label {
+  flex-shrink: 0;
+  font-family: var(--cz-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--cz-line);
+  color: var(--cz-tx-dim);
+  background: rgba(255, 255, 255, 0.03);
+  white-space: nowrap;
+}
+.ss-summary .ss-note .ss-label {
+  color: var(--cz-vio);
+  border-color: rgba(169, 139, 255, 0.3);
 }
 
 /* ask-user option chips */
@@ -342,6 +380,11 @@ body::before {
   background-size: 200% 100%;
   animation: ss-shimmer 1.3s ease-in-out infinite;
 }
+.ss-skel-group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 .ss-skel-card {
   border: 1px solid var(--cz-line);
   border-radius: var(--cz-r);
@@ -361,6 +404,71 @@ body::before {
 .ss-empty {
   color: var(--cz-tx-dim);
   font-size: 0.92rem;
+}
+
+/* error bubble (network / server failure) */
+.ss-error {
+  border: 1px solid rgba(255, 107, 138, 0.4);
+  background: linear-gradient(180deg, rgba(255, 107, 138, 0.08), rgba(255, 107, 138, 0.02));
+  border-radius: var(--cz-rs);
+  padding: 13px 15px;
+  font-size: 0.9rem;
+  color: #ffd7df;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+.ss-error .ss-error-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--cz-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--cz-red);
+}
+.ss-error .ss-error-label::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cz-red);
+  box-shadow: 0 0 8px var(--cz-red);
+}
+
+/* ===== onboarding / empty state (첫 진입) ===== */
+.ss-empty-state {
+  border: 1px solid var(--cz-line);
+  background: var(--cz-bg-soft);
+  border-radius: var(--cz-r);
+  padding: clamp(20px, 4vw, 28px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.ss-empty-state .ss-welcome {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--cz-tx);
+  line-height: 1.5;
+}
+.ss-empty-state .ss-welcome span {
+  color: var(--cz-cyan);
+}
+.ss-empty-state .ss-hint {
+  font-family: var(--cz-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cz-tx-mute);
+}
+.ss-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 /* ===== product card ===== */
@@ -415,10 +523,42 @@ body::before {
   font-size: 0.8rem;
   flex-wrap: wrap;
 }
-.ss-pros {
+.ss-pros,
+.ss-cons {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  color: var(--cz-tx-dim);
+}
+/* 색 점 + 라벨 (👍/👎 이모지 대체) */
+.ss-pros::before,
+.ss-cons::before {
+  content: '';
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  transform: translateY(1px);
+}
+.ss-pros::before {
+  background: var(--cz-grn);
+  box-shadow: 0 0 8px rgba(57, 255, 150, 0.5);
+}
+.ss-cons::before {
+  background: var(--cz-red);
+  box-shadow: 0 0 8px rgba(255, 107, 138, 0.5);
+}
+.ss-pc-label {
+  font-family: var(--cz-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.ss-pros .ss-pc-label {
   color: var(--cz-grn);
 }
-.ss-cons {
+.ss-cons .ss-pc-label {
   color: var(--cz-red);
 }
 
@@ -482,7 +622,9 @@ body::before {
   margin-top: 8px;
 }
 .ss-link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin-top: 10px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -492,6 +634,16 @@ body::before {
 }
 .ss-link:hover {
   text-shadow: 0 0 10px rgba(94, 242, 255, 0.6);
+}
+.ss-link svg {
+  flex-shrink: 0;
+}
+.ss-link-host {
+  font-family: var(--cz-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--cz-tx-mute);
+  margin-left: 2px;
 }
 
 /* rank star */
@@ -570,5 +722,41 @@ body::before {
   .ss-card:hover,
   .ss-btn.primary:hover {
     transform: none;
+  }
+}
+
+/* ===== responsive (모바일) ===== */
+@media (max-width: 560px) {
+  .ss-main {
+    padding: clamp(16px, 5vw, 24px) 14px 28px;
+  }
+  .ss-bubble {
+    max-width: 92%;
+  }
+  .ss-composer {
+    gap: 8px;
+  }
+  .ss-btn.primary {
+    padding: 11px 16px;
+    font-size: 0.85rem;
+  }
+  .ss-input {
+    padding: 12px 14px;
+  }
+  .ss-summary,
+  .ss-card {
+    padding: 13px 14px;
+  }
+  /* 긴 제목과 가격이 한 줄에서 충돌 → 가격을 아래 줄로 */
+  .ss-card-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .ss-proscons {
+    gap: 10px;
+  }
+  .ss-skel-card {
+    padding: 14px;
   }
 }

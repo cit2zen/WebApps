@@ -28,11 +28,12 @@ class Game {
     this.maze = new Maze();
     this.hud = new Hud();
     this.audio = new Audio();
-    this.input = new Input(() => this._onStart());
+    this.input = new Input(() => this._onStart(), () => this._togglePause());
     this.paused = false;
+    this.userPaused = false;
     this.settings = new Settings(this.audio, {
       onOpen: () => { this.paused = true; },
-      onClose: () => { this.paused = false; },
+      onClose: () => { this.paused = this.userPaused; },
     });
 
     this.pac = new Pacman(this.maze, this.input);
@@ -54,7 +55,12 @@ class Game {
     this.hud.setHigh(this.high);
     this.hud.setLives(this.lives);
     this.hud.setLevel(this.level);
-    this.hud.showOverlay("NEON<br>PAC-MAN", "PRESS ENTER / TAP TO START");
+    this.hud.showOverlay("NEON<br>PAC-MAN", "엔터 · 탭으로 시작");
+
+    // 모바일: 일시정지 중 오버레이 탭으로 재개 (키보드 P 대체)
+    this.hud.overlay.addEventListener("pointerdown", () => {
+      if (this.userPaused) this._togglePause();
+    });
 
     this.last = 0;
     requestAnimationFrame((t) => this._loop(t));
@@ -83,6 +89,15 @@ class Game {
     if (this.state === "TITLE" || this.state === "GAMEOVER" || this.state === "WIN") {
       this.startRequested = true;
     }
+  }
+
+  _togglePause() {
+    // 플레이 중에만 동작. 설정 창이 연 일시정지(this.paused)와 충돌하지 않게 분리.
+    if (this.state !== "PLAYING" && !this.userPaused) return;
+    this.userPaused = !this.userPaused;
+    this.paused = this.userPaused;
+    if (this.userPaused) this.hud.showOverlay("PAUSED", "일시정지 · P · 탭");
+    else this.hud.hideOverlay();
   }
 
   _newGame() {
@@ -147,7 +162,7 @@ class Game {
         if (this.lives <= 0) {
           this.state = "GAMEOVER";
           this.audio.stopBgm();
-          this.hud.showOverlay("GAME<br>OVER", "PRESS ENTER / TAP TO RETRY");
+          this.hud.showOverlay("GAME<br>OVER", "엔터 · 탭으로 다시 시작");
         } else {
           // 목숨이 남으면 시작 위치로 돌아가지 않고 그 자리에서 재개.
           // 즉사 방지를 위해 유령만 집으로 되돌린다.

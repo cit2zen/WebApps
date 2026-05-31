@@ -10,7 +10,7 @@
   <!-- cz 헤더가 화면 상단에 놓이고 게임 스테이지는 남은 공간 중앙에 유지되도록 body 레이아웃만 보정(게임 캔버스 크기 계산은 미변경) -->
   <style>
     body { display: flex; flex-direction: column; }
-    #stage { margin: auto; }
+    #stage { margin: auto; z-index: 1; }
   </style>
 </head>
 <body>
@@ -41,8 +41,8 @@
         <h2>준비됐나요?</h2>
         <p class="hint">마이크에 대고 크게 <b>"야옹!"</b> 외치면 점프해요.<br />소리가 클수록 더 높이 뛰어요.</p>
         <div class="meter-wrap">
-          <span class="meter-label">목소리 테스트</span>
-          <div class="meter"><div id="ready-meter-fill"></div><div id="ready-meter-threshold"></div></div>
+          <span class="meter-label" id="ready-meter-label">목소리 테스트</span>
+          <div class="meter" role="meter" aria-labelledby="ready-meter-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="ready-meter-fill"></div><div id="ready-meter-threshold"></div></div>
         </div>
         <p id="ready-mic-status" class="mic-status"></p>
         <button id="ready-start" class="btn primary">출발! 🐾</button>
@@ -72,8 +72,8 @@
         </label>
 
         <div class="meter-wrap">
-          <span class="meter-label">지금 음량</span>
-          <div class="meter"><div id="meter-fill"></div><div id="meter-threshold"></div></div>
+          <span class="meter-label" id="meter-label">지금 음량</span>
+          <div class="meter" role="meter" aria-labelledby="meter-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="meter-fill"></div><div id="meter-threshold"></div></div>
         </div>
         <p id="mic-status" class="mic-status"></p>
 
@@ -96,7 +96,8 @@
 
   <script type="module" src="js/main.js"></script>
   <script type="module">
-    import { czHeader } from '../cityzen-ui.js';
+    import { czHeader, czFx } from '../cityzen-ui.js';
+    czFx();
     czHeader({ title: 'Yaong' });
   </script>
 </body>

@@ -2,14 +2,14 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>NEON TETRIS</title>
-  <link rel="icon" href="data:," />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2306060b'/%3E%3Crect x='6' y='6' width='8' height='8' fill='%235ef2ff'/%3E%3Crect x='14' y='6' width='8' height='8' fill='%23ff4fc8'/%3E%3Crect x='14' y='14' width='8' height='8' fill='%23a98bff'/%3E%3Crect x='14' y='22' width='8' height='8' fill='%2339ff96'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Chivo+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../cityzen-ui.css" />
+  <link rel="stylesheet" href="style.css" />
   <style>
     /* cityzen header integration: body is a centering flex container
        (align-items/justify-content:center). Switch to a column so the
@@ -21,58 +21,74 @@
   </style>
 </head>
 <body data-level="1">
-  <div class="scanlines"></div>
+  <div class="scanlines" aria-hidden="true"></div>
   <main class="game">
     <aside class="panel panel--left">
       <h1 class="logo">TETRIS</h1>
       <section class="box hold-box">
-        <h2>HOLD</h2>
-        <canvas id="hold" width="118" height="90"></canvas>
+        <h2>HOLD · 홀드</h2>
+        <canvas id="hold" width="118" height="90" role="img" aria-label="홀드한 조각"></canvas>
       </section>
       <section class="box stats">
-        <div><span>SCORE</span><strong id="score">0</strong></div>
-        <div><span>LINES</span><strong id="lines">0</strong></div>
-        <div><span>LEVEL</span><strong id="level">1</strong></div>
+        <div><span>SCORE · 점수</span><strong id="score" aria-live="polite">0</strong></div>
+        <div><span>LINES · 줄</span><strong id="lines" aria-live="polite">0</strong></div>
+        <div><span>LEVEL · 레벨</span><strong id="level" aria-live="polite">1</strong></div>
       </section>
     </aside>
 
     <div class="stage">
-      <canvas id="board" width="280" height="560" class="board"></canvas>
+      <canvas id="board" width="280" height="560" class="board" role="img" aria-label="테트리스 게임 보드"></canvas>
+      <!-- 게임오버/일시정지 시 캔버스 위에 뜨는 실제 버튼(터치 가능) -->
+      <div class="board-overlay" id="board-overlay" hidden>
+        <p class="board-overlay__title" id="overlay-title">GAME OVER</p>
+        <button type="button" class="ov-btn" id="overlay-action">다시 하기</button>
+      </div>
     </div>
 
     <aside class="panel panel--right">
       <section class="box">
-        <h2>NEXT</h2>
-        <canvas id="next" width="118" height="210"></canvas>
+        <h2>NEXT · 다음</h2>
+        <canvas id="next" width="118" height="210" role="img" aria-label="다음에 나올 조각"></canvas>
       </section>
       <section class="box help">
-        <h2>CONTROLS</h2>
+        <h2>CONTROLS · 조작</h2>
         <ul>
-          <li><kbd>←</kbd><kbd>→</kbd><i>move</i></li>
-          <li><kbd>↓</kbd><i>soft drop</i></li>
-          <li><kbd>↑</kbd><kbd>X</kbd><i>rotate</i></li>
-          <li><kbd>Z</kbd><i>rotate ccw</i></li>
-          <li><kbd>Space</kbd><i>hard drop</i></li>
-          <li><kbd>C</kbd><i>hold</i></li>
-          <li><kbd>P</kbd><i>pause</i></li>
-          <li><kbd>R</kbd><i>restart</i></li>
-          <li><kbd>M</kbd><i>mute</i></li>
+          <li><kbd>←</kbd><kbd>→</kbd><i>이동</i></li>
+          <li><kbd>↓</kbd><i>소프트 드롭</i></li>
+          <li><kbd>↑</kbd><kbd>X</kbd><i>회전</i></li>
+          <li><kbd>Z</kbd><i>역회전</i></li>
+          <li><kbd>Space</kbd><i>하드 드롭</i></li>
+          <li><kbd>C</kbd><i>홀드</i></li>
+          <li><kbd>P</kbd><i>일시정지</i></li>
+          <li><kbd>R</kbd><i>재시작</i></li>
+          <li><kbd>M</kbd><i>음소거</i></li>
         </ul>
       </section>
       <section class="box volume">
-        <h2>VOLUME</h2>
-        <label class="vol-row">
+        <h2>VOLUME · 음량</h2>
+        <label class="vol-row" for="vol-music">
           <span>BGM</span>
-          <input id="vol-music" type="range" min="0" max="100" value="50" />
+          <input id="vol-music" type="range" min="0" max="100" value="50" aria-label="배경음 음량" />
         </label>
-        <label class="vol-row">
+        <label class="vol-row" for="vol-sfx">
           <span>SFX</span>
-          <input id="vol-sfx" type="range" min="0" max="100" value="70" />
+          <input id="vol-sfx" type="range" min="0" max="100" value="70" aria-label="효과음 음량" />
         </label>
       </section>
       <button id="mute" class="mute">♪ ON</button>
     </aside>
   </main>
+
+  <!-- 모바일 온스크린 컨트롤 (D-pad) -->
+  <nav class="touchpad" id="touchpad" aria-label="모바일 조작">
+    <button type="button" class="tp-btn" data-act="left" aria-label="왼쪽 이동">◀</button>
+    <button type="button" class="tp-btn" data-act="rotate" aria-label="회전">⟳</button>
+    <button type="button" class="tp-btn" data-act="right" aria-label="오른쪽 이동">▶</button>
+    <button type="button" class="tp-btn" data-act="hold" aria-label="홀드">⤓</button>
+    <button type="button" class="tp-btn" data-act="soft" aria-label="소프트 드롭">▼</button>
+    <button type="button" class="tp-btn tp-btn--hard" data-act="hard" aria-label="하드 드롭">⬇</button>
+  </nav>
+
   <script type="module" src="main.js"></script>
   <script type="module">
     import { czHeader } from '../cityzen-ui.js';

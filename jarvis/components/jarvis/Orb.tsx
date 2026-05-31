@@ -39,10 +39,12 @@ declare module "@react-three/fiber" {
   interface ThreeElements { fresnelMaterial: ThreeElement<typeof FresnelMaterial>; }
 }
 
-export function Orb() {
+export function Orb({ reduced = false }: { reduced?: boolean }) {
   const mesh = useRef<THREE.Mesh>(null!);
   const mat = useRef<any>(null!);
   const color = useMemo(() => new THREE.Color("#5ef2ff"), []);
+  // prefers-reduced-motion: 호흡 진폭을 0 근처로 낮추고 색전이만 유지(전정장애 대응).
+  const breathe = reduced ? 0 : 0.03;
 
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime;
@@ -55,7 +57,7 @@ export function Orb() {
     color.lerp(STATE_COLORS[STATE.current] ?? STATE_COLORS[0], 1 - Math.pow(0.015, delta));
     mat.current.uniforms.uColor.value.copy(color);
     // 호흡 + 진폭 스케일 (프레임 독립)
-    const target = 1 + amp * 0.4 + Math.sin(t * 1.5) * 0.03;
+    const target = 1 + amp * 0.4 + Math.sin(t * 1.5) * breathe;
     const s = THREE.MathUtils.lerp(mesh.current.scale.x, target, 1 - Math.pow(0.001, delta));
     mesh.current.scale.setScalar(s);
   });

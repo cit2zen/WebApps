@@ -19,6 +19,10 @@ const levelEl = document.getElementById('level');
 const muteBtn = document.getElementById('mute');
 const volMusic = document.getElementById('vol-music');
 const volSfx = document.getElementById('vol-sfx');
+const boardOverlay = document.getElementById('board-overlay');
+const overlayTitle = document.getElementById('overlay-title');
+const overlayAction = document.getElementById('overlay-action');
+const touchpad = document.getElementById('touchpad');
 
 const audio = createAudio();
 const effects = createEffects();
@@ -41,6 +45,9 @@ function handleEvents() {
         audio.sfx('levelup');
         effects.text(`LEVEL ${e.level}`, '#a5f3fc');
         document.body.dataset.level = ((e.level - 1) % 6) + 1;
+        // 7레벨 이후엔 색 순환이 반복돼 진행감이 사라지므로,
+        // 누적 레벨에 비례한 연속 hue 회전으로 정체감을 없앤다.
+        document.body.style.setProperty('--level-hue', `${(e.level - 1) * 24}deg`);
         break;
       case 'gameover': audio.sfx('gameover'); break;
       case 'clear': {
@@ -73,7 +80,27 @@ function loop(now) {
   scoreEl.textContent = game.score.toLocaleString();
   linesEl.textContent = game.lines;
   levelEl.textContent = game.level;
+  syncOverlay();
   requestAnimationFrame(loop);
+}
+
+// 키보드 없는 기기를 위해 게임오버/일시정지를 실제 DOM 버튼으로 노출.
+let overlayState = '';
+function syncOverlay() {
+  if (game.state === overlayState) return;
+  overlayState = game.state;
+  if (game.state === 'over') {
+    overlayTitle.textContent = 'GAME OVER · 게임 오버';
+    overlayAction.textContent = '다시 하기';
+    boardOverlay.hidden = false;
+    overlayAction.focus();
+  } else if (game.state === 'paused') {
+    overlayTitle.textContent = 'PAUSE · 일시정지';
+    overlayAction.textContent = '계속하기';
+    boardOverlay.hidden = false;
+  } else {
+    boardOverlay.hidden = true;
+  }
 }
 
 const input = createInput({
@@ -85,9 +112,40 @@ const input = createInput({
   hardDrop: () => hardDrop(game),
   hold: () => hold(game),
   pause: () => pause(game),
-  restart: () => { game = createGame(); document.body.dataset.level = 1; },
+  restart: () => doRestart(),
   mute: () => updateMute(),
 });
+
+function doRestart() {
+  game = createGame();
+  document.body.dataset.level = 1;
+  document.body.style.setProperty('--level-hue', '0deg');
+}
+
+// 게임오버=재시작, 일시정지=재개. 키보드 없이 터치만으로 조작 가능.
+overlayAction.addEventListener('click', () => {
+  if (game.state === 'over') doRestart();
+  else if (game.state === 'paused') pause(game);
+});
+
+// 모바일 온스크린 D-pad
+const TP = {
+  left: () => move(game, -1, 0),
+  right: () => move(game, 1, 0),
+  rotate: () => rotate(game, 1),
+  soft: () => softDrop(game),
+  hard: () => hardDrop(game),
+  hold: () => hold(game),
+};
+touchpad.addEventListener('pointerdown', (e) => {
+  const btn = e.target.closest('.tp-btn');
+  if (!btn) return;
+  e.preventDefault();
+  const fn = TP[btn.dataset.act];
+  if (fn) fn();
+});
+// 보드 위 스와이프 제스처
+input.bindTouch(boardEl);
 
 function updateMute() {
   const muted = audio.toggleMute();

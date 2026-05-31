@@ -13,7 +13,6 @@
   <style>
     /* cityzen 공통 헤더: 앱이 fixed로 화면을 꽉 채우므로 헤더만 상단에 띄움 (앱 레이아웃·캔버스 미변경) */
     .cz-gamehead { position: fixed; top: 0; left: 0; right: 0; z-index: 30; background: linear-gradient(90deg, rgba(94,242,255,.05), rgba(2,3,10,.55)); backdrop-filter: blur(6px); }
-    .wordmark { top: 64px; }
   </style>
 </head>
 <body data-phase="idle" data-running="false">
@@ -21,13 +20,11 @@
   <div class="vignette" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
 
-  <header class="wordmark">Aura</header>
-
   <main id="ui">
-    <p id="caption" class="caption"></p>
+    <p id="caption" class="caption" role="status" aria-live="polite">오브를 누르고 말을 걸어보세요</p>
 
     <div class="dock">
-      <button id="orb" class="orb" aria-label="대화 시작 / 정지">
+      <button id="orb" class="orb" aria-label="대화 시작 / 정지" aria-pressed="false">
         <span class="ring r1"></span>
         <span class="ring r2"></span>
         <span class="ring r3"></span>
@@ -38,7 +35,7 @@
           <path d="M12 17v4M9 21h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
       </button>
-      <p id="status" class="status">시작을 누르세요</p>
+      <p id="status" class="status" aria-live="polite">시작을 누르세요</p>
     </div>
   </main>
 

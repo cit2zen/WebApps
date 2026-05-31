@@ -41,7 +41,7 @@ function overlay(ctx, text, sub) {
   ctx.shadowBlur = 0;
   if (sub) {
     ctx.fillStyle = '#a5b4fc';
-    ctx.font = '12px "Chivo Mono", monospace';
+    ctx.font = '12px "Geist Mono", ui-monospace, monospace';
     ctx.fillText(sub, (COLS * CELL) / 2, (ROWS * CELL) / 2 + 24);
   }
 }
@@ -82,8 +82,8 @@ function drawMini(ctx, type, areaX, areaY, areaW, size) {
 export function render(ctx, g, holdCtx, nextCtx, effects) {
   drawBoard(ctx, g);
   effects.draw(ctx);
-  if (g.state === 'paused') overlay(ctx, 'PAUSE', 'press P to resume');
-  if (g.state === 'over') overlay(ctx, 'GAME OVER', 'press R to restart');
+  if (g.state === 'paused') overlay(ctx, 'PAUSE', '일시정지 · P/탭');
+  if (g.state === 'over') overlay(ctx, 'GAME OVER', '다시 시작 · R');
 
   holdCtx.clearRect(0, 0, holdCtx.canvas.width, holdCtx.canvas.height);
   if (g.hold) drawMini(holdCtx, g.hold, 0, 20, holdCtx.canvas.width, 20);

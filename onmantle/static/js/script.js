@@ -48,19 +48,42 @@ async function loadPuzzle() {
         puzzleNumber = data.puzzle_number;
         nextChangeAt = new Date(data.next_change_at);
         puzzleNumberSpan.textContent = `퍼즐 #${puzzleNumber}`;
-        // 10등/1000등 기준 유사도 표시
+        // 10등/1000등 기준 유사도 표시 (DOM API로 안전하게 구성)
         const rankInfo = document.getElementById("rank-info");
-        const parts = [];
-        if (data.rank10_similarity != null) {
-            parts.push(`10등 단어의 유사도는 <span class="sim-value">${data.rank10_similarity.toFixed(2)}</span> 입니다`);
-        }
-        if (data.rank1000_similarity != null) {
-            parts.push(`1000등 단어의 유사도는 <span class="sim-value">${data.rank1000_similarity.toFixed(2)}</span> 입니다`);
-        }
-        rankInfo.innerHTML = parts.map(p => `<span>${p}</span>`).join("");
+        rankInfo.textContent = "";
+        const addRankLine = (label, value) => {
+            const line = document.createElement("span");
+            line.append(document.createTextNode(`${label} 단어의 유사도는 `));
+            const v = document.createElement("span");
+            v.className = "sim-value";
+            v.textContent = value.toFixed(2);
+            line.append(v, document.createTextNode(" 입니다"));
+            rankInfo.append(line);
+        };
+        if (data.rank10_similarity != null) addRankLine("10등", data.rank10_similarity);
+        if (data.rank1000_similarity != null) addRankLine("1000등", data.rank1000_similarity);
+        hidePuzzleError();
     } catch (e) {
-        showError("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+        showPuzzleError();
     }
+}
+
+// 퍼즐 로드 실패 시: 입력 비활성 + 재시도 안내
+function showPuzzleError() {
+    showError("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+    guessInput.disabled = true;
+    guessBtn.disabled = true;
+    const retry = document.getElementById("puzzle-retry-wrap");
+    if (retry) retry.classList.remove("hidden");
+}
+
+function hidePuzzleError() {
+    if (!solved) {
+        guessInput.disabled = false;
+        guessBtn.disabled = false;
+    }
+    const retry = document.getElementById("puzzle-retry-wrap");
+    if (retry) retry.classList.add("hidden");
 }
 
 function loadState() {
@@ -89,7 +112,7 @@ async function submitGuess() {
     const word = guessInput.value.trim();
     if (!word || solved) return;
     if (guesses.some(g => g.word === word)) {
-        showError(`"${word}"는 이미 추측한 단어입니다.`);
+        showInfo(`"${word}"는 이미 추측한 단어입니다.`);
         guessInput.value = "";
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
@@ -257,7 +280,7 @@ async function loadLeaderboard() {
         const data = await resp.json();
         renderLeaderboard(data.scores);
     } catch (e) {
-        // 무시
+        leaderboardContent.innerHTML = '<p class="leaderboard-empty">순위표를 불러오지 못했습니다.</p>';
     }
 }
 
@@ -304,6 +327,7 @@ async function registerScore() {
             }),
         });
         if (resp.ok) {
+            localStorage.setItem(`onmantle_registered_${puzzleNumber}`, "1");
             registerArea.classList.add("hidden");
             loadLeaderboard();
         } else {
@@ -321,17 +345,38 @@ function shareResult() {
     let text = `온맨틀 #${puzzleNumber} — ${guesses.length}번 만에 맞춤!`;
     if (hintCount > 0) text += ` (힌트 ${hintCount}회 사용)`;
     text += "\nhttps://onmantle.cityzen.kr";
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => {
-            showError("결과가 클립보드에 복사되었습니다!");
-            setTimeout(hideError, 2000);
-        });
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+            .then(() => showInfo("결과가 클립보드에 복사되었습니다!"))
+            .catch(() => fallbackCopy(text));
+    } else {
+        fallbackCopy(text);
+    }
+}
+
+function fallbackCopy(text) {
+    try {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        showInfo(ok ? "결과가 클립보드에 복사되었습니다!" : "복사할 결과를 직접 선택해 복사해주세요.");
+    } catch (e) {
+        showInfo("복사할 결과를 직접 선택해 복사해주세요.");
     }
 }
 
 // --- Timer ---
+let timerHandle = null;
+let reloadScheduled = false;
 function startTimer() {
-    setInterval(updateTimer, 1000);
+    if (timerHandle) clearInterval(timerHandle);
+    timerHandle = setInterval(updateTimer, 1000);
     updateTimer();
 }
 
@@ -340,7 +385,11 @@ function updateTimer() {
     const diff = nextChangeAt - new Date();
     if (diff <= 0) {
         timerSpan.textContent = "새 퍼즐 로딩...";
-        setTimeout(() => location.reload(), 2000);
+        if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
+        if (!reloadScheduled) {
+            reloadScheduled = true;
+            setTimeout(() => location.reload(), 2000);
+        }
         return;
     }
     const h = Math.floor(diff / 3600000);
@@ -350,8 +399,21 @@ function updateTimer() {
 }
 
 // --- UI Helpers ---
-function showError(msg) { errorMsg.textContent = msg; errorMsg.classList.remove("hidden"); }
+function showError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.classList.remove("hidden", "info");
+}
 function hideError() { errorMsg.classList.add("hidden"); }
+
+// 성공/중립 안내는 error(빨강) 대신 초록 톤으로 표시
+let infoToastTimer = null;
+function showInfo(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.classList.add("info");
+    errorMsg.classList.remove("hidden");
+    if (infoToastTimer) clearTimeout(infoToastTimer);
+    infoToastTimer = setTimeout(hideError, 2000);
+}
 
 function showSuccess() {
     const hintCount = Object.keys(hintsUsed).length;
@@ -417,29 +479,53 @@ function bindEvents() {
     document.getElementById("lunch-menu").addEventListener("keydown", (e) => { if (e.key === "Enter") submitLunch(); });
     document.getElementById("feedback-submit-btn").addEventListener("click", submitFeedback);
     document.getElementById("dark-toggle").addEventListener("click", toggleDark);
+    // 점메추 좋아요: 인라인 onclick 대신 이벤트 위임 (CSP 안전)
+    lunchContent.addEventListener("click", (e) => {
+        const btn = e.target.closest(".like-btn");
+        if (btn && btn.dataset.id) likeLunch(+btn.dataset.id, btn);
+    });
+    const retryBtn = document.getElementById("puzzle-retry-btn");
+    if (retryBtn) retryBtn.addEventListener("click", retryLoad);
+}
+
+async function retryLoad() {
+    hideError();
+    await loadPuzzle();
+    if (puzzleNumber !== null) {
+        loadState();
+        renderGuesses();
+        updateHintButtons();
+        startTimer();
+        loadLeaderboard();
+        loadLunch();
+    }
 }
 
 // --- 다크 모드 ---
-function toggleDark() {
-    const body = document.body;
+function applyTheme(isDark) {
+    const el = document.documentElement;
     const btn = document.getElementById("dark-toggle");
-    if (body.dataset.theme === "dark") {
-        body.removeAttribute("data-theme");
-        btn.textContent = "🌙";
-        localStorage.setItem("onmantle_theme", "light");
-    } else {
-        body.dataset.theme = "dark";
+    if (isDark) {
+        el.setAttribute("data-theme", "dark");
         btn.textContent = "☀️";
-        localStorage.setItem("onmantle_theme", "dark");
+        btn.setAttribute("aria-pressed", "true");
+    } else {
+        el.removeAttribute("data-theme");
+        btn.textContent = "🌙";
+        btn.setAttribute("aria-pressed", "false");
     }
+}
+
+function toggleDark() {
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    applyTheme(!isDark);
+    localStorage.setItem("onmantle_theme", isDark ? "light" : "dark");
 }
 
 function loadTheme() {
     const saved = localStorage.getItem("onmantle_theme");
-    if (saved === "dark") {
-        document.body.dataset.theme = "dark";
-        document.getElementById("dark-toggle").textContent = "☀️";
-    }
+    // 기본은 다크. 저장값이 'light'면 라이트로 복원.
+    applyTheme(saved !== "light");
 }
 
 // --- 점메추 ---
@@ -457,7 +543,9 @@ async function loadLunch() {
         const resp = await fetch(`${API_URL}/api/lunch`);
         const data = await resp.json();
         renderLunch(data.picks);
-    } catch (e) { /* 무시 */ }
+    } catch (e) {
+        lunchContent.innerHTML = '<p class="leaderboard-empty">점메추를 불러오지 못했습니다.</p>';
+    }
 }
 
 function renderLunch(picks) {
@@ -473,7 +561,7 @@ function renderLunch(picks) {
                 <div class="lunch-menu">${escapeHtml(p.menu)}</div>
                 <div class="lunch-nick">${escapeHtml(p.nickname)}</div>
             </div>
-            <button class="like-btn${liked}" data-id="${p.id}" onclick="likeLunch(${p.id}, this)">
+            <button class="like-btn${liked}" type="button" data-id="${p.id}" aria-label="${escapeHtml(p.menu)} 추천 좋아요 (현재 ${p.likes})">
                 ♥ ${p.likes}
             </button>
         </div>`;

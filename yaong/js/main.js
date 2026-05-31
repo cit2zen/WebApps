@@ -33,7 +33,10 @@ function show(name) {
 
 // --- HUD 갱신 ---
 game.onLivesChange = (n) => {
-  $("lives").textContent = "💗".repeat(Math.max(0, n)) + "🤍".repeat(Math.max(0, 3 - n));
+  const alive = Math.max(0, n);
+  $("lives").textContent = "💗".repeat(alive) + "🤍".repeat(Math.max(0, 3 - n));
+  // 이모지는 스크린리더가 개수를 못 읽으므로 aria-label로 수치 제공
+  $("lives").setAttribute("aria-label", `생명 ${alive}개`);
 };
 game.onScoreChange = (s) => {
   $("score").textContent = `${s} m`;
@@ -41,6 +44,7 @@ game.onScoreChange = (s) => {
 game.onGameOver = (score, best) => {
   $("final-score").textContent = score;
   $("best-result").textContent = `최고 기록 ${best} m`;
+  music.stop(); // 결과 화면에서 BGM 정지(배터리/오디오 점유 방지)
   show("gameover");
 };
 
@@ -57,14 +61,17 @@ async function ensureMic() {
 function startMeter(fillEl, thresholdEl, statusEl) {
   stopMeter();
   if (thresholdEl) thresholdEl.style.left = `${settings.threshold * 100}%`;
+  const meterEl = fillEl.closest(".meter"); // role=meter 래퍼
   const tick = () => {
     const lv = audio.getLevel();
-    fillEl.style.width = `${Math.min(100, lv * 100)}%`;
+    const pct = Math.round(Math.min(100, lv * 100));
+    fillEl.style.width = `${pct}%`;
+    if (meterEl) meterEl.setAttribute("aria-valuenow", String(pct));
     meterRaf = requestAnimationFrame(tick);
   };
   tick();
   ensureMic().then((ok) => {
-    if (statusEl) statusEl.textContent = ok ? "" : "마이크 권한을 허용해 주세요 🎤";
+    if (statusEl) statusEl.textContent = ok ? "" : "⚠️ 마이크 권한을 허용해 주세요";
   });
 }
 function stopMeter() {
@@ -150,6 +157,18 @@ game.bg.draw(game.ctx);
 game.cat.draw(game.ctx, false);
 $("best-line").textContent = game.best ? `최고 기록 ${game.best} m` : "";
 show("start");
+
+// 탭 비활성/백그라운드에서는 BGM 스케줄러를 멈추고, 복귀 시 재개
+// (배경에서 노트 예약·배터리 점유 방지). 게임 플레이 중일 때만 자동 재개.
+let _musicWasPlaying = false;
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    _musicWasPlaying = music.playing;
+    music.stop();
+  } else if (_musicWasPlaying && game.state === "playing") {
+    music.start();
+  }
+});
 
 // 테스트 훅
 window.__game = game;

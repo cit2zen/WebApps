@@ -54,6 +54,13 @@ const decals = new DecalPool(scene);
 const combatfx = new CombatFX(scene);
 const fx = { particles, decals, combat: combatfx };
 
+// reduced-motion: 화면흔들림(shake) 강도 0.3배 감쇠(호출부 무변경, 인스턴스 래핑)
+if (typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion:reduce)').matches) {
+  const _origShake = combatfx.shake.bind(combatfx);
+  combatfx.shake = (amount) => _origShake(amount * 0.3);
+}
+
 const projectiles = new ProjectileSystem(scene);
 const pickups = new PickupSystem(scene);
 
@@ -152,6 +159,12 @@ let bobPhase = 0;
 
 const keys = {};
 const clock = new THREE.Clock();
+
+// 전정기관 민감 사용자 배려: 머리흔들림(bob)/화면흔들림(shake) 감쇠
+const REDUCE_MOTION = window.matchMedia?.('(prefers-reduced-motion:reduce)').matches ?? false;
+// 터치/coarse 포인터(모바일·태블릿) 환경 감지 — PointerLock 미지원이라 안내 노출
+const COARSE_POINTER = window.matchMedia?.('(pointer:coarse)').matches
+  || ('ontouchstart' in window && !window.matchMedia?.('(pointer:fine)').matches);
 
 // scratch vectors reused each frame to avoid per-frame heap allocations
 const _dir = new THREE.Vector3();
@@ -453,8 +466,9 @@ function updateLandDip(dt) {
 
 // ---- head bob ----
 const BOB_SPEED = 9.0;
-const BOB_VERT = 0.035;
-const BOB_LAT = 0.018;
+// reduced-motion 시 머리흔들림 제거(전정기관 자극 차단)
+const BOB_VERT = REDUCE_MOTION ? 0 : 0.035;
+const BOB_LAT = REDUCE_MOTION ? 0 : 0.018;
 
 function getHeadBob(dt) {
   const moving = onGround && (keys['KeyW'] || keys['KeyS'] || keys['KeyA'] || keys['KeyD']);
@@ -622,8 +636,10 @@ renderer.domElement.addEventListener('mouseup', (e) => {
   }
 });
 
+// 단일 핸들러로 상태 분기(MENU/OVER/WIN→시작, PAUSED→재잠금)
 el('o-btn').addEventListener('click', () => {
-  if (state === State.PLAYING || state === State.PAUSED) return;
+  if (state === State.PLAYING) return;
+  if (state === State.PAUSED) { try { controls.lock(); } catch (e) {} return; }
   startGame();
 });
 
@@ -645,20 +661,16 @@ controls.addEventListener('lock', () => {
   }
 });
 
-// settings sliders
+// settings sliders — audio.init()은 첫 사용자 제스처(startGame)에서 1회 호출되므로
+// 드래그마다 호출하지 않는다. init 전 슬라이더 조작 시 설정만 보관됐다가 init 시 적용됨.
 const sliders = [['vol-master', 'setMaster', 'master'], ['vol-sfx', 'setSfx', 'sfx'], ['vol-music', 'setMusic', 'music']];
 for (const [id, setter, key] of sliders) {
   const input = el(id);
   input.value = audio.vol[key];
   input.addEventListener('input', () => {
-    audio.init();
     audio[setter](parseFloat(input.value));
   });
 }
-// resume from pause: clicking the button locks again
-el('o-btn').addEventListener('click', () => {
-  if (state === State.PAUSED) { try { controls.lock(); } catch (e) {} }
-});
 
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
@@ -666,6 +678,13 @@ addEventListener('resize', () => {
   renderer.setSize(innerWidth, innerHeight);
   postfx.resize(innerWidth, innerHeight);
 });
+
+// 터치/모바일 환경: PointerLock(마우스)이 없어 사실상 플레이 불가 → 시작 오버레이에 안내 노출
+// ('클릭하여 시작'을 눌러도 시점 전환이 안 되는 죽은 페이지 오해 방지)
+if (COARSE_POINTER) {
+  const notice = el('touch-notice');
+  if (notice) notice.style.display = 'block';
+}
 
 tick();
 

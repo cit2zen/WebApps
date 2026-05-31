@@ -105,19 +105,21 @@ body[data-theme="mono"] .scene {
 .brand p { margin-top: 6px; font-weight: 700; color: #bcd3bf; font-size: .95rem; }
 .brand b { color: var(--gold); }
 
-.stats { display: flex; gap: 12px; }
+.stats { display: flex; gap: 12px; flex-wrap: wrap; }
 .stat {
   background: rgba(0,0,0,.28);
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 14px;
-  padding: 8px 18px;
+  padding: 8px 16px;
   text-align: center;
-  min-width: 96px;
+  min-width: 84px;
   backdrop-filter: blur(4px);
 }
-.stat__label { display: block; font-size: .68rem; letter-spacing: .22em; color: #9fb8a4; font-weight: 800; }
-.stat__value { font-family: "Fraunces", serif; font-weight: 900; font-size: 1.9rem; line-height: 1.1; }
-.stat--score .stat__value { color: var(--gold); }
+.stat__label { display: block; font-family: var(--cz-mono, "Nunito"), monospace; font-size: .68rem; letter-spacing: .22em; color: #9fb8a4; font-weight: 800; }
+.stat__value { font-family: "Fraunces", serif; font-weight: 900; font-size: 1.9rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+/* 강조 수치(SCORE)는 cityzen amber로 정렬해 헤더 톤과 연속성 확보 */
+.stat--score .stat__value { color: var(--cz-amb, var(--gold)); }
+.stat--best .stat__value { color: var(--cz-vio, #a98bff); }
 .stat--time.low .stat__value { color: #ff7a6b; }
 
 /* ── timer bar ── */
@@ -246,8 +248,9 @@ body[data-theme="mono"] .scene {
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
 /* ── settings ── */
+/* cz-gamehead(상단 고정 헤더)와 겹치지 않도록 헤더 높이만큼 내림 */
 .gear {
-  position: fixed; top: 18px; right: 18px; z-index: 50;
+  position: fixed; top: 64px; right: 18px; z-index: 50;
   width: 46px; height: 46px; border-radius: 50%;
   font-size: 1.4rem; line-height: 1; cursor: pointer; color: var(--cream);
   background: rgba(0,0,0,.32); border: 1px solid rgba(255,255,255,.14);
@@ -256,7 +259,7 @@ body[data-theme="mono"] .scene {
 .gear:hover { transform: rotate(45deg); background: rgba(0,0,0,.5); }
 
 .panel {
-  position: fixed; top: 74px; right: 18px; z-index: 50; width: 248px;
+  position: fixed; top: 120px; right: 18px; z-index: 50; width: 248px;
   background: rgba(14,26,18,.92); backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,.12); border-radius: 16px;
   padding: 16px 18px; color: var(--cream);
@@ -284,4 +287,28 @@ body[data-theme="mono"] .scene {
 .sw--sunset  { background: linear-gradient(135deg, #5e2f2a, #2a1214); }
 .sw--mono    { background: linear-gradient(135deg, #3a3f44, #181a1d); }
 
-@media (max-width: 820px) { :root { --cell: min(7.6vw, 46px); --gap: 4px; } }
+/* keyboard focus ring (WCAG 2.4.7) */
+:focus-visible {
+  outline: 2px solid var(--cz-cyan, #5ef2ff);
+  outline-offset: 3px;
+}
+.btn:focus-visible { outline-offset: 4px; }
+
+/* ── 소형 폰: 17열 보드가 가로로 넘치지 않게 셀을 폭 기준으로 산출 ──
+   board 내폭 = min(96vw,880px) - 2*(gap+8) 패딩.  17열 + 16갭이 그 안에
+   들어가도록 셀 크기 = (가용폭 - 16*gap) / 17.  상한 46px. */
+@media (max-width: 820px) {
+  :root {
+    --gap: 3px;
+    --cell: min(calc((min(96vw, 880px) - 2 * (var(--gap) + 8px) - (var(--cols) - 1) * var(--gap)) / var(--cols)), 46px);
+  }
+}
+
+/* ── prefers-reduced-motion: 장식 모션 정지 (낙하/컨페티 등) ── */
+@media (prefers-reduced-motion: reduce) {
+  body { transition: none; }
+  .apple.cleared { animation: none !important; opacity: 0; }
+  .confetti i { animation: none !important; display: none; }
+  .timebar__fill { transition: none; }
+  .overlay, .panel, .gear { animation: none !important; }
+}

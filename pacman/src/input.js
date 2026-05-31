@@ -9,9 +9,10 @@ export const DIR = {
 };
 
 export class Input {
-  constructor(onStart) {
+  constructor(onStart, onPause) {
     this.requested = DIR.NONE;
     this.onStart = onStart;
+    this.onPause = onPause;
     this._bindKeys();
     this._bindTouch();
   }
@@ -29,6 +30,7 @@ export class Input {
         case "ArrowUp": case "w": case "W": this._set(DIR.UP); break;
         case "ArrowDown": case "s": case "S": this._set(DIR.DOWN); break;
         case "Enter": case " ": if (this.onStart) this.onStart(); break;
+        case "p": case "P": if (this.onPause) this.onPause(); break;
         default: return;
       }
       e.preventDefault();

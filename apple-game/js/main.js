@@ -9,6 +9,7 @@ const DURATION = 120_000; // 2분
 
 const $ = (id) => document.getElementById(id);
 const scoreEl = $("score");
+const bestEl = $("best");
 const timeEl = $("time");
 const timeStat = timeEl.closest(".stat");
 const timebar = $("timebar");
@@ -17,6 +18,11 @@ const finalScore = $("finalScore");
 const overlayKicker = $("overlayKicker");
 const overlaySub = $("overlaySub");
 const confetti = $("confetti");
+const replayBtn = $("replay");
+
+const BEST_KEY = "apple-game-best";
+let best = Number(localStorage.getItem(BEST_KEY) || 0);
+bestEl.textContent = best;
 
 const game = new Game();
 const board = new Board(
@@ -53,22 +59,41 @@ function startGame() {
   timer.start();
 }
 
+// 점수 구간별 성취 카피 (0점·고득점이 같은 문구로 밋밋하던 문제 보완)
+function praise(score, newBest) {
+  if (newBest && score > 0) return "🏆 최고 기록 경신!";
+  if (score >= 1000) return "대단해요! 사과 마스터";
+  if (score >= 600) return "훌륭해요! 멋진 수확";
+  if (score >= 300) return "좋아요! 점점 느는데요";
+  if (score > 0) return "사과를 수확했어요";
+  return "다음엔 더 많이 모아봐요";
+}
+
 function endGame(win) {
   timer.stop();
   board.setEnabled(false);
-  finalScore.textContent = game.score;
+  const score = game.score;
+  finalScore.textContent = score;
+  const newBest = score > best;
+  if (newBest) {
+    best = score;
+    bestEl.textContent = best;
+    localStorage.setItem(BEST_KEY, String(best));
+  }
   if (win) {
     overlayKicker.textContent = "🎉 CLEAR!";
     overlaySub.textContent = "모든 사과를 수확했어요! 축하합니다";
     overlay.classList.add("overlay--win");
     spawnConfetti();
   } else {
-    overlayKicker.textContent = "TIME'S UP";
-    overlaySub.textContent = "사과를 수확했어요";
+    overlayKicker.textContent = "TIME'S UP · 시간 종료";
+    overlaySub.textContent = praise(score, newBest);
     overlay.classList.remove("overlay--win");
     timeUp();
   }
   overlay.hidden = false;
+  // 키보드 사용자가 Enter로 바로 재시작할 수 있게 포커스 이동
+  replayBtn.focus();
 }
 
 function spawnConfetti() {

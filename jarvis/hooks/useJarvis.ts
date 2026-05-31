@@ -103,29 +103,57 @@ export function useJarvis() {
     });
   }, [abort, store]);
 
-  // 첫 사용자 제스처에서 호출 (오디오/마이크/TTS 시작 + 인사)
-  const enable = useCallback(async () => {
-    if (startedRef.current) return;
-    startedRef.current = true;
-    const s = store.getState();
+  // TTS만 준비(거의 모든 브라우저 지원). STT 미지원 환경의 텍스트 폴백에서도 인사·음성 사용.
+  const ensureTts = useCallback(async () => {
+    if (ttsRef.current) return ttsRef.current;
     const tts = new BrowserTTS();
     await tts.init();
     tts.onWord = () => { audio.speakingEnv = 0.85; }; // 단어마다 엔벌로프 튐
     tts.onIdle = () => maybeFinish();
     ttsRef.current = tts;
+    return tts;
+  }, [maybeFinish]);
+
+  // 첫 사용자 제스처에서 호출 (오디오/마이크/TTS 시작 + 인사)
+  // 성공 시 true, 마이크 권한 거부/장치 없음 시 false 반환 → 호출부가 '다시 시작' 버튼 재노출.
+  const enable = useCallback(async (): Promise<boolean> => {
+    if (startedRef.current) return true;
+    const s = store.getState();
+    const tts = await ensureTts();
     try {
       await mic.start(); // 마이크 권한 거부/장치 없음 → reject → 아래 catch
     } catch {
       startedRef.current = false;
-      s.setNotice("마이크 권한이 필요해요. 허용 후 다시 시작해주세요.");
-      return;
+      s.setNotice("마이크 권한이 필요해요. 브라우저 주소창의 마이크 아이콘에서 허용 후 다시 눌러주세요.");
+      return false;
     }
+    startedRef.current = true;
     startStt();
     s.setMode("speaking");
     tts.enqueue("안녕하세요. JARVIS입니다. 무엇을 도와드릴까요?");
-  }, [mic, startStt, store, maybeFinish]);
+    return true;
+  }, [mic, startStt, store, ensureTts]);
+
+  // 텍스트 입력 경로(STT 미지원/보조). 마이크 없이 한 턴을 직접 시작한다.
+  const sendText = useCallback(async (text: string) => {
+    const msg = text.trim();
+    if (!msg) return;
+    await ensureTts();
+    startedRef.current = true;
+    const s = store.getState();
+    if (s.mode === "thinking" || s.mode === "speaking") {
+      ttsRef.current?.cancel();
+      abort();
+    }
+    s.setTranscript(msg);
+    s.resetResponse();
+    sentence.current = createSentenceBuffer();
+    streaming.current = true;
+    s.setMode("thinking");
+    send(msg);
+  }, [ensureTts, store, abort, send]);
 
   useEffect(() => () => { stopStt(); ttsRef.current?.cancel(); }, [stopStt]);
 
-  return { enable };
+  return { enable, sendText };
 }

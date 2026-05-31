@@ -5,49 +5,123 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>cityzen games — 네온 아케이드</title>
   <meta name="description" content="cityzen 홈서버에서 운영하는 브라우저 게임 모음. 광고 없이, 빠르게." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='9' width='28' height='15' rx='5' fill='%230c0c14' stroke='%235ef2ff' stroke-width='2'/%3E%3Crect x='7' y='14' width='2.6' height='6' rx='1.3' fill='%235ef2ff'/%3E%3Crect x='4.7' y='16.3' width='6' height='2.6' rx='1.3' fill='%235ef2ff'/%3E%3Ccircle cx='22' cy='15.5' r='1.7' fill='%23ff4fc8'/%3E%3Ccircle cx='25.5' cy='18.5' r='1.7' fill='%2339ff96'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="./cityzen-ui.css" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{min-height:100vh;overflow-x:hidden;padding-bottom:60px}
+    /* 외부 도메인 타일·앱 카드 신호 (게임 로직 무관, 프레젠테이션) */
+    .cz-tile{position:relative}
+    .cz-ext{position:absolute;top:9px;right:9px;font-family:var(--cz-mono);font-size:.62rem;color:var(--cz-cyan);opacity:.7;z-index:2}
+    .cz-tile .cz-sub{font-family:var(--cz-mono);font-size:.56rem;letter-spacing:.06em;color:var(--cz-tx-dim);z-index:1;margin-top:-4px}
     footer{position:relative;z-index:2;text-align:center;color:var(--cz-tx-mute);font-size:.82rem;margin-top:40px}
     footer a{color:var(--cz-vio);text-decoration:none}
     footer a:hover{color:#fff}
   </style>
 </head>
 <body class="cz-root">
-  <nav class="cz-nav">
+  <nav class="cz-nav" aria-label="주요">
     <a class="cz-logo" href="https://cityzen.kr">city<b>zen</b></a>
     <span class="cz-navlinks">
-      <a href="https://cityzen.kr">Apps</a>
-      <a href="./">Games</a>
-      <a class="cz-cta" href="https://cityzen.kr/login">Sign in</a>
+      <a href="https://cityzen.kr">앱</a>
+      <a href="./" aria-current="page">게임</a>
+      <a class="cz-cta" href="https://cityzen.kr/login">로그인</a>
     </span>
   </nav>
 
-  <div class="cz-wrap">
+  <main class="cz-wrap">
     <section class="cz-hero">
-      <div class="cz-kicker"><span class="cz-dot"></span>self-hosted · home server</div>
+      <div class="cz-kicker"><span class="cz-dot"></span>홈서버에서 직접 운영 · 광고 없음</div>
       <h1>브라우저에서 즐기는<br><span class="cz-glow">cityzen 게임</span></h1>
       <p>설치 없이 바로 플레이하는 바닐라 JS 게임 모음. 광고 없이, 빠르게.</p>
     </section>
 
-    <div class="cz-label">게임 선택</div>
-    <nav class="cz-grid-games">
-      <a class="cz-tile" href="./pacman/"><span class="cz-e">👻</span><span class="cz-n">PAC-MAN</span></a>
-      <a class="cz-tile" href="./tetris/"><span class="cz-e">🧱</span><span class="cz-n">TETRIS</span></a>
-      <a class="cz-tile" href="./apple-game/"><span class="cz-e">🍎</span><span class="cz-n">APPLE 10</span></a>
-      <a class="cz-tile" href="./yaong/"><span class="cz-e">🐱</span><span class="cz-n">YAONG</span></a>
-      <a class="cz-tile" href="./aurora-hands/"><span class="cz-e">✋</span><span class="cz-n">AURORA</span></a>
-      <a class="cz-tile" href="./doom-shooter/"><span class="cz-e">🔫</span><span class="cz-n">DOOMBLAST</span></a>
-      <a class="cz-tile" href="https://aura.cityzen.kr"><span class="cz-e">🎙️</span><span class="cz-n">AURA</span></a>
-    </nav>
-  </div>
+    <h2 class="cz-label">게임 선택</h2>
+    <nav class="cz-grid-games" aria-label="게임 목록" id="cz-games"></nav>
+
+    <h2 class="cz-label">cityzen 앱</h2>
+    <section class="cz-grid-svc" aria-label="앱 목록" id="cz-apps"></section>
+  </main>
 
   <footer><a href="https://cityzen.kr">← cityzen.kr</a> · 홈서버에서 운영</footer>
 
   <script type="module">
     import { czFx } from './cityzen-ui.js';
     czFx();
+
+    // 게임/앱 메타데이터 — 타일·카드를 한 곳에서 렌더(일관·확장 용이).
+    const games = [
+      { e:'👻', n:'PAC-MAN',   sub:'네온 팩맨',  href:'./pacman/' },
+      { e:'🧱', n:'TETRIS',    sub:'테트리스',   href:'./tetris/' },
+      { e:'🍎', n:'APPLE 10',  sub:'사과 게임',  href:'./apple-game/' },
+      { e:'🐱', n:'YAONG',     sub:'야옹',       href:'./yaong/' },
+      { e:'✋', n:'AURORA',    sub:'손 추적',    href:'./aurora-hands/' },
+      { e:'🔫', n:'DOOMBLAST', sub:'슈팅',       href:'./doom-shooter/' },
+      { e:'🎙️', n:'AURA',      sub:'음성 AI',    href:'https://aura.cityzen.kr', ext:true },
+    ];
+
+    const apps = [
+      { ic:'🎙️', ttl:'AURA',     dsc:'브라우저 음성 대화 AI',        href:'https://aura.cityzen.kr',     status:'live' },
+      { ic:'🧠', ttl:'onmantle', dsc:'한국어 단어 유사도 추측 게임', href:'https://onmantle.cityzen.kr', status:'live' },
+    ];
+
+    // 안전한 DOM 생성(문자열 HTML 미사용 → XSS 차단).
+    const el = (tag, cls, text) => {
+      const n = document.createElement(tag);
+      if (cls) n.className = cls;
+      if (text != null) n.textContent = text;
+      return n;
+    };
+    const isExternal = (href) => /^https?:\/\//.test(href);
+
+    const gamesRoot = document.getElementById('cz-games');
+    for (const g of games) {
+      const a = el('a', 'cz-tile');
+      a.href = g.href;
+      if (g.ext || isExternal(g.href)) {
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        const ext = el('span', 'cz-ext', '↗');
+        ext.setAttribute('aria-hidden', 'true');
+        a.append(ext);
+        a.setAttribute('aria-label', `${g.n} (새 탭에서 열림)`);
+      }
+      const e = el('span', 'cz-e', g.e);
+      e.setAttribute('aria-hidden', 'true');
+      a.append(e, el('span', 'cz-n', g.n));
+      if (g.sub) a.append(el('span', 'cz-sub', g.sub));
+      gamesRoot.append(a);
+    }
+
+    const appsRoot = document.getElementById('cz-apps');
+    for (const app of apps) {
+      const live = app.status === 'live';
+      // 라이브 앱은 링크(<a>), 준비 중 앱은 비활성 카드(<div>).
+      const card = el(live ? 'a' : 'div', 'cz-card');
+      if (live) {
+        card.href = app.href;
+        if (isExternal(app.href)) {
+          card.target = '_blank';
+          card.rel = 'noopener noreferrer';
+          card.setAttribute('aria-label', `${app.ttl} (새 탭에서 열림)`);
+        }
+      } else {
+        card.setAttribute('aria-disabled', 'true');
+        card.style.opacity = '.7';
+      }
+      const inner = el('div', 'cz-inner');
+      const ic = el('span', 'cz-ic', app.ic);
+      ic.setAttribute('aria-hidden', 'true');
+      const meta = el('div');
+      meta.append(el('div', 'cz-ttl', app.ttl), el('div', 'cz-dsc', app.dsc));
+      const badge = el('span', `cz-badge ${live ? 'live' : 'soon'}`);
+      const bdot = el('span', 'cz-bdot');
+      bdot.setAttribute('aria-hidden', 'true');
+      badge.append(bdot, document.createTextNode(live ? 'LIVE' : 'SOON'));
+      inner.append(ic, meta, badge);
+      card.append(inner);
+      appsRoot.append(card);
+    }
   </script>
 </body>
 </html>

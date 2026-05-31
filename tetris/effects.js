@@ -75,7 +75,7 @@ export function createEffects() {
     ctx.textBaseline = 'middle';
     for (const t of texts) {
       ctx.globalAlpha = Math.min(1, t.life * 1.6);
-      ctx.font = '700 24px "Chivo Mono", ui-monospace, monospace';
+      ctx.font = '700 24px "Geist Mono", ui-monospace, monospace';
       ctx.fillStyle = t.color;
       ctx.shadowColor = t.color;
       ctx.shadowBlur = 16;

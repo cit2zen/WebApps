@@ -15,14 +15,14 @@ const NEBULA_COLORS = [
 ];
 
 const NebulaMaterial = shaderMaterial(
-  { uTime: 0, uAmp: 0, uState: 0, uColor: new THREE.Color("#5ef2ff") },
+  { uTime: 0, uAmp: 0, uState: 0, uMotion: 1, uColor: new THREE.Color("#5ef2ff") },
   /* glsl */ `
-    uniform float uTime, uAmp, uState;
+    uniform float uTime, uAmp, uState, uMotion;
     attribute vec3 aDir; attribute float aRadius; attribute float aSeed;
     varying float vGlow;
     void main(){
       float t = uTime + aSeed * 6.2831;
-      float spin = t * (0.2 + uState * 0.25);     // thinking일수록 빠르게 공전
+      float spin = t * (0.2 + uState * 0.25) * uMotion;     // thinking일수록 빠르게 공전(reduced-motion 시 정지)
       float c = cos(spin), s = sin(spin);
       vec3 d = vec3(aDir.x*c - aDir.z*s, aDir.y, aDir.x*s + aDir.z*c);
       float converge = mix(1.0, 0.5, step(0.5, uState) * step(uState, 1.5)); // listening 응축
@@ -48,7 +48,7 @@ declare module "@react-three/fiber" {
   interface ThreeElements { nebulaMaterial: ThreeElement<typeof NebulaMaterial>; }
 }
 
-export function Nebula({ count = 4000 }: { count?: number }) {
+export function Nebula({ count = 4000, reduced = false }: { count?: number; reduced?: boolean }) {
   const mat = useRef<any>(null!);
   const color = useMemo(() => new THREE.Color("#5ef2ff"), []);
   const { positions, dirs, radii, seeds } = useMemo(() => {
@@ -74,6 +74,7 @@ export function Nebula({ count = 4000 }: { count?: number }) {
     mat.current.uniforms.uTime.value = state.clock.elapsedTime;
     mat.current.uniforms.uAmp.value = THREE.MathUtils.lerp(mat.current.uniforms.uAmp.value, audio.amplitude, 0.2);
     mat.current.uniforms.uState.value = STATE.current;
+    mat.current.uniforms.uMotion.value = reduced ? 0 : 1; // reduced-motion 시 공전 정지, 색전이만 유지
     color.lerp(NEBULA_COLORS[STATE.current] ?? NEBULA_COLORS[0], 1 - Math.pow(0.02, delta));
     mat.current.uniforms.uColor.value.copy(color);
   });

@@ -9,8 +9,14 @@ export class Game {
   constructor(canvas, audio, settings, sfx) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
-    this.W = canvas.width;
-    this.H = canvas.height;
+    // 내부 좌표계는 800×450 고정(게임 로직 무변경). 백버퍼만 DPR배율로 키워
+    // 레티나/모바일 업스케일 흐림을 없앤다. attribute width/height(=800/450)를 논리치로 사용.
+    this.W = canvas.getAttribute("width") ? parseInt(canvas.getAttribute("width"), 10) : canvas.width;
+    this.H = canvas.getAttribute("height") ? parseInt(canvas.getAttribute("height"), 10) : canvas.height;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = this.W * dpr;
+    canvas.height = this.H * dpr;
+    this.ctx.scale(dpr, dpr);
     this.groundY = this.H - 70;
 
     this.audio = audio;

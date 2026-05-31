@@ -4,10 +4,7 @@ export function getKey() { return 'subscription'; }
 export function setKey() { /* no-op */ }
 export function hasKey() { return true; }
 
-// 설정 dialog는 더 이상 키 입력을 받지 않는다. gear 버튼이 있으면 안내용으로만 연다.
+// 설정 dialog/gear DOM은 제거됨 — no-op 스텁만 유지.
 export function initSettings() {
-  const dialog = document.getElementById('settings');
-  const gear = document.getElementById('gear');
-  if (gear && dialog) gear.addEventListener('click', () => dialog.showModal());
-  return { open: () => dialog?.showModal() };
+  return { open: () => {} };
 }
