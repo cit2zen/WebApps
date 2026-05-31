@@ -3,20 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
-class Similarity(db.Model):
-    """사전계산된 (시크릿, 단어) 유사도·순위. 추측은 이 테이블 조회로 처리."""
-    __tablename__ = "similarities"
-    secret_idx = db.Column(db.Integer, primary_key=True)
-    word = db.Column(db.Text, primary_key=True)
-    similarity = db.Column(db.Float, nullable=False)
-    rank = db.Column(db.Integer)  # 상위 1000위만 채워짐(그 외 NULL)
-
-
 class Secret(db.Model):
-    """시크릿 단어 (seed가 similarities의 similarity=100 행에서 유도)."""
+    """시크릿 단어 (seed가 secrets 테이블을 raw SQL로 적재)."""
     __tablename__ = "secrets"
     idx = db.Column(db.Integer, primary_key=True)
     word = db.Column(db.Text, nullable=False)
+    pos = db.Column(db.Text)  # 품사(힌트 레벨 1용)
 
 
 class Nearest(db.Model):

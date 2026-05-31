@@ -155,7 +155,7 @@ function renderGuesses() {
         }
         return `<div class="guess-row${correctClass}${latestClass}">
             <span class="col-num">${g.num}</span>
-            <span class="col-word">${g.word}</span>
+            <span class="col-word">${escapeHtml(g.word)}</span>
             <span class="col-sim ${simClass}">${g.similarity.toFixed(2)}</span>
             <span class="col-rank ${rankColorClass}">${rankText}</span>
             <span class="col-bar"><div class="sim-bar ${barClass}" style="width: ${simPercent}%"></div></span>
@@ -181,7 +181,7 @@ function renderGuesses() {
         const simClass = latest.rank ? "ranked" : latest.similarity < 0 ? "negative" : "";
         latestBlock.innerHTML = `<div class="guess-row latest">
             <span class="col-num">${latest.num}</span>
-            <span class="col-word">${latest.word}</span>
+            <span class="col-word">${escapeHtml(latest.word)}</span>
             <span class="col-sim ${simClass}">${latest.similarity.toFixed(2)}</span>
             <span class="col-rank ${rankColorClass}">${rankText}</span>
             <span class="col-bar"><div class="sim-bar ${latest.similarity >= 0 ? "positive" : "negative"}" style="width: ${Math.max(0, (latest.similarity + 100) / 200 * 100)}%"></div></span>
