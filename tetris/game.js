@@ -4,6 +4,7 @@ import { createGrid, collides, lockCells, clearLines } from './board.js';
 import { TYPES, cellsOf, spawnPiece, getKicks, ROWS, COLS } from './piece.js';
 
 const LOCK_DELAY = 500; // ms grounded before locking
+const MAX_LOCK_RESETS = 15; // 바닥에서 이동/회전으로 고정을 미룰 수 있는 최대 횟수
 const gravityMs = (level) =>
   Math.max(Math.pow(0.8 - (level - 1) * 0.007, level - 1) * 1000, 1);
 
@@ -19,6 +20,8 @@ export function createGame() {
     state: 'playing', // playing | paused | over
     gravityTimer: 0,
     lockTimer: 0,
+    lockResets: 0,
+    canHold: true,
     lastRotation: false,
     lastKick: 0,
     events: [],
@@ -52,6 +55,7 @@ export function spawnNext(g) {
   refill(g);
   g.current = spawnPiece(g.queue.shift());
   g.lockTimer = 0;
+  g.lockResets = 0;
   g.lastRotation = false;
   if (collides(g.grid, cellsOf(g.current))) {
     g.state = 'over';
@@ -64,7 +68,12 @@ function onGround(g) {
 }
 
 function resetLockIfGround(g) {
-  if (onGround(g)) g.lockTimer = 0;
+  // 바닥에서 이동/회전 시 락 타이머를 리셋하되 횟수를 제한해,
+  // 무한히 좌우 이동·회전으로 고정을 미루지 못하게 한다.
+  if (onGround(g) && g.lockResets < MAX_LOCK_RESETS) {
+    g.lockTimer = 0;
+    g.lockResets++;
+  }
 }
 
 export function move(g, dx, dy) {
@@ -115,12 +124,14 @@ export function hardDrop(g) {
 
 export function hold(g) {
   if (g.state !== 'playing') return;
+  if (!g.canHold) return; // 조각당 1회만 홀드 가능
   const cur = g.current.type;
   if (g.hold) {
     g.current = spawnPiece(g.hold);
     g.hold = cur;
     g.lastRotation = false;
     g.lockTimer = 0;
+    g.lockResets = 0;
     if (collides(g.grid, cellsOf(g.current))) {
       g.state = 'over';
       emit(g, 'gameover');
@@ -129,6 +140,7 @@ export function hold(g) {
     g.hold = cur;
     spawnNext(g);
   }
+  g.canHold = false;
   emit(g, 'hold');
 }
 
@@ -194,4 +206,5 @@ function lockDown(g) {
   }
   if (g.level > prevLevel) emit(g, 'levelup', { level: g.level });
   spawnNext(g);
+  g.canHold = true;
 }
