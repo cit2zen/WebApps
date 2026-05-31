@@ -130,55 +130,48 @@ export default function Chat() {
   }
 
   return (
-    <div style={{ marginTop: 16 }}>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 4 }}>
-        <button onClick={resetConversation} disabled={loading} style={tab(false)} aria-label="새 대화">
+    <div className="ss-chat">
+      <div className="ss-toolbar">
+        <button onClick={resetConversation} disabled={loading} className="ss-btn ghost" aria-label="새 대화">
           + 새 대화
         </button>
       </div>
-      <div style={{ minHeight: 320, marginBottom: 12 }}>
+      <div className="ss-stream">
         {msgs.map((m, i) => {
           const view = views[i] ?? 'cards';
           // 비교표는 동일상품 중복 제외 후 2개 이상일 때만 의미가 있다(ComparisonTable 내부 필터와 일치, bug28)
           const comparableCount = m.rec ? m.rec.ranked.filter((r) => !r.duplicateOf).length : 0;
           return (
-          <div key={i} style={{ margin: '10px 0' }}>
+          <div key={i} className="ss-turn">
             {m.text && !m.rec && (
-              <div>
-                <b>{m.role === 'user' ? '나' : 'ShopScout'}:</b> {m.text}
+              <div className={`ss-bubble ${m.role === 'user' ? 'user' : 'bot'}`}>
+                <span className="ss-who">{m.role === 'user' ? '나' : 'ShopScout'}</span>
+                {m.text}
               </div>
             )}
             {m.rec && (
-              <div>
+              <div className="ss-turn">
                 {m.rec.summary && (
-                  <div style={{ background: '#eef6ff', borderRadius: 8, padding: 10, marginBottom: 8 }}>
+                  <div className="ss-summary">
                     💡 {m.rec.summary}
-                    {m.rec.priorityNote && (
-                      <div style={{ marginTop: 6, fontSize: 13, color: '#456' }}>
-                        🎯 {m.rec.priorityNote}
-                      </div>
-                    )}
+                    {m.rec.priorityNote && <div className="ss-note">🎯 {m.rec.priorityNote}</div>}
                     {m.rec.appliedCriteria && m.rec.appliedCriteria.length > 0 && (
-                      <div style={{ marginTop: 6, fontSize: 12, color: '#678' }}>
+                      <div className="ss-criteria">
                         📋 이번에 본 기준: {m.rec.appliedCriteria.slice(0, 10).join(' · ')}
                       </div>
                     )}
                   </div>
                 )}
                 {m.rec.askUser && (
-                  <div style={{ marginBottom: 8 }}>
-                    <div>
-                      <b>ShopScout:</b> {m.rec.askUser.question}
+                  <div className="ss-turn">
+                    <div className="ss-bubble bot">
+                      <span className="ss-who">ShopScout</span>
+                      {m.rec.askUser.question}
                     </div>
                     {m.rec.askUser.options && m.rec.askUser.options.length > 0 && (
-                      <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
+                      <div className="ss-chips">
                         {m.rec.askUser.options.map((opt) => (
-                          <button
-                            key={opt}
-                            onClick={() => sendText(opt)}
-                            disabled={loading}
-                            style={chip}
-                          >
+                          <button key={opt} onClick={() => sendText(opt)} disabled={loading} className="ss-chip">
                             {opt}
                           </button>
                         ))}
@@ -187,11 +180,17 @@ export default function Chat() {
                   </div>
                 )}
                 {comparableCount >= 2 && (
-                  <div style={{ marginBottom: 6 }}>
-                    <button onClick={() => setViews((v) => ({ ...v, [i]: 'cards' }))} style={tab(view === 'cards')}>
+                  <div className="ss-tabs">
+                    <button
+                      onClick={() => setViews((v) => ({ ...v, [i]: 'cards' }))}
+                      className={`ss-tab ${view === 'cards' ? 'active' : ''}`}
+                    >
                       카드
                     </button>
-                    <button onClick={() => setViews((v) => ({ ...v, [i]: 'table' }))} style={tab(view === 'table')}>
+                    <button
+                      onClick={() => setViews((v) => ({ ...v, [i]: 'table' }))}
+                      className={`ss-tab ${view === 'table' ? 'active' : ''}`}
+                    >
                       비교표
                     </button>
                   </div>
@@ -205,14 +204,14 @@ export default function Chat() {
                       .map((r, idx) => <ProductCard key={r.listing.id} {...r} rank={idx + 1} />)
                   ))}
                 {m.rec.ranked.length === 0 && !m.rec.askUser && (
-                  <div>
+                  <div className="ss-empty">
                     {m.rec.degraded
                       ? '⚠️ 일시적으로 모든 쇼핑몰 검색에 실패했어요. 잠시 후 다시 시도해 주세요.'
                       : '조건에 맞는 매물을 찾지 못했어요.'}
                   </div>
                 )}
                 {m.failedSources && m.failedSources.length > 0 && (
-                  <div style={{ fontSize: 12, color: '#a66', marginTop: 4 }}>
+                  <div className="ss-warn">
                     ⚠ 일부 소스에서 결과를 못 가져왔어요:{' '}
                     {m.failedSources.map((s) => SOURCE_LABEL[s] ?? s).join(', ')}
                   </div>
@@ -223,46 +222,24 @@ export default function Chat() {
           );
         })}
         {loading && (
-          <div style={{ color: '#888' }}>
-            <span style={{ display: 'inline-block', marginRight: 6 }}>⏳</span>
+          <div className="ss-loading">
+            <span className="ss-spinner" aria-hidden />
             {stage ? STAGE_LABEL[stage] ?? 'ShopScout가 찾는 중…' : 'ShopScout가 찾는 중…'}
           </div>
         )}
       </div>
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div className="ss-composer">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && send()}
-          style={{ flex: 1, padding: 10, borderRadius: 8, border: '1px solid #ddd' }}
+          className="ss-input"
           placeholder="무엇을 찾으세요? (예: 코딩용 무선 기계식 키보드 10만원)"
         />
-        <button onClick={send} disabled={loading} style={{ padding: '10px 16px', borderRadius: 8 }}>
+        <button onClick={send} disabled={loading} className="ss-btn primary">
           보내기
         </button>
       </div>
     </div>
   );
-}
-
-const chip: React.CSSProperties = {
-  padding: '6px 12px',
-  borderRadius: 16,
-  border: '1px solid #bcd',
-  background: '#fff',
-  cursor: 'pointer',
-  fontSize: 13,
-};
-
-function tab(active: boolean): React.CSSProperties {
-  return {
-    padding: '4px 12px',
-    marginRight: 6,
-    borderRadius: 6,
-    border: '1px solid #ccc',
-    background: active ? '#333' : '#fff',
-    color: active ? '#fff' : '#333',
-    cursor: 'pointer',
-    fontSize: 13,
-  };
 }

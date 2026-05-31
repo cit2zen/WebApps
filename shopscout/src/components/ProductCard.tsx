@@ -30,55 +30,46 @@ export default function ProductCard({
   const total = totalPrice(listing);
   const passed = evaluation.passesTrustThreshold;
   return (
-    <div
-      style={{
-        border: `1px solid ${passed ? '#cfe9d4' : '#f0d2d2'}`,
-        background: passed ? '#fff' : '#fff7f7',
-        borderRadius: 10,
-        padding: 14,
-        marginBottom: 10,
-      }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-        <strong>
-          {rank === 1 && passed ? '⭐ ' : ''}
+    <div className={`ss-card ${passed ? 'pass' : 'flagged'}`}>
+      <div className="ss-card-head">
+        <strong className="ss-card-title">
+          {rank === 1 && passed ? <span className="ss-rank">⭐ </span> : ''}
           {listing.title}
         </strong>
-        <span style={{ whiteSpace: 'nowrap', fontWeight: 600 }}>{total.toLocaleString()}원</span>
+        <span className="ss-card-price">{total.toLocaleString()}원</span>
       </div>
-      <div style={{ fontSize: 13, color: '#666', marginTop: 4 }}>
+      <div className="ss-card-meta">
         {listing.marketplace}
         {listing.rating != null ? ` · ★${listing.rating}` : ''}
         {listing.reviewCount != null ? ` (${listing.reviewCount.toLocaleString()})` : ''} · {reason}
       </div>
       {(pros?.length || cons?.length) ? (
-        <div style={{ display: 'flex', gap: 12, marginTop: 6, fontSize: 12, flexWrap: 'wrap' }}>
-          {pros && pros.length > 0 && (
-            <div style={{ color: '#2a7' }}>👍 {pros.join(' · ')}</div>
-          )}
-          {cons && cons.length > 0 && (
-            <div style={{ color: '#c55' }}>👎 {cons.join(' · ')}</div>
-          )}
+        <div className="ss-proscons">
+          {pros && pros.length > 0 && <div className="ss-pros">👍 {pros.join(' · ')}</div>}
+          {cons && cons.length > 0 && <div className="ss-cons">👎 {cons.join(' · ')}</div>}
         </div>
       ) : null}
-      <details style={{ marginTop: 8 }}>
-        <summary style={{ cursor: 'pointer', fontSize: 13 }}>평가 근거 (신뢰 {evaluation.trustScore})</summary>
-        <ul style={{ fontSize: 13, marginTop: 6 }}>
+      <details className={`ss-trust ${passed ? '' : 'flagged'}`}>
+        <summary>
+          <span className="ss-bdot" />
+          신뢰 {evaluation.trustScore} · 평가 근거
+        </summary>
+        <ul>
           {evaluation.factors.map((f) => (
             <li key={f.code}>
               <b>{FACTOR_NAMES[f.code] ?? f.code}</b>: {f.score}점
-              {f.flags.length ? ` · ⚠ ${f.flags.join(', ')}` : ''} — {f.rationale}
+              {f.flags.length ? <span className="ss-flag"> · ⚠ {f.flags.join(', ')}</span> : ''} — {f.rationale}
             </li>
           ))}
         </ul>
       </details>
       {cheaperThanGroupCount ? (
-        <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
+        <div className="ss-fold">
           같은 상품을 파는 더 비싼 판매처 {cheaperThanGroupCount}곳을 접었어요(이게 최저가).
         </div>
       ) : null}
       <div>
-        <a href={listing.url} target="_blank" rel="noreferrer" style={{ fontSize: 13 }}>
+        <a href={listing.url} target="_blank" rel="noreferrer" className="ss-link">
           상품 보기 →
         </a>
       </div>

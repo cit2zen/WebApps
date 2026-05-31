@@ -35,18 +35,19 @@ export function VoiceController() {
         <Overlay>
           <button
             onClick={() => { setStarted(true); enable(); }}
-            style={{ padding: "16px 32px", fontSize: 18, borderRadius: 999, cursor: "pointer",
-              background: "linear-gradient(#22e0ff,#2b8cff)", color: "#021018", border: "none",
-              boxShadow: "0 0 40px rgba(57,208,255,.5)" }}
+            style={{ padding: "16px 32px", fontSize: 18, borderRadius: 16, cursor: "pointer",
+              background: "linear-gradient(135deg, #5ef2ff, #a98bff)", color: "#06060a", border: "none",
+              fontWeight: 600, boxShadow: "0 0 40px rgba(94,242,255,.5)" }}
           >🎙️ 음성으로 대화 시작</button>
         </Overlay>
       )}
       <div style={{ position: "fixed", left: 0, right: 0, bottom: 28, textAlign: "center", pointerEvents: "none" }}>
-        <div style={{ fontSize: 12, letterSpacing: ".15em", color: "#39d0ff", textTransform: "uppercase" }}>
+        <div style={{ fontSize: 12, letterSpacing: ".15em", color: "#5ef2ff", textTransform: "uppercase",
+          fontFamily: "var(--font-mono)" }}>
           {LABEL[mode]}{notice ? ` · ${notice}` : ""}
         </div>
-        {transcript && <div style={{ marginTop: 8, color: "#7d93a8", fontSize: 14 }}>나: {transcript}</div>}
-        {response && <div style={{ marginTop: 4, color: "#eaf6ff", fontSize: 16, maxWidth: 720, margin: "4px auto 0" }}>{response}</div>}
+        {transcript && <div style={{ marginTop: 8, color: "#9a9ac0", fontSize: 14 }}>나: {transcript}</div>}
+        {response && <div style={{ marginTop: 4, color: "#eef0ff", fontSize: 16, maxWidth: 720, margin: "4px auto 0" }}>{response}</div>}
       </div>
     </>
   );

@@ -6,16 +6,16 @@ import { extend, useFrame, type ThreeElement } from "@react-three/fiber";
 import { shaderMaterial } from "@react-three/drei";
 import { audio, STATE } from "@/lib/audioBus";
 
-// 상태별 기본 색: idle 청회색 / listening 시안 / thinking 보라 / speaking 시안화이트
+// 상태별 기본 색(cityzen Neon): idle 딤시안 / listening 시안 / thinking 바이올렛 / speaking 시안화이트
 const STATE_COLORS = [
-  new THREE.Color("#2b6f9e"),
-  new THREE.Color("#22e0ff"),
-  new THREE.Color("#a366ff"),
-  new THREE.Color("#9af3ff"),
+  new THREE.Color("#2f7d97"),
+  new THREE.Color("#5ef2ff"),
+  new THREE.Color("#a98bff"),
+  new THREE.Color("#b4f6ff"),
 ];
 
 const FresnelMaterial = shaderMaterial(
-  { uTime: 0, uIntensity: 1, uColor: new THREE.Color("#22e0ff") },
+  { uTime: 0, uIntensity: 1, uColor: new THREE.Color("#5ef2ff") },
   /* glsl */ `
     varying vec3 vNormal; varying vec3 vViewDir;
     void main(){
@@ -42,7 +42,7 @@ declare module "@react-three/fiber" {
 export function Orb() {
   const mesh = useRef<THREE.Mesh>(null!);
   const mat = useRef<any>(null!);
-  const color = useMemo(() => new THREE.Color("#22e0ff"), []);
+  const color = useMemo(() => new THREE.Color("#5ef2ff"), []);
 
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime;

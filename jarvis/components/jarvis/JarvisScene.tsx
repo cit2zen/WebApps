@@ -12,7 +12,7 @@ export default function JarvisScene() {
       gl={{ antialias: true, powerPreference: "high-performance" }}
       camera={{ position: [0, 0, 6], fov: 50 }}
     >
-      <color attach="background" args={["#02030a"]} />
+      <color attach="background" args={["#06060b"]} />
       <ambientLight intensity={0.3} />
       <pointLight position={[5, 5, 5]} intensity={1.5} />
       <Orb />

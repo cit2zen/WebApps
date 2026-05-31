@@ -18,13 +18,13 @@ export default function ComparisonTable({ items }: { items: RankedItem[] }) {
   const top = items.filter((r) => !r.duplicateOf).slice(0, 3); // 동일상품 중복 제외(E6)
   if (top.length < 2) return null;
   return (
-    <div style={{ overflowX: 'auto', marginBottom: 10 }}>
-      <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: 13 }}>
+    <div className="ss-table-wrap">
+      <table className="ss-table">
         <thead>
           <tr>
-            <th style={th}>항목</th>
+            <th>항목</th>
             {top.map((r, i) => (
-              <th key={r.listing.id} style={th}>
+              <th key={r.listing.id}>
                 {i === 0 && r.evaluation.passesTrustThreshold ? '⭐ ' : ''}
                 {r.listing.marketplace}
               </th>
@@ -34,10 +34,7 @@ export default function ComparisonTable({ items }: { items: RankedItem[] }) {
         <tbody>
           <Row label="가격(총)" cells={top.map((r) => `${totalPrice(r.listing).toLocaleString()}원`)} />
           <Row label="신뢰" cells={top.map((r) => `${r.evaluation.trustScore}점`)} />
-          <Row
-            label="통과"
-            cells={top.map((r) => (r.evaluation.passesTrustThreshold ? '✅' : '⚠️'))}
-          />
+          <Row label="통과" cells={top.map((r) => (r.evaluation.passesTrustThreshold ? '✅' : '⚠️'))} />
           {FACTOR_ORDER.filter((code) =>
             top.some((r) => r.evaluation.factors.some((x) => x.code === code)),
           ).map((code) => (
@@ -59,21 +56,10 @@ export default function ComparisonTable({ items }: { items: RankedItem[] }) {
 function Row({ label, cells }: { label: string; cells: string[] }) {
   return (
     <tr>
-      <td style={{ ...td, color: '#666' }}>{label}</td>
+      <td className="ss-rowlabel">{label}</td>
       {cells.map((c, i) => (
-        <td key={i} style={td}>
-          {c}
-        </td>
+        <td key={i}>{c}</td>
       ))}
     </tr>
   );
 }
-
-const th: React.CSSProperties = {
-  border: '1px solid #eee',
-  padding: '6px 8px',
-  background: '#f7f7f7',
-  textAlign: 'left',
-  whiteSpace: 'nowrap',
-};
-const td: React.CSSProperties = { border: '1px solid #eee', padding: '6px 8px', whiteSpace: 'nowrap' };

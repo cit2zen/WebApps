@@ -6,16 +6,16 @@ import { extend, useFrame, type ThreeElement } from "@react-three/fiber";
 import { shaderMaterial } from "@react-three/drei";
 import { audio, STATE } from "@/lib/audioBus";
 
-// 상태별 네뷸라 색(오브와 동일 팔레트): idle 청회 / listening 시안 / thinking 보라 / speaking 시안화이트
+// 상태별 네뷸라 색(cityzen Neon · 오브와 동일 팔레트): idle 딤시안 / listening 시안 / thinking 바이올렛 / speaking 시안화이트
 const NEBULA_COLORS = [
-  new THREE.Color("#2b6f9e"),
-  new THREE.Color("#22e0ff"),
-  new THREE.Color("#a366ff"),
-  new THREE.Color("#7ad7ff"),
+  new THREE.Color("#2f7d97"),
+  new THREE.Color("#5ef2ff"),
+  new THREE.Color("#a98bff"),
+  new THREE.Color("#9ceaff"),
 ];
 
 const NebulaMaterial = shaderMaterial(
-  { uTime: 0, uAmp: 0, uState: 0, uColor: new THREE.Color("#26d6ff") },
+  { uTime: 0, uAmp: 0, uState: 0, uColor: new THREE.Color("#5ef2ff") },
   /* glsl */ `
     uniform float uTime, uAmp, uState;
     attribute vec3 aDir; attribute float aRadius; attribute float aSeed;
@@ -50,7 +50,7 @@ declare module "@react-three/fiber" {
 
 export function Nebula({ count = 4000 }: { count?: number }) {
   const mat = useRef<any>(null!);
-  const color = useMemo(() => new THREE.Color("#26d6ff"), []);
+  const color = useMemo(() => new THREE.Color("#5ef2ff"), []);
   const { positions, dirs, radii, seeds } = useMemo(() => {
     const positions = new Float32Array(count * 3);
     const dirs = new Float32Array(count * 3);
