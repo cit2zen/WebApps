@@ -81,7 +81,38 @@ html, body { width: 100%; height: 100dvh; background: var(--bg); overflow: hidde
 @keyframes jv-pulse { 0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: .4; transform: scale(.7); } }
 
+/* ── 홀로그래픽 HUD 오버레이 ── */
+.jv-hud {
+  position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  display: grid; place-items: center; overflow: hidden;
+}
+.jv-hud-wave, .jv-hud-svg {
+  grid-area: 1 / 1; pointer-events: none;
+}
+.jv-hud-svg {
+  width: min(78vmin, 560px); height: min(78vmin, 560px);
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--hud) 55%, transparent));
+  opacity: .9;
+}
+.jv-ring { transform-origin: 100px 100px; }
+.jv-ring-a { animation: jv-spin 26s linear infinite; }
+.jv-ring-b { animation: jv-spin 14s linear infinite reverse; }
+.jv-ring-c { animation: jv-spin 60s linear infinite; }
+@keyframes jv-spin { to { transform: rotate(360deg); } }
+
+/* 코너 타겟 브래킷 */
+.jv-bracket {
+  position: absolute; width: 26px; height: 26px; pointer-events: none;
+  border: 1.5px solid color-mix(in srgb, var(--hud) 70%, transparent);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--hud) 50%, transparent));
+}
+.jv-tl { top: 22px; left: 22px; border-right: none; border-bottom: none; }
+.jv-tr { top: 22px; right: 22px; border-left: none; border-bottom: none; }
+.jv-bl { bottom: 22px; left: 22px; border-right: none; border-top: none; }
+.jv-br { bottom: 22px; right: 22px; border-left: none; border-top: none; }
+
 @media (prefers-reduced-motion: reduce) {
   .jv-dot { animation: none !important; }
   .jv-btn:hover, .jv-send:hover { transform: none !important; }
+  .jv-ring-a, .jv-ring-b, .jv-ring-c { animation: none !important; }
 }
