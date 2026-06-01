@@ -3,6 +3,7 @@ import { Speech } from './speech.js';
 import { Claude } from './claude.js';
 import { TTS } from './tts.js';
 import { Visualizer } from './visualizer.js';
+import { stripMarkdown } from './clean.js';
 
 const canvas = document.getElementById('stage');
 const ctx = canvas.getContext('2d');
@@ -45,11 +46,11 @@ function setPhase(p) {
   if (reduceMotion.matches && !document.hidden) renderStaticFrame();
 }
 
-// 자막을 블러-인 애니메이션과 함께 교체.
+// 자막을 블러-인 애니메이션과 함께 교체. 마크다운 기호는 표시에서 제거(이모지는 유지).
 function setCaption(text) {
   captionEl.classList.remove('show');
   void captionEl.offsetWidth;
-  captionEl.textContent = text;
+  captionEl.textContent = stripMarkdown(text);
   captionEl.classList.add('show');
 }
 

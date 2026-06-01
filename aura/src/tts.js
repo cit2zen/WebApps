@@ -1,6 +1,8 @@
 // 고품질 신경망 TTS 재생 + 실제 오디오 엔벨로프(AnalyserNode).
 // 1순위: 서버 /api/tts(Edge Neural, mp3) → WebAudio 재생 + 실시간 스펙트럼.
 // 폴백: 브라우저 speechSynthesis(서버 합성 실패 시). getEnvelope()로 비주얼라이저에 level/spectrum 공급.
+import { cleanForSpeech } from './clean.js';
+
 export class TTS {
   constructor() {
     this.speaking = false;
@@ -37,7 +39,8 @@ export class TTS {
     return this._ac;
   }
 
-  async speak(text) {
+  async speak(rawText) {
+    const text = cleanForSpeech(rawText); // 마크다운/이모지 제거 후 발화
     if (!text) return;
     this.cancel();
     try {

@@ -2,6 +2,7 @@
 "use client";
 import { useJarvis } from "@/hooks/useJarvis";
 import { useJarvisStore } from "@/lib/store";
+import { stripMarkdown } from "@/lib/cleanText";
 import { useEffect, useRef, useState } from "react";
 
 const LABEL: Record<string, string> = {
@@ -85,7 +86,7 @@ function Hud({ mode, notice, transcript, response }: {
         <div className="jv-transcript" aria-live="polite">나: {transcript}</div>
       )}
       {response && (
-        <div className="jv-response" aria-live="polite" aria-atomic="true">{response}</div>
+        <div className="jv-response" aria-live="polite" aria-atomic="true">{stripMarkdown(response)}</div>
       )}
     </div>
   );

@@ -1,5 +1,6 @@
 "use client";
 import { chunkText } from "./ttsChunker";
+import { cleanForSpeech } from "./cleanText";
 
 export interface WordInfo { word: string; globalCharIndex: number; }
 
@@ -54,7 +55,9 @@ export class BrowserTTS implements TextToSpeech {
 
   enqueue(text: string) {
     this.cancelled = false;
-    for (const c of chunkText(text)) this.queue.push(c);
+    const spoken = cleanForSpeech(text); // 마크다운/이모지 제거 후 발화
+    if (!spoken) return;
+    for (const c of chunkText(spoken)) this.queue.push(c);
     if (!this.playing) this.playNext();
   }
 
