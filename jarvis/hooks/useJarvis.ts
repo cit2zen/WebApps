@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useMicAnalyser } from "./useMicAnalyser";
 import { useSpeechRecognition } from "./useSpeechRecognition";
 import { useAgentStream } from "./useAgentStream";
-import { BrowserTTS } from "@/lib/tts";
+import { NeuralTTS } from "@/lib/tts";
 import { makeBargeInDetector } from "@/lib/bargeIn";
 import { createSentenceBuffer } from "@/lib/sentenceBuffer";
 import { useJarvisStore } from "@/lib/store";
@@ -13,7 +13,7 @@ import type { AgentEvent } from "@/lib/events";
 
 export function useJarvis() {
   const store = useJarvisStore;
-  const ttsRef = useRef<BrowserTTS | null>(null);
+  const ttsRef = useRef<NeuralTTS | null>(null);
   const sentence = useRef(createSentenceBuffer());
   const startedRef = useRef(false);
   const streaming = useRef(false); // 서버 스트림이 진행 중인지(턴 종료 게이트)
@@ -23,8 +23,10 @@ export function useJarvis() {
     const mode = store.getState().mode;
     if (mode === "listening") audio.amplitude = rms;
     else if (mode === "speaking") {
-      audio.speakingEnv = Math.max(0, audio.speakingEnv - 0.04);
-      audio.amplitude = audio.speakingEnv;
+      // 신경망 TTS의 실측 진폭으로 오브 구동(실제 음성에 반응)
+      const lvl = ttsRef.current?.getLevel() ?? 0;
+      audio.speakingEnv = lvl;
+      audio.amplitude = lvl;
     } else {
       audio.amplitude = Math.max(0, audio.amplitude - 0.03);
     }
@@ -106,9 +108,8 @@ export function useJarvis() {
   // TTS만 준비(거의 모든 브라우저 지원). STT 미지원 환경의 텍스트 폴백에서도 인사·음성 사용.
   const ensureTts = useCallback(async () => {
     if (ttsRef.current) return ttsRef.current;
-    const tts = new BrowserTTS();
+    const tts = new NeuralTTS();
     await tts.init();
-    tts.onWord = () => { audio.speakingEnv = 0.85; }; // 단어마다 엔벌로프 튐
     tts.onIdle = () => maybeFinish();
     ttsRef.current = tts;
     return tts;

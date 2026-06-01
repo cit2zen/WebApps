@@ -13,24 +13,25 @@
     "e2e": "playwright test"
   },
   "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "0.3.158",
+    "@react-three/drei": "10.7.7",
+    "@react-three/fiber": "9.6.1",
+    "@react-three/postprocessing": "3.0.4",
+    "msedge-tts": "^2.0.5",
     "next": "16.2.6",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "zustand": "^5.0.2",
-    "zod": "^4.0.0",
-    "@anthropic-ai/claude-agent-sdk": "0.3.158",
     "three": "0.184.0",
-    "@react-three/fiber": "9.6.1",
-    "@react-three/drei": "10.7.7",
-    "@react-three/postprocessing": "3.0.4"
+    "zod": "^4.0.0",
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
-    "typescript": "^5.6.3",
+    "@playwright/test": "^1.49.0",
     "@types/node": "^22.9.0",
     "@types/react": "19.2.0",
     "@types/react-dom": "19.2.0",
     "@types/three": "^0.184.0",
-    "vitest": "^2.1.5",
-    "@playwright/test": "^1.49.0"
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.5"
   }
 }
