@@ -41,14 +41,15 @@ export function HudOverlay() {
       smooth += (audio.amplitude - smooth) * 0.2;
       const tt = reduced ? 0 : performance.now() * 0.001;
       const r0 = Math.min(w, h) * 0.34;
-      const bars = 110;
+      const bars = 96;
       ctx!.save();
       ctx!.translate(cx, cy);
       ctx!.strokeStyle = accentRef.current;
       ctx!.lineWidth = Math.max(1.4 * dpr, 1.6);
       ctx!.lineCap = "round";
-      ctx!.shadowColor = accentRef.current;
-      ctx!.shadowBlur = 7 * dpr;
+      ctx!.globalAlpha = 0.85;
+      // 모든 막대를 단일 경로로 모아 한 번만 stroke (per-stroke shadowBlur는 치명적 비용 → 글로우는 CSS filter로)
+      ctx!.beginPath();
       for (let i = 0; i < bars; i++) {
         const a = (i / bars) * Math.PI * 2;
         const band = audio.bands[i % 5] || 0;
@@ -56,12 +57,10 @@ export function HudOverlay() {
         const v = (0.06 + smooth * 0.85 + band * 0.4) * (0.35 + 0.65 * wob);
         const len = Math.min(w, h) * (0.02 + v * 0.16);
         const ca = Math.cos(a), sa = Math.sin(a);
-        ctx!.globalAlpha = 0.35 + v * 0.65;
-        ctx!.beginPath();
         ctx!.moveTo(ca * r0, sa * r0);
         ctx!.lineTo(ca * (r0 + len), sa * (r0 + len));
-        ctx!.stroke();
       }
+      ctx!.stroke();
       ctx!.restore();
     }
     draw();

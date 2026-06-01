@@ -1,8 +1,7 @@
 // components/jarvis/JarvisScene.tsx
 "use client";
-import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
-import { EffectComposer, Bloom, ChromaticAberration, Vignette, Noise } from "@react-three/postprocessing";
+import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { useMemo } from "react";
 import { Orb } from "./Orb";
 import { Nebula } from "./Nebula";
@@ -19,9 +18,9 @@ function useQuality() {
     const lowMem = (navigator as any).deviceMemory ? (navigator as any).deviceMemory <= 4 : false;
     const lite = narrow || lowMem;
     return {
-      dpr: (lite ? [1, 1.5] : [1, 2]) as [number, number],
-      particles: lite ? 1200 : 3200,
-      bloom: lite ? 0.6 : 0.95,
+      dpr: (lite ? [1, 1.25] : [1, 1.5]) as [number, number],
+      particles: lite ? 1000 : 2600,
+      bloom: lite ? 0.6 : 0.9,
       reduced,
       lite,
     };
@@ -41,14 +40,10 @@ export default function JarvisScene() {
       <pointLight position={[5, 5, 5]} intensity={1.5} />
       <Orb reduced={q.reduced} />
       <Nebula count={q.particles} reduced={q.reduced} />
-      <EffectComposer>
+      {/* multisampling 0 — 일부 ANGLE/AMD 드라이버에서 MSAA+포스트가 깜빡임 유발 → 끔 */}
+      <EffectComposer multisampling={0}>
         <Bloom mipmapBlur intensity={q.bloom} luminanceThreshold={0.65} luminanceSmoothing={0.3} />
-        {/* 시네마틱 그레이딩 — 저사양에선 색수차/그레인 생략 */}
-        {q.lite ? <></> : (
-          <ChromaticAberration offset={new THREE.Vector2(0.0009, 0.0011)} radialModulation modulationOffset={0.35} />
-        )}
-        <Vignette eskil={false} offset={0.22} darkness={0.82} />
-        {q.lite ? <></> : <Noise premultiply opacity={0.045} />}
+        <Vignette eskil={false} offset={0.22} darkness={0.8} />
       </EffectComposer>
     </Canvas>
   );

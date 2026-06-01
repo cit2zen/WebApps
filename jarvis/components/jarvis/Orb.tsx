@@ -24,7 +24,7 @@ const NOISE = /* glsl */ `
                    mix(hash(i+vec3(0,1,0)),hash(i+vec3(1,1,0)),f.x),f.y),
                mix(mix(hash(i+vec3(0,0,1)),hash(i+vec3(1,0,1)),f.x),
                    mix(hash(i+vec3(0,1,1)),hash(i+vec3(1,1,1)),f.x),f.y),f.z); }
-  float fbm(vec3 p){ float a=0.5,s=0.0; for(int i=0;i<5;i++){ s+=a*vnoise(p); p*=2.0; a*=0.5;} return s; }
+  float fbm(vec3 p){ float a=0.5,s=0.0; for(int i=0;i<3;i++){ s+=a*vnoise(p); p*=2.0; a*=0.5;} return s; }
 `;
 
 // 플라즈마 코어 — 표면이 노이즈로 끓고, 음성 진폭으로 돌출/발광한다.
