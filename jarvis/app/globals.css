@@ -28,6 +28,9 @@ html, body { width: 100%; height: 100dvh; background: var(--bg); overflow: hidde
 .jv-overlay { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center;
   justify-content: center; gap: 18px; z-index: 10; text-align: center; padding: 24px;
   padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+/* 중앙 소프트 백드롭 — 분주한 오브 위에서 타이틀/버튼 가독성·깊이감 */
+.jv-overlay::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(60% 50% at 50% 50%, rgba(6,6,11,.72), rgba(6,6,11,.30) 55%, transparent 78%); }
 .jv-title { font-family: var(--font-mono); font-weight: 700; font-size: clamp(2rem, 9vw, 3.4rem);
   letter-spacing: .14em; margin: 0;
   background: linear-gradient(90deg, var(--cyan), var(--violet)); -webkit-background-clip: text;
@@ -51,16 +54,29 @@ html, body { width: 100%; height: 100dvh; background: var(--bg); overflow: hidde
 .jv-hud { position: fixed; left: 0; right: 0; bottom: 28px; text-align: center;
   padding: 0 16px calc(env(safe-area-inset-bottom)); pointer-events: none; }
 .jv-status { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono);
-  font-size: .78rem; letter-spacing: .12em; color: var(--cyan); text-transform: uppercase; }
+  font-size: .76rem; letter-spacing: .14em; color: var(--cyan); text-transform: uppercase;
+  padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(94,242,255,.22);
+  background: rgba(94,242,255,.06); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  text-shadow: 0 0 10px rgba(94,242,255,.5); }
 .jv-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan);
   box-shadow: 0 0 8px var(--cyan); animation: jv-pulse 1.4s ease-in-out infinite; }
 .jv-notice { color: var(--amber); }
-.jv-transcript { margin-top: 8px; color: var(--dim); font-size: .9rem;
-  width: min(720px, 92vw); margin-left: auto; margin-right: auto;
+.jv-transcript { margin: 10px auto 0; color: var(--dim); font-size: .86rem;
+  width: fit-content; max-width: min(720px, 92vw); padding: 5px 14px; border-radius: 999px;
+  background: rgba(255,255,255,.03); border: 1px solid var(--border);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.jv-response { margin-top: 4px; color: var(--text); font-size: 1rem; line-height: 1.5;
-  width: min(720px, 92vw); margin-left: auto; margin-right: auto;
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+/* AI 응답 — 글래스 패널로 가독성·고급감 */
+.jv-response { margin: 8px auto 0; color: var(--text); font-size: 1.02rem; line-height: 1.55;
+  width: fit-content; max-width: min(680px, 92vw);
+  padding: 13px 20px; border-radius: var(--r);
+  background: linear-gradient(180deg, rgba(20,22,40,.62), rgba(10,11,22,.62));
+  border: 1px solid rgba(169,139,255,.20);
+  box-shadow: 0 8px 40px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06),
+    0 0 28px rgba(94,242,255,.10);
+  backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  animation: jv-rise .35s ease both; }
+@keyframes jv-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
 /* ── 텍스트 입력 폴백 (STT 미지원/보조 입력) ── */
 .jv-fallback { position: fixed; left: 0; right: 0; bottom: 0; z-index: 11;

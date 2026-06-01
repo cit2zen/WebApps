@@ -1,7 +1,11 @@
 // components/jarvis/JarvisScene.tsx
 "use client";
+import { Vector2 } from "three";
 import { Canvas } from "@react-three/fiber";
-import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { EffectComposer, Bloom, Vignette, ChromaticAberration, Noise } from "@react-three/postprocessing";
+
+// 안정적인 정적 인스턴스(렌더마다 재생성 방지)
+const CA_OFFSET = new Vector2(0.0007, 0.0009);
 import { useMemo } from "react";
 import { Orb } from "./Orb";
 import { Nebula } from "./Nebula";
@@ -29,6 +33,13 @@ function useQuality() {
 
 export default function JarvisScene() {
   const q = useQuality();
+  // EffectComposer 자식은 Element 배열만 허용(boolean 불가) → 조건부로 배열 구성.
+  const effects = [
+    <Bloom key="bloom" mipmapBlur intensity={q.bloom} luminanceThreshold={0.65} luminanceSmoothing={0.3} />,
+  ];
+  if (!q.lite) effects.push(<ChromaticAberration key="ca" offset={CA_OFFSET} />);
+  effects.push(<Vignette key="vig" eskil={false} offset={0.22} darkness={0.8} />);
+  if (!q.lite) effects.push(<Noise key="noise" premultiply opacity={0.035} />);
   return (
     <Canvas
       dpr={q.dpr}
@@ -41,10 +52,7 @@ export default function JarvisScene() {
       <Orb reduced={q.reduced} />
       <Nebula count={q.particles} reduced={q.reduced} />
       {/* multisampling 0 — 일부 ANGLE/AMD 드라이버에서 MSAA+포스트가 깜빡임 유발 → 끔 */}
-      <EffectComposer multisampling={0}>
-        <Bloom mipmapBlur intensity={q.bloom} luminanceThreshold={0.65} luminanceSmoothing={0.3} />
-        <Vignette eskil={false} offset={0.22} darkness={0.8} />
-      </EffectComposer>
+      <EffectComposer multisampling={0}>{effects}</EffectComposer>
     </Canvas>
   );
 }
