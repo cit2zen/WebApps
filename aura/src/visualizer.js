@@ -74,7 +74,30 @@ export class Visualizer {
     drawFluid(s, w, h, frame);
     drawSpectrum(s, w, h, frame);
     this.particles.draw(s, w, h, frame);
+    this._core(s, w, h, frame);
 
     this.bloom.composite(this.ctx, this.cur.blur, this.cur.glow);
+  }
+
+  // 중앙 오로라 코어 — 음성 진폭으로 맥동하는 발광 초점(블룸으로 번짐). 고급감의 중심.
+  _core(s, w, h, frame) {
+    const p = frame.palette, lvl = frame.level;
+    const cx = w * 0.5, cy = h * 0.46;
+    const breath = 0.5 + 0.5 * Math.sin(this.t * 0.9);
+    const R = Math.min(w, h) * (0.11 + lvl * 0.14 + breath * 0.015);
+    const hue = (c) => `hsla(${p.h | 0}, ${p.sat | 0}%, ${(p.light + 6) | 0}%, ${c})`;
+    s.globalCompositeOperation = 'lighter';
+    const g = s.createRadialGradient(cx, cy, 0, cx, cy, R);
+    g.addColorStop(0, hue(0.42 + lvl * 0.4));
+    g.addColorStop(0.35, hue(0.14 + lvl * 0.12));
+    g.addColorStop(1, hue(0));
+    s.fillStyle = g;
+    s.beginPath(); s.arc(cx, cy, R, 0, Math.PI * 2); s.fill();
+    // 얇은 광륜(rim) — 살짝 회전하는 가는 링으로 정밀감
+    const rimR = R * 1.18;
+    s.strokeStyle = hue(0.10 + lvl * 0.18);
+    s.lineWidth = 1.4;
+    s.beginPath(); s.arc(cx, cy, rimR, 0, Math.PI * 2); s.stroke();
+    s.globalCompositeOperation = 'source-over';
   }
 }

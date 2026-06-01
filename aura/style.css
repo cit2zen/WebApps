@@ -36,7 +36,9 @@ body[data-phase="speaking"]  { --accent: #ff4fc8; }
 /* ── 분위기 오버레이 ── */
 .vignette {
   position: fixed; inset: 0; pointer-events: none; z-index: 2;
-  background: radial-gradient(120% 100% at 50% 44%, transparent 38%, rgba(0,0,0,.55) 100%);
+  background:
+    radial-gradient(120% 100% at 50% 44%, transparent 36%, rgba(0,0,0,.58) 100%),
+    linear-gradient(180deg, rgba(6,6,11,.38), transparent 20%, transparent 76%, rgba(6,6,11,.5));
 }
 .grain {
   position: fixed; inset: -120%; pointer-events: none; z-index: 3;
@@ -92,6 +94,20 @@ body[data-phase="speaking"]  { --accent: #ff4fc8; }
 }
 .orb:hover { transform: scale(1.06); }
 .orb:active { transform: scale(.97); }
+/* 외곽 부드러운 헤일로 — 떠 있는 듯한 깊이 */
+.orb::before {
+  content: ""; position: absolute; inset: -16px; border-radius: 50%; pointer-events: none; z-index: 0;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 16%, transparent), transparent 68%);
+  opacity: .75; animation: breathe 5.5s ease-in-out infinite;
+}
+/* 가장자리 회전 광륜 — 정밀한 보석 같은 디테일 */
+.orb::after {
+  content: ""; position: absolute; inset: -1px; border-radius: 50%; pointer-events: none; z-index: 0;
+  background: conic-gradient(from 0deg, transparent 52%, color-mix(in srgb, var(--accent) 55%, transparent) 72%, transparent 86%);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
+  mask: radial-gradient(closest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
+  opacity: .65; animation: spin 9s linear infinite;
+}
 /* 켜짐(대화 중) 상태: 테두리·글로우 상향으로 어포던스 강화 */
 .orb.active {
   border-color: var(--accent);
@@ -150,5 +166,5 @@ body[data-phase="speaking"] .orb-core { animation: breathe 1.6s ease-in-out infi
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .grain, .orb-core, .orb .ring, .status::before { animation: none !important; }
+  .grain, .orb-core, .orb .ring, .status::before, .orb::before, .orb::after { animation: none !important; }
 }
