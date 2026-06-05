@@ -1,0 +1,26 @@
+.wrap { margin-bottom: 24px; }
+.block {
+  position: relative;
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px 28px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: filter .15s;
+}
+.block:hover { filter: brightness(1.07); }
+.focused { outline: 1px solid rgba(68,170,255,0.5); }
+.label { font-size: 9px; font-weight: 600; letter-spacing: .5px; margin-bottom: 6px; }
+.body { font-size: 13px; line-height: 1.8; color: #ccc; }
+.body p { margin: 0 0 6px; }
+
+.intuitive { border-left: 3px solid #4af; background: #0d1a2a; }
+.intuitive .label { color: #7cb9e8; }
+.formula   { border-left: 3px solid #f4a; background: #1e0d18; }
+.formula   .label { color: #f07cbf; }
+.chart     { border-left: 3px solid #8f4; background: #111c0d; }
+.chart     .label { color: #8f4; }
+.detailed  { border-left: 3px solid #666; background: #161b22; }
+.detailed  .label { color: #888; }
+
+.formulaBlock { margin-bottom: 12px; }
+.vars { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
