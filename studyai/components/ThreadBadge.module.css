@@ -1,0 +1,8 @@
+.badge { position: absolute; bottom: 8px; right: 10px; background: #1a3050; border: 1px solid #2a5080; border-radius: 10px; padding: 2px 8px; font-size: 9px; color: #4af; cursor: pointer; user-select: none; }
+.badge:hover { background: #1e3a60; }
+.popup { position: absolute; bottom: 26px; right: 0; background: #1a2a3a; border: 1px solid #2a4a6a; border-radius: 8px; padding: 8px; min-width: 190px; font-size: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.6); display: flex; flex-direction: column; gap: 2px; z-index: 40; }
+.popLabel { color: #555; font-size: 9px; margin-bottom: 3px; }
+.popRow { background: none; border: none; padding: 4px 6px; border-radius: 4px; cursor: pointer; color: #aaa; text-align: left; }
+.popRow:hover { background: #1e3a5a; color: #4af; }
+.popAdd { background: none; border: none; border-top: 1px solid #2a3a4a; padding: 4px 6px; margin-top: 2px; color: #3a5a7a; cursor: pointer; text-align: left; }
+.popAdd:hover { color: #7cb9e8; }
