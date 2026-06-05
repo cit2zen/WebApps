@@ -11,19 +11,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'card_id and rating(1-4) required' }, { status: 400 })
   }
 
-  const [card] = await query<SRSCard>(`SELECT * FROM srs_cards WHERE id = $1`, [card_id])
-  if (!card) return NextResponse.json({ error: 'card not found' }, { status: 404 })
+  try {
+    const [card] = await query<SRSCard>(`SELECT * FROM srs_cards WHERE id = $1`, [card_id])
+    if (!card) return NextResponse.json({ error: 'card not found' }, { status: 404 })
 
-  const next = computeNextReview({ interval: card.interval, ease_factor: card.ease_factor }, rating as 1|2|3|4)
+    const next = computeNextReview({ interval: card.interval, ease_factor: card.ease_factor }, rating as 1|2|3|4)
 
-  await query(
-    `UPDATE srs_cards SET interval = $1, ease_factor = $2, due_date = $3 WHERE id = $4`,
-    [next.interval, next.ease_factor, next.due_date, card_id]
-  )
-  await query(
-    `INSERT INTO srs_reviews (id, card_id, rating) VALUES ($1, $2, $3)`,
-    [uuidv4(), card_id, rating]
-  )
+    await query(
+      `UPDATE srs_cards SET interval = $1, ease_factor = $2, due_date = $3 WHERE id = $4`,
+      [next.interval, next.ease_factor, next.due_date, card_id]
+    )
+    await query(
+      `INSERT INTO srs_reviews (id, card_id, rating) VALUES ($1, $2, $3)`,
+      [uuidv4(), card_id, rating]
+    )
 
-  return NextResponse.json({ next })
+    return NextResponse.json({ next })
+  } catch (err) {
+    console.error('/api/review/submit error:', err)
+    return NextResponse.json({ error: '서버 오류' }, { status: 500 })
+  }
 }

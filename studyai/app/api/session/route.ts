@@ -8,8 +8,13 @@ export async function POST(req: NextRequest) {
   const { title } = await req.json()
   if (!title) return NextResponse.json({ error: 'title required' }, { status: 400 })
 
-  const id = uuidv4()
-  await query(`INSERT INTO sessions (id, title) VALUES ($1, $2)`, [id, title])
-  const [session] = await query<Session>(`SELECT * FROM sessions WHERE id = $1`, [id])
-  return NextResponse.json(session)
+  try {
+    const id = uuidv4()
+    await query(`INSERT INTO sessions (id, title) VALUES ($1, $2)`, [id, title])
+    const [session] = await query<Session>(`SELECT * FROM sessions WHERE id = $1`, [id])
+    return NextResponse.json(session)
+  } catch (err) {
+    console.error('/api/session error:', err)
+    return NextResponse.json({ error: '서버 오류' }, { status: 500 })
+  }
 }

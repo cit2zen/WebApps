@@ -27,11 +27,22 @@ export default function SliderChart({ chartConfig }: Props) {
         (chartRef.current as InstanceType<typeof Chart>).destroy()
       }
 
-      // Inject current slider values into chart config datasets
-      const config = JSON.parse(JSON.stringify(chartConfig.config)) as Record<string, unknown>
+      // Deep clone config and inject current slider values into labels/title
+      const config = JSON.parse(JSON.stringify(chartConfig.config)) as any
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      chartRef.current = new Chart(canvasRef.current, config as any)
+      // Inject slider values into chart: update title to show current variable values
+      const sliderSummary = chartConfig.sliders
+        .map(s => `${s.variable}=${values[s.variable]?.toFixed(1) ?? s.default}`)
+        .join(', ')
+      if (config.options?.plugins?.title) {
+        config.options.plugins.title.text = sliderSummary
+      } else {
+        config.options = config.options ?? {}
+        config.options.plugins = config.options.plugins ?? {}
+        config.options.plugins.title = { display: true, text: sliderSummary, color: '#888', font: { size: 11 } }
+      }
+
+      chartRef.current = new Chart(canvasRef.current, config)
     }
 
     initChart()
@@ -42,7 +53,7 @@ export default function SliderChart({ chartConfig }: Props) {
         chartRef.current = null
       }
     }
-  }, [chartConfig.config, values])
+  }, [chartConfig, values])
 
   return (
     <div className={styles.wrap}>

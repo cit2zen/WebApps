@@ -31,7 +31,10 @@ export function computeNextReview(card: ReviewInput, rating: 1 | 2 | 3 | 4): Rev
 
   const due = new Date()
   due.setDate(due.getDate() + interval)
-  const due_date = due.toISOString().slice(0, 10)
+  const y = due.getFullYear()
+  const m = String(due.getMonth() + 1).padStart(2, '0')
+  const d = String(due.getDate()).padStart(2, '0')
+  const due_date = `${y}-${m}-${d}`
 
   return { interval, ease_factor, due_date }
 }

@@ -31,14 +31,19 @@ async function buildThreadChain(allNodes: NodeRow[], allThreads: Thread[], chain
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const nodes = await query<NodeRow>(`SELECT * FROM nodes WHERE session_id = $1 ORDER BY created_at`, [id])
-  const threads = await query<Thread>(
-    `SELECT t.* FROM threads t
-     JOIN nodes n ON n.session_id = $1
-     WHERE t.parent_node_id = n.id
-     ORDER BY t.created_at`,
-    [id]
-  )
-  const tree = await buildTree(nodes, threads, null)
-  return NextResponse.json(tree)
+  try {
+    const nodes = await query<NodeRow>(`SELECT * FROM nodes WHERE session_id = $1 ORDER BY created_at`, [id])
+    const threads = await query<Thread>(
+      `SELECT t.* FROM threads t
+       JOIN nodes n ON n.session_id = $1
+       WHERE t.parent_node_id = n.id
+       ORDER BY t.created_at`,
+      [id]
+    )
+    const tree = await buildTree(nodes, threads, null)
+    return NextResponse.json(tree)
+  } catch (err) {
+    console.error('/api/session/[id]/tree error:', err)
+    return NextResponse.json({ error: '서버 오류' }, { status: 500 })
+  }
 }
