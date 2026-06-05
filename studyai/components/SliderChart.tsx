@@ -30,7 +30,8 @@ export default function SliderChart({ chartConfig }: Props) {
       // Inject current slider values into chart config datasets
       const config = JSON.parse(JSON.stringify(chartConfig.config)) as Record<string, unknown>
 
-      chartRef.current = new Chart(canvasRef.current, config as Parameters<typeof Chart>[1])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      chartRef.current = new Chart(canvasRef.current, config as any)
     }
 
     initChart()

@@ -28,7 +28,7 @@ export default function BranchTree({ tree, onSelect, onClose }: Props) {
             id: `threads-${node.node.id}`,
             nodes: node.threads.map(t => ({
               node: { ...node.node, question: t.thread.label, id: t.thread.id },
-              threads: t.chain,
+              threads: t.chain as unknown as import('@/lib/types').TreeThread[],
             })),
           },
         ]
