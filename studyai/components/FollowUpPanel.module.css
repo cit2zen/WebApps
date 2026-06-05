@@ -1,0 +1,28 @@
+.panel { width: 270px; display: flex; flex-direction: column; background: #0d1117; border-left: 1px solid #21262d; flex-shrink: 0; transition: width .2s; }
+.wide { width: 100%; }
+.header { padding: 10px 12px; border-bottom: 1px solid #21262d; display: flex; align-items: center; justify-content: space-between; background: #161b22; flex-shrink: 0; }
+.title { font-size: 12px; color: #7cb9e8; }
+.headerRight { display: flex; align-items: center; gap: 6px; }
+.origin { font-size: 9px; color: #2a5a2a; background: #0a1a0a; padding: 2px 6px; border-radius: 3px; }
+.expandBtn { background: #1a2030; border: 1px solid #2a3a4a; border-radius: 4px; color: #555; padding: 2px 8px; cursor: pointer; font-size: 12px; }
+.expandBtn:hover { color: #aaa; }
+.scroll { flex: 1; overflow-y: auto; padding: 10px 12px; }
+.scroll::-webkit-scrollbar { width: 3px; }
+.scroll::-webkit-scrollbar-thumb { background: #2a3a4a; border-radius: 2px; }
+.empty { font-size: 11px; color: #444; text-align: center; margin-top: 20px; }
+.turn { margin-bottom: 12px; }
+.q { border-left: 2px solid #4af; padding-left: 8px; margin-bottom: 5px; }
+.a { border-left: 2px solid #7cb9e8; padding-left: 8px; }
+.who { font-size: 9px; color: #555; margin-bottom: 2px; }
+.aiWho { color: #7cb9e8; }
+.bubble { background: #1a2a3a; border-radius: 5px; padding: 6px 8px; font-size: 11px; color: #ccc; line-height: 1.5; }
+.aiBubble { background: #0d1a2a; }
+.digBtn { font-size: 9px; color: #3a5a7a; margin-top: 5px; cursor: pointer; background: none; border: none; padding-left: 0; }
+.digBtn:hover { color: #7cb9e8; }
+.loading { font-size: 11px; color: #555; text-align: center; padding: 8px; }
+.inputWrap { padding: 8px 12px; border-top: 1px solid #21262d; display: flex; gap: 6px; background: #0d1117; flex-shrink: 0; }
+.input { flex: 1; background: #1f2937; border: 1px solid #2a3a4a; border-radius: 6px; padding: 6px 10px; color: #ccc; font-size: 11px; outline: none; }
+.input::placeholder { color: #444; }
+.input:disabled { opacity: .5; }
+.sendBtn { background: #1a3a5a; border: none; border-radius: 5px; color: #7cb9e8; padding: 5px 10px; cursor: pointer; font-size: 11px; }
+.sendBtn:disabled { opacity: .5; }
