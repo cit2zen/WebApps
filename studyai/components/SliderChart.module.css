@@ -1,0 +1,6 @@
+.wrap { background: #0d1107; border-radius: 8px; padding: 12px; }
+.chartArea { height: 120px; margin-bottom: 10px; }
+.sliderRow { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 12px; }
+.varLabel { color: #8f4; min-width: 20px; font-style: italic; }
+.slider { flex: 1; accent-color: #8f4; }
+.value { color: #fff; min-width: 32px; text-align: right; font-size: 11px; }
