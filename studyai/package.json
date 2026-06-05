@@ -1,0 +1,36 @@
+{
+  "name": "studyai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.100.1",
+    "chart.js": "^4.5.1",
+    "katex": "^0.17.0",
+    "next": "16.2.7",
+    "pg": "^8.21.0",
+    "react": "19.2.4",
+    "react-chartjs-2": "^5.3.1",
+    "react-dom": "19.2.4",
+    "react-katex": "^3.1.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "uuid": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/pg": "^8.20.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/uuid": "^10.0.0",
+    "@vitejs/plugin-react": "^6.0.2",
+    "typescript": "^5",
+    "vitest": "^4.1.8"
+  }
+}
