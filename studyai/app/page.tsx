@@ -71,15 +71,19 @@ export default function Home() {
           parent_id: lastMainNode?.id ?? null,
         }),
       })
-      const data = await r.json() as { node_id: string; response: StructuredResponse }
+      const data = await r.json() as { node_id?: string; response?: StructuredResponse; error?: string }
+      if (!r.ok || data.error) {
+        alert(data.error ?? 'AI 응답 생성 실패')
+        return
+      }
 
       const newNode: NodeRow = {
-        id: data.node_id,
+        id: data.node_id!,
         session_id: activeSession.id,
         parent_id: lastMainNode?.id ?? null,
         thread_id: null,
         question,
-        response: data.response,
+        response: data.response!,
         created_at: new Date().toISOString(),
       }
       setNodes(prev => [...prev, newNode])

@@ -44,8 +44,11 @@ export async function POST(req: NextRequest) {
     )
 
     return NextResponse.json({ node_id: nodeId, response })
-  } catch (err) {
+  } catch (err: any) {
     console.error('/api/ask error:', err)
+    if (err?.status === 429) {
+      return NextResponse.json({ error: '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.' }, { status: 429 })
+    }
     return NextResponse.json({ error: 'AI 응답 생성 실패' }, { status: 500 })
   }
 }
