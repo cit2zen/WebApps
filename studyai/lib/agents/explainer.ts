@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-const client = new Anthropic()
+const client = new Anthropic({ authToken: process.env.ANTHROPIC_AUTH_TOKEN })
 
 export async function runExplainer(
   question: string,
