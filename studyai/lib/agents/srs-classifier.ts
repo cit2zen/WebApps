@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { SRSCardInput } from '../types'
 
-const client = new Anthropic({ authToken: process.env.ANTHROPIC_AUTH_TOKEN })
+const client = new Anthropic({ authToken: process.env.ANTHROPIC_AUTH_TOKEN, apiKey: null })
 
 export async function runSrsClassifier(
   question: string,
