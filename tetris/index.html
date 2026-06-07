@@ -7,7 +7,7 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2306060b'/%3E%3Crect x='6' y='6' width='8' height='8' fill='%235ef2ff'/%3E%3Crect x='14' y='6' width='8' height='8' fill='%23ff4fc8'/%3E%3Crect x='14' y='14' width='8' height='8' fill='%23a98bff'/%3E%3Crect x='14' y='22' width='8' height='8' fill='%2339ff96'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fraunces:ital,opsz,wght@1,9..144,100..900&family=Space+Mono&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../cityzen-ui.css" />
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -39,9 +39,17 @@
     <div class="stage">
       <canvas id="board" width="280" height="560" class="board" role="img" aria-label="테트리스 게임 보드"></canvas>
       <!-- 게임오버/일시정지 시 캔버스 위에 뜨는 실제 버튼(터치 가능) -->
-      <div class="board-overlay" id="board-overlay" hidden>
-        <p class="board-overlay__title" id="overlay-title">GAME OVER</p>
-        <button type="button" class="ov-btn" id="overlay-action">다시 하기</button>
+      <div class="board-overlay pol-lobby" id="board-overlay" hidden>
+        <span id="overlay-title" style="display:none" aria-live="polite"></span>
+        <div class="pol-lcard">
+          <div class="pol-lphoto" style="background:linear-gradient(145deg,#4a6ab0,#1a2a60)"></div>
+          <span class="pol-lnum">cityzen</span>
+          <span class="pol-ltag">tetris</span>
+        </div>
+        <h2 class="pol-ltitle">tetris</h2>
+        <p class="pol-ldesc">쌓고, 지워라.</p>
+        <div class="pol-lbtn" id="overlay-action" style="cursor:pointer">다시하기</div>
+        <span class="pol-llabel">cityzen &middot; Game - Puzzle</span>
       </div>
     </div>
 

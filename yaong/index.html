@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>야옹! — 목소리로 점프하는 고양이</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🐱</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,100;1,200;1,300&family=Space+Mono&display=swap" />
   <link rel="stylesheet" href="../cityzen-ui.css" />
   <link rel="stylesheet" href="styles.css" />
   <!-- cz 헤더가 화면 상단에 놓이고 게임 스테이지는 남은 공간 중앙에 유지되도록 body 레이아웃만 보정(게임 캔버스 크기 계산은 미변경) -->
@@ -24,15 +27,16 @@
     </div>
 
     <!-- 시작 화면 -->
-    <div id="start-screen" class="overlay">
-      <div class="panel">
-        <h1>야옹!</h1>
-        <p class="sub">목소리로 고양이를 점프시켜요 🐱</p>
-        <p class="hint">크게 소리칠수록 높이 뛰어요.<br />선인장을 피해 멀리 달려보세요!</p>
-        <button id="start-btn" class="btn primary">시작하기</button>
-        <button id="settings-btn" class="btn ghost">⚙️ 설정</button>
-        <p id="best-line" class="best"></p>
+    <div id="start-screen" class="overlay pol-lobby">
+      <div class="pol-lcard">
+        <div class="pol-lphoto" style="background:linear-gradient(145deg,#d4a08a,#8a5040)"></div>
+        <span class="pol-lnum">cityzen</span>
+        <span class="pol-ltag">yaong</span>
       </div>
+      <h2 class="pol-ltitle">yaong</h2>
+      <p class="pol-ldesc">냥이를 키워라.</p>
+      <button class="pol-lbtn" id="start-btn">시작하기</button>
+      <span class="pol-llabel">cityzen &middot; Game - Cat</span>
     </div>
 
     <!-- 준비(대기) 화면 -->

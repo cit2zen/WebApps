@@ -6,6 +6,8 @@
 <title>오로라 핸드 — 손동작 인터랙티브 시뮬레이션</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🖐️</text></svg>" />
 <link rel="stylesheet" href="../cityzen-ui.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,100;1,200;1,300&family=Space+Mono&display=swap">
 <style>
   :root { color-scheme: dark; }
   html, body {
@@ -51,8 +53,8 @@
     border:1px solid rgba(255,255,255,0.06); white-space: nowrap;
   }
   #overlay {
-    position: fixed; inset: 0; z-index: 20; display: grid; place-items: center;
-    background: radial-gradient(1200px 600px at 50% 30%, rgba(80,40,160,.35), rgba(0,0,0,.85));
+    position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+    background: #ece7dc;
     transition: opacity .4s ease; opacity: 1; pointer-events: auto;
   }
   #overlay.hidden { opacity: 0; pointer-events: none; }
@@ -103,6 +105,18 @@
     #loader .spin { animation: none; border-top-color: rgba(255,255,255,0.3); }
     #overlay { transition: none; }
   }
+
+/* Polaroid Lobby 2026-06-07 */
+.pol-lobby{position:fixed;inset:0;background:#ece7dc;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:500}
+.pol-lcard{background:#fff;padding:5px 5px 22px;width:140px;box-shadow:0 3px 12px rgba(0,0,0,.18);transform:rotate(-3deg);flex-shrink:0}
+.pol-lphoto{width:100%;aspect-ratio:1 / 1}
+.pol-lnum{font-family:'Fraunces',serif;font-style:italic;font-weight:100;font-size:.6rem;color:#c0a060;display:block;margin-top:5px}
+.pol-ltag{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.66rem;color:#a09060;text-align:center;margin-top:2px;display:block}
+.pol-ltitle{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:clamp(1.9rem,5vw,3rem);color:#1a1005;line-height:1;text-align:center}
+.pol-ldesc{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.86rem;color:#4a3820;text-align:center;max-width:260px;line-height:1.55}
+.pol-lbtn{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.88rem;letter-spacing:.16em;color:#c0a060;background:#fff;border:1px solid rgba(192,160,96,.45);padding:11px 46px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:box-shadow .3s,transform .3s;margin-top:6px}
+.pol-lbtn:hover{box-shadow:0 8px 22px rgba(0,0,0,.15);transform:translateY(-2px)}
+.pol-llabel{font-family:'Space Mono',monospace;font-size:.57rem;color:#a09060;letter-spacing:.09em;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -128,14 +142,18 @@
 
 <div id="hint">✋ 펴기=충격파 · ✊ 주먹=수축 · ☝ 가리키기=분사 · 🤏 집기=특이점 · 양손=다리</div>
 
-<div id="overlay">
-  <div class="card">
-    <h2>오로라 핸드</h2>
-    <p>손동작에 반응하는 실시간 3D 입자장입니다. 웹캠은 기기 안에서만 처리되며 영상은 외부로 전송되지 않습니다.</p>
-    <button id="startBtn">카메라 켜기</button>
-    <div id="loader" class="hidden" aria-hidden="true"><span class="spin"></span></div>
-    <div id="err"></div>
-  </div>
+<div id="overlay" class="pol-lobby">
+<div class="pol-lcard">
+  <div class="pol-lphoto" style="background:linear-gradient(145deg,#9ab0be,#5a7080)"></div>
+  <span class="pol-lnum">cityzen</span>
+  <span class="pol-ltag">aurora</span>
+</div>
+<h2 class="pol-ltitle">aurora</h2>
+<p class="pol-ldesc">손으로 빛을 그려라.</p>
+<button class="pol-lbtn" id="startBtn">시작하기</button>
+<span class="pol-llabel">cityzen &middot; AI - Vision</span>
+<div id="loader" class="hidden" aria-hidden="true"><span class="spin"></span></div>
+<div id="err"></div>
 </div>
 
 <!-- MediaPipe Hands (global) -->

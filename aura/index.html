@@ -10,9 +10,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,300..600&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="/cityzen-ui.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet" />
   <style>
     /* cityzen 공통 헤더: 앱이 fixed로 화면을 꽉 채우므로 헤더만 상단에 띄움 (앱 레이아웃·캔버스 미변경) */
     .cz-gamehead { position: fixed; top: 0; left: 0; right: 0; z-index: 30; background: linear-gradient(90deg, rgba(94,242,255,.05), rgba(2,3,10,.55)); backdrop-filter: blur(6px); }
+    /* Polaroid dock overrides */
+    .dock { font-family: 'Fraunces', serif; font-style: italic; }
+    .orb { border-color: rgba(192,160,96,.55); box-shadow: 0 0 18px rgba(192,160,96,.25); }
+    .orb:hover { box-shadow: 0 0 30px rgba(192,160,96,.4); }
+    .orb-core { background: radial-gradient(circle, rgba(192,160,96,.18), transparent 70%); }
+    #status { color: #c0a060; }
+    #status::before { background: #c0a060; box-shadow: 0 0 10px #c0a060; }
   </style>
 </head>
 <body data-phase="idle" data-running="false">

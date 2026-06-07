@@ -60,8 +60,10 @@ body[data-level="6"] { --accent: #f43f5e; --accent2: var(--cz-cyan); }
 }
 
 .logo {
-  /* 캔버스 밖 픽셀 로고 — 게임 정체성상 Press Start 2P 유지 */
-  font-family: "Press Start 2P", monospace;
+  /* Polaroid Editorial: Fraunces italic */
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
   font-size: 20px;
   line-height: 1.3;
   letter-spacing: 0.02em;
@@ -315,3 +317,16 @@ kbd {
   body { animation: none !important; }
   .ov-btn:hover, .tp-btn:active, .mute:hover { transform: none !important; }
 }
+
+/* Polaroid Lobby 2026-06-07 */
+.pol-lobby{position:fixed;inset:0;background:#ece7dc;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:500}
+.board-overlay.pol-lobby{position:fixed;inset:0;background:#ece7dc;border-radius:0;backdrop-filter:none;z-index:500}
+.pol-lcard{background:#fff;padding:5px 5px 22px;width:140px;box-shadow:0 3px 12px rgba(0,0,0,.18);transform:rotate(-3deg);flex-shrink:0}
+.pol-lphoto{width:100%;aspect-ratio:1 / 1}
+.pol-lnum{font-family:'Fraunces',serif;font-style:italic;font-weight:100;font-size:.6rem;color:#c0a060;display:block;margin-top:5px}
+.pol-ltag{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.66rem;color:#a09060;text-align:center;margin-top:2px;display:block}
+.pol-ltitle{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:clamp(1.9rem,5vw,3rem);color:#1a1005;line-height:1;text-align:center}
+.pol-ldesc{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.86rem;color:#4a3820;text-align:center;max-width:260px;line-height:1.55}
+.pol-lbtn{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.88rem;letter-spacing:.16em;color:#c0a060;background:#fff;border:1px solid rgba(192,160,96,.45);padding:11px 46px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:box-shadow .3s,transform .3s;margin-top:6px}
+.pol-lbtn:hover{box-shadow:0 8px 22px rgba(0,0,0,.15);transform:translateY(-2px)}
+.pol-llabel{font-family:'Space Mono',monospace;font-size:.57rem;color:#a09060;letter-spacing:.09em;text-transform:uppercase}
