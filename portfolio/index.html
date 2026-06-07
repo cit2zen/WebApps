@@ -187,19 +187,16 @@ body {
   transform: rotate(0deg);
 }
 
-/* Photo gradients by category */
-.ph-ai    { background: linear-gradient(145deg, #7a9aaa, #3a5a6a); }
-.ph-game  { background: linear-gradient(145deg, #c8964a, #7a5028); }
-.ph-tool  { background: linear-gradient(145deg, #8a9a7a, #4a5a3a); }
-.ph-aura  { background: linear-gradient(145deg, #8a7aaa, #4a3a6a); }
+/* Photo gradients (fallback only) */
 .ph-aurora{ background: linear-gradient(145deg, #9ab0be, #5a7080); }
-.ph-study { background: linear-gradient(145deg, #7aa090, #3a6050); }
-.ph-yaong { background: linear-gradient(145deg, #d4a08a, #8a5040); }
-.ph-dl    { background: linear-gradient(145deg, #7a5ab8, #2a1860); }
-.ph-doom  { background: linear-gradient(145deg, #8a4a3a, #3a1a18); }
-.ph-pacman{ background: linear-gradient(145deg, #c8b040, #6a5a18); }
-.ph-tetris{ background: linear-gradient(145deg, #4a6ab0, #1a2a60); }
-.ph-apple { background: linear-gradient(145deg, #6aaa4a, #284818); }
+
+/* Screenshot thumbnails */
+.pol-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 
 /* Category tag in caption */
 .pol-tag {
@@ -279,25 +276,25 @@ footer {
   <div class="pol-group hero-group" id="heroGroup">
     <!-- Card 1: Jarvis (AI) -->
     <div class="pol-card" data-url="https://jarvis.cityzen.kr">
-      <div class="pol-photo ph-ai"></div>
+      <div class="pol-photo"><img src="thumbs/jarvis.jpg" alt="Jarvis"></div>
       <span class="pol-num">01</span>
       <p class="pol-caption">Jarvis<span class="pol-tag">AI · Voice</span></p>
     </div>
     <!-- Card 2: ShopScout (Tool) -->
     <div class="pol-card" data-url="https://shopscout.cityzen.kr">
-      <div class="pol-photo ph-tool"></div>
+      <div class="pol-photo"><img src="thumbs/shopscout.jpg" alt="ShopScout"></div>
       <span class="pol-num">02</span>
       <p class="pol-caption">ShopScout<span class="pol-tag">Tool · Chat</span></p>
     </div>
     <!-- Card 3: Onmantle (Game) -->
     <div class="pol-card" data-url="https://onmantle.cityzen.kr">
-      <div class="pol-photo ph-game"></div>
+      <div class="pol-photo"><img src="thumbs/onmantle.jpg" alt="Onmantle"></div>
       <span class="pol-num">03</span>
       <p class="pol-caption">Onmantle<span class="pol-tag">Game · Words</span></p>
     </div>
     <!-- Card 4: Aura (AI TTS) -->
     <div class="pol-card" data-url="https://aura.cityzen.kr">
-      <div class="pol-photo ph-aura"></div>
+      <div class="pol-photo"><img src="thumbs/aura.jpg" alt="Aura"></div>
       <span class="pol-num">04</span>
       <p class="pol-caption">Aura<span class="pol-tag">AI · TTS</span></p>
     </div>
@@ -333,7 +330,7 @@ footer {
     <!-- StudyAI -->
     <a class="service-link" href="https://study.cityzen.kr" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:-3deg">
-        <div class="pol-photo ph-study"></div>
+        <div class="pol-photo"><img src="thumbs/study.jpg" alt="StudyAI"></div>
         <span class="pol-num">06</span>
         <p class="pol-caption">StudyAI<span class="pol-tag">Tool · Learn</span></p>
       </div>
@@ -342,7 +339,7 @@ footer {
     <!-- Doom Shooter -->
     <a class="service-link" href="https://games.cityzen.kr/doom-shooter" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:2.5deg">
-        <div class="pol-photo ph-doom"></div>
+        <div class="pol-photo"><img src="thumbs/doom-shooter.jpg" alt="Doom Shooter"></div>
         <span class="pol-num">07</span>
         <p class="pol-caption">Doom Shooter<span class="pol-tag">Game · FPS</span></p>
       </div>
@@ -351,7 +348,7 @@ footer {
     <!-- Pacman -->
     <a class="service-link" href="https://games.cityzen.kr/pacman" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:-2deg">
-        <div class="pol-photo ph-pacman"></div>
+        <div class="pol-photo"><img src="thumbs/pacman.jpg" alt="Pacman"></div>
         <span class="pol-num">08</span>
         <p class="pol-caption">Pacman<span class="pol-tag">Game · Arcade</span></p>
       </div>
@@ -360,7 +357,7 @@ footer {
     <!-- Tetris -->
     <a class="service-link" href="https://games.cityzen.kr/tetris" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:1.5deg">
-        <div class="pol-photo ph-tetris"></div>
+        <div class="pol-photo"><img src="thumbs/tetris.jpg" alt="Tetris"></div>
         <span class="pol-num">09</span>
         <p class="pol-caption">Tetris<span class="pol-tag">Game · Puzzle</span></p>
       </div>
@@ -369,7 +366,7 @@ footer {
     <!-- Apple Game -->
     <a class="service-link" href="https://games.cityzen.kr/apple-game" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:-2.5deg">
-        <div class="pol-photo ph-apple"></div>
+        <div class="pol-photo"><img src="thumbs/apple-game.jpg" alt="Apple Game"></div>
         <span class="pol-num">10</span>
         <p class="pol-caption">Apple Game<span class="pol-tag">Game · Puzzle</span></p>
       </div>
@@ -378,7 +375,7 @@ footer {
     <!-- Yaong -->
     <a class="service-link" href="https://games.cityzen.kr/yaong" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:2deg">
-        <div class="pol-photo ph-yaong"></div>
+        <div class="pol-photo"><img src="thumbs/yaong.jpg" alt="Yaong"></div>
         <span class="pol-num">11</span>
         <p class="pol-caption">Yaong<span class="pol-tag">Game · Cat</span></p>
       </div>
@@ -387,7 +384,7 @@ footer {
     <!-- Deep Learning -->
     <a class="service-link" href="https://deeplearning.cityzen.kr" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:-1.5deg">
-        <div class="pol-photo ph-dl"></div>
+        <div class="pol-photo"><img src="thumbs/deeplearning.jpg" alt="Deep Learning"></div>
         <span class="pol-num">12</span>
         <p class="pol-caption">Deep Learning<span class="pol-tag">Study · AI</span></p>
       </div>
@@ -396,7 +393,7 @@ footer {
     <!-- Games Hub -->
     <a class="service-link" href="https://games.cityzen.kr" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:1deg">
-        <div class="pol-photo ph-game"></div>
+        <div class="pol-photo"><img src="thumbs/games.jpg" alt="Games Hub"></div>
         <span class="pol-num">13</span>
         <p class="pol-caption">Games Hub<span class="pol-tag">Game · Hub</span></p>
       </div>
