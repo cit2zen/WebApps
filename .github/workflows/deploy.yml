@@ -23,5 +23,5 @@ jobs:
       - name: Trigger Coolify deploy
         run: |
           curl -fsS --retry 3 --retry-delay 5 \
-            "http://100.116.176.25:8000/api/v1/deploy?uuid=z68yt4hzmjsua32sdyzxodix&force=false" \
+            "http://100.104.79.84:8000/api/v1/deploy?uuid=z68yt4hzmjsua32sdyzxodix&force=false" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"
