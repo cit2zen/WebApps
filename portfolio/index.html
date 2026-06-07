@@ -87,22 +87,30 @@ body {
   text-align: right;
 }
 
-/* Hero pol-group: larger cards */
+/* Hero pol-group: 5 cards */
 .hero-group {
-  --pol-width: 178px;
-  min-height: 400px;
-  min-width: 420px;
+  --pol-width: 162px;
+  min-height: 460px;
+  min-width: 680px;
 }
-/* Override expanded positions for larger cards */
-.hero-group.open .pol-card:nth-child(1) {
-  transform: translate(-148px, -78px) rotate(-5deg);
+/* Anchor point override for 5-card layout */
+.hero-group .pol-card {
+  top: 48%;
 }
-.hero-group.open .pol-card:nth-child(2) {
-  transform: translate(148px, -78px) rotate(6deg);
-}
-.hero-group.open .pol-card:nth-child(3) {
-  transform: translate(0px, 106px) rotate(-2deg);
-}
+
+/* ── Cascade: 5장 겹치기 ── */
+.hero-group .pol-card:nth-child(1) { transform: translate(-32px, -18px) rotate(-11deg); z-index:1; }
+.hero-group .pol-card:nth-child(2) { transform: translate(-12px,  12px) rotate(  6deg); z-index:2; }
+.hero-group .pol-card:nth-child(3) { transform: translate(  8px, -14px) rotate( -4deg); z-index:3; }
+.hero-group .pol-card:nth-child(4) { transform: translate( 28px,   8px) rotate(  8deg); z-index:4; }
+.hero-group .pol-card:nth-child(5) { transform: translate(  4px,  -2px) rotate( -2deg); z-index:5; }
+
+/* ── Expanded: 부채꼴 아크 ── */
+.hero-group.open .pol-card:nth-child(1) { transform: translate(-220px,  18px) rotate(-16deg); }
+.hero-group.open .pol-card:nth-child(2) { transform: translate(-110px, -52px) rotate( -8deg); }
+.hero-group.open .pol-card:nth-child(3) { transform: translate(   0px, -82px) rotate(  0deg); }
+.hero-group.open .pol-card:nth-child(4) { transform: translate( 110px, -52px) rotate(  8deg); }
+.hero-group.open .pol-card:nth-child(5) { transform: translate( 220px,  18px) rotate( 16deg); }
 /* Card links in expanded hero */
 .hero-group.open .pol-card {
   cursor: pointer;
@@ -286,6 +294,18 @@ footer {
       <span class="pol-num">03</span>
       <p class="pol-caption">Onmantle<span class="pol-tag">Game · Words</span></p>
     </div>
+    <!-- Card 4: Aura (AI TTS) -->
+    <div class="pol-card" data-url="https://aura.cityzen.kr">
+      <div class="pol-photo ph-aura"></div>
+      <span class="pol-num">04</span>
+      <p class="pol-caption">Aura<span class="pol-tag">AI · TTS</span></p>
+    </div>
+    <!-- Card 5: Doom Shooter (Game) -->
+    <div class="pol-card" data-url="https://doom-shooter.cityzen.kr">
+      <div class="pol-photo ph-doom"></div>
+      <span class="pol-num">05</span>
+      <p class="pol-caption">Doom Shooter<span class="pol-tag">Game · FPS</span></p>
+    </div>
   </div>
 
   <div class="hero-right">
@@ -309,39 +329,21 @@ footer {
   </div>
   <div class="service-grid">
 
-    <!-- Aura -->
-    <a class="service-link" href="https://aura.cityzen.kr" target="_blank" rel="noopener">
-      <div class="pol-card service-card" style="--rot:-3deg">
-        <div class="pol-photo ph-aura"></div>
-        <span class="pol-num">04</span>
-        <p class="pol-caption">Aura<span class="pol-tag">AI · TTS</span></p>
-      </div>
-    </a>
-
     <!-- StudyAI -->
     <a class="service-link" href="https://studyai.cityzen.kr" target="_blank" rel="noopener">
-      <div class="pol-card service-card" style="--rot:2deg">
+      <div class="pol-card service-card" style="--rot:-3deg">
         <div class="pol-photo ph-study"></div>
-        <span class="pol-num">05</span>
+        <span class="pol-num">06</span>
         <p class="pol-caption">StudyAI<span class="pol-tag">Tool · Learn</span></p>
       </div>
     </a>
 
     <!-- Aurora Hands -->
     <a class="service-link" href="https://aurora-hands.cityzen.kr" target="_blank" rel="noopener">
-      <div class="pol-card service-card" style="--rot:-1.5deg">
+      <div class="pol-card service-card" style="--rot:2deg">
         <div class="pol-photo ph-aurora"></div>
-        <span class="pol-num">06</span>
-        <p class="pol-caption">Aurora Hands<span class="pol-tag">AI · Vision</span></p>
-      </div>
-    </a>
-
-    <!-- Doom Shooter -->
-    <a class="service-link" href="https://doom-shooter.cityzen.kr" target="_blank" rel="noopener">
-      <div class="pol-card service-card" style="--rot:3deg">
-        <div class="pol-photo ph-doom"></div>
         <span class="pol-num">07</span>
-        <p class="pol-caption">Doom Shooter<span class="pol-tag">Game · FPS</span></p>
+        <p class="pol-caption">Aurora Hands<span class="pol-tag">AI · Vision</span></p>
       </div>
     </a>
 
