@@ -673,4 +673,8 @@ body:has(> .cz-gamehead) { padding-top: 0; }
 .pol-ldesc{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.86rem;color:#4a3820;text-align:center;max-width:260px;line-height:1.55}
 .pol-lbtn{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.88rem;letter-spacing:.16em;color:#c0a060;background:#fff;border:1px solid rgba(192,160,96,.45);padding:11px 46px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:box-shadow .3s,transform .3s;margin-top:6px}
 .pol-lbtn:hover{box-shadow:0 8px 22px rgba(0,0,0,.15);transform:translateY(-2px)}
+
+/* pol-back-btn */
+.pol-back-btn{position:fixed;top:14px;left:14px;font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.78rem;color:#c0a060;text-decoration:none;letter-spacing:.06em;z-index:9999;background:rgba(236,231,220,.88);padding:6px 14px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1px solid rgba(192,160,96,.25);transition:color .2s,background .2s}
+.pol-back-btn:hover{color:#1a1005;background:rgba(236,231,220,.98)}
 .pol-llabel{font-family:'Space Mono',monospace;font-size:.57rem;color:#a09060;letter-spacing:.09em;text-transform:uppercase}
