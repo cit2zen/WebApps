@@ -14,7 +14,7 @@ from PIL import Image
 app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]
 app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SECURE"] = False
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
 UPLOAD_FOLDER = Path(os.environ.get("UPLOAD_FOLDER", "/app/uploads"))
