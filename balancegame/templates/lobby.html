@@ -205,7 +205,10 @@
   <p id="no-sets" style="display:none;font-style:italic;color:var(--ink-light)">
     셋이 없습니다. 설정 페이지에서 만들어주세요.
   </p>
-  <a href="/logout" class="nav-link" style="margin-top:2rem">로그아웃</a>
+  <div style="display:flex;gap:1.5rem;margin-top:2rem">
+    <a href="{{ cross_url }}" class="nav-link">{{ cross_label }}</a>
+    <a href="/logout" class="nav-link">로그아웃</a>
+  </div>
 </div>
 
 <div id="size-overlay" class="size-overlay" style="display:none">

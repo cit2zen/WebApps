@@ -88,6 +88,18 @@ def is_settings_host():
     return "settings" in request.host
 
 
+@app.context_processor
+def inject_cross_url():
+    """게임 ↔ 설정 호스트 전환 링크 (balancegame ↔ balancegame-settings)."""
+    host = request.host
+    if is_settings_host():
+        return {"cross_url": "//" + host.replace("-settings", "") + "/",
+                "cross_label": "게임으로 →"}
+    first, _, rest = host.partition(".")
+    return {"cross_url": f"//{first}-settings.{rest}/",
+            "cross_label": "설정 →"}
+
+
 # ── Pages ─────────────────────────────────────────────────────────────
 
 @app.route("/")
