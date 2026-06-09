@@ -12,24 +12,44 @@ function esc(s) {
 }
 
 function getSelectedIds() {
-  return Array.from(document.querySelectorAll('.item-cb:checked')).map(cb => parseInt(cb.value));
+  return Array.from(document.querySelectorAll('.item-pick-card.selected'))
+    .map(c => parseInt(c.dataset.id));
 }
 
 function setChecked(ids) {
-  document.querySelectorAll('.item-cb').forEach(cb => {
-    cb.checked = ids.includes(parseInt(cb.value));
+  document.querySelectorAll('.item-pick-card').forEach(c => {
+    c.classList.toggle('selected', ids.includes(parseInt(c.dataset.id)));
   });
 }
 
 async function loadCheckboxes() {
   const res = await fetch('/api/items');
   const items = await res.json();
-  itemCbWrap.innerHTML = items.map(item => `
-    <label class="item-cb-label">
-      <input type="checkbox" class="item-cb" value="${item.id}">
-      ${esc(item.title)}
-    </label>
-  `).join('');
+  itemCbWrap.innerHTML = '';
+
+  if (!items.length) {
+    itemCbWrap.innerHTML = `<p style="font-style:italic;color:var(--ink-light);font-size:0.85rem">
+      항목이 없습니다. <a href="/" style="color:var(--gold-mid)">항목 관리</a>에서 추가해주세요.</p>`;
+    return;
+  }
+
+  items.forEach(item => {
+    const img = item.image_path ? '/uploads/' + item.image_path : null;
+    const card = document.createElement('div');
+    card.className = 'item-pick-card';
+    card.dataset.id = item.id;
+    card.innerHTML = `
+      <div class="item-pick-photo">
+        ${img
+          ? `<img src="${img}" alt="${esc(item.title)}">`
+          : `<div class="item-pick-init">${esc(item.title.charAt(0).toUpperCase())}</div>`}
+      </div>
+      <div class="item-pick-check">✓</div>
+      <div class="item-pick-title">${esc(item.title)}</div>
+    `;
+    card.addEventListener('click', () => card.classList.toggle('selected'));
+    itemCbWrap.appendChild(card);
+  });
 }
 
 function renderSetGroup(set) {
@@ -38,7 +58,6 @@ function renderSetGroup(set) {
   wrap.className = 'sset-wrap';
   wrap.dataset.id = set.id;
 
-  // Cascade group
   const group = document.createElement('div');
   group.className = 'sset-group';
 
@@ -58,24 +77,15 @@ function renderSetGroup(set) {
   `;
   group.appendChild(front);
 
-  // Action buttons
   const actions = document.createElement('div');
   actions.className = 'sset-actions';
-  actions.style.width = 'calc(var(--lw, 160px) + 2rem)';
-  actions.innerHTML = `
-    <button class="sset-btn sset-btn-edit" data-id="${set.id}">수정</button>
-    <button class="sset-btn sset-btn-del"  data-id="${set.id}">삭제</button>
-  `;
 
-  actions.querySelector('.sset-btn-del').addEventListener('click', async () => {
-    if (!confirm('셋을 삭제할까요?')) return;
-    await fetch(`/api/sets/${set.id}`, { method: 'DELETE' });
-    wrap.remove();
-  });
-
-  actions.querySelector('.sset-btn-edit').addEventListener('click', async () => {
-    const res = await fetch(`/api/sets/${set.id}`);
-    const s = await res.json();
+  const editBtn = document.createElement('button');
+  editBtn.className = 'sset-btn sset-btn-edit';
+  editBtn.textContent = '수정';
+  editBtn.addEventListener('click', async () => {
+    const r = await fetch(`/api/sets/${set.id}`);
+    const s = await r.json();
     inpQuestion.value = s.question;
     setChecked(s.items.map(i => i.id));
     editingSetId = parseInt(set.id);
@@ -83,6 +93,17 @@ function renderSetGroup(set) {
     document.getElementById('set-form').scrollIntoView({ behavior: 'smooth' });
   });
 
+  const delBtn = document.createElement('button');
+  delBtn.className = 'sset-btn sset-btn-del';
+  delBtn.textContent = '삭제';
+  delBtn.addEventListener('click', async () => {
+    if (!confirm('셋을 삭제할까요?')) return;
+    await fetch(`/api/sets/${set.id}`, { method: 'DELETE' });
+    wrap.remove();
+  });
+
+  actions.appendChild(editBtn);
+  actions.appendChild(delBtn);
   wrap.appendChild(group);
   wrap.appendChild(actions);
   return wrap;
@@ -92,6 +113,11 @@ async function loadSets() {
   const res = await fetch('/api/sets');
   const sets = await res.json();
   setsCascade.innerHTML = '';
+  if (!sets.length) {
+    setsCascade.innerHTML = `<p style="font-style:italic;color:var(--ink-light);font-size:0.9rem">
+      아직 만든 셋이 없습니다.</p>`;
+    return;
+  }
   sets.forEach(s => setsCascade.appendChild(renderSetGroup(s)));
 }
 
