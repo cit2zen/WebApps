@@ -34,7 +34,7 @@ async function loadCheckboxes() {
   }
 
   items.forEach(item => {
-    const img = item.image_path ? '/uploads/' + item.image_path : null;
+    const img = item.image_path ? '/uploads/' + esc(item.image_path) : null;
     const card = document.createElement('div');
     card.className = 'item-pick-card';
     card.dataset.id = item.id;

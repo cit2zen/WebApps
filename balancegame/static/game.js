@@ -9,7 +9,7 @@ function esc(s) {
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-function imageUrl(path) { return path ? '/uploads/' + path : null; }
+function imageUrl(path) { return path ? '/uploads/' + esc(path) : null; }
 
 // 항상 2의거듭제곱: prevPow2(6)=4, prevPow2(8)=8, prevPow2(10)=8
 function prevPow2(n) {
