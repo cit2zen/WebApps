@@ -23,6 +23,22 @@
   </div>
 
   <div id="items-grid" class="items-grid"></div>
+
+  <hr style="border:none;border-top:1px solid var(--cream-400)">
+
+  <div style="display:flex;justify-content:space-between;align-items:baseline">
+    <h1 class="settings-title">🗂 셋 관리</h1>
+  </div>
+  <div class="upload-form" id="set-form">
+    <label>질문</label>
+    <input type="text" id="inp-question" placeholder="이 중에 가장 좋은 것은?">
+    <label>항목 선택 (2개 이상)</label>
+    <div id="item-checkboxes" class="item-checkboxes"></div>
+    <button class="btn" id="btn-save-set">셋 만들기</button>
+    <p class="status-msg" id="set-status"></p>
+  </div>
+  <div id="sets-list"></div>
 </div>
 <script src="/static/settings.js"></script>
+<script src="/static/sets.js"></script>
 {% endblock %}

@@ -1,31 +1,23 @@
-// 토너먼트 상태
-let bracket = [];   // 현재 라운드 항목 배열
+let bracket = [];
 let roundWinners = [];
 let currentMatch = 0;
 let roundNum = 0;
-let totalRounds = 0;
+let currentSetId = null;
 
 function esc(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-function imageUrl(path) {
-  return path ? '/uploads/' + path : null;
-}
+function imageUrl(path) { return path ? '/uploads/' + path : null; }
 
 function renderCard(el, item) {
   const img = imageUrl(item.image_path);
-  const initial = esc(item.title.charAt(0).toUpperCase());
   el.innerHTML = `
     <div class="pol-photo">
       ${img
         ? `<img src="${img}" alt="${esc(item.title)}">`
-        : `<div class="pol-placeholder">${initial}</div>`}
+        : `<div class="pol-placeholder">${esc(item.title.charAt(0).toUpperCase())}</div>`}
     </div>
     <div class="pol-caption">${esc(item.title)}</div>
   `;
@@ -41,7 +33,6 @@ function shuffle(arr) {
 }
 
 function buildBracket(items) {
-  // 홀수면 마지막 항목 부전승으로 roundWinners에 먼저 추가
   const shuffled = shuffle([...items]);
   if (shuffled.length % 2 === 1) {
     roundWinners = [shuffled.pop()];
@@ -54,9 +45,10 @@ function buildBracket(items) {
 function getRoundLabel() {
   const total = bracket.length + roundWinners.length;
   if (total === 2) return '결승';
-  if (total === 4) return '4강';
-  if (total === 8) return '8강';
-  if (total === 16) return '16강';
+  if (total <= 4) return '4강';
+  if (total <= 8) return '8강';
+  if (total <= 16) return '16강';
+  if (total <= 32) return '32강';
   return `${total}강`;
 }
 
@@ -65,9 +57,9 @@ function showMatch() {
   const b = bracket[currentMatch * 2 + 1];
   const matchesTotal = Math.floor(bracket.length / 2);
 
-  document.getElementById('round-badge').textContent =
-    `${getRoundLabel()} ${currentMatch + 1} / ${matchesTotal}`;
-  document.getElementById('round-badge').style.display = 'block';
+  const badge = document.getElementById('round-badge');
+  badge.textContent = `${getRoundLabel()} ${currentMatch + 1} / ${matchesTotal}`;
+  badge.style.display = 'block';
 
   const cardA = document.getElementById('card-a');
   const cardB = document.getElementById('card-b');
@@ -81,7 +73,6 @@ function showMatch() {
 }
 
 async function onChoose(winner) {
-  // 애니메이션
   const winEl = winner.id === parseInt(document.getElementById('card-a').dataset.id)
     ? document.getElementById('card-a')
     : document.getElementById('card-b');
@@ -93,14 +84,11 @@ async function onChoose(winner) {
   currentMatch++;
 
   if (currentMatch >= Math.floor(bracket.length / 2)) {
-    // 라운드 끝
     if (roundWinners.length === 1) {
-      // 우승자 확정
       await recordWin(roundWinners[0].id);
       goToResult(roundWinners[0]);
       return;
     }
-    // 다음 라운드 준비
     buildBracket(roundWinners);
     currentMatch = 0;
     roundNum++;
@@ -109,7 +97,11 @@ async function onChoose(winner) {
 }
 
 async function recordWin(id) {
-  await fetch(`/api/win/${id}`, { method: 'POST' });
+  await fetch(`/api/win/${id}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ set_id: currentSetId })
+  });
 }
 
 function goToResult(winner) {
@@ -118,23 +110,37 @@ function goToResult(winner) {
 }
 
 async function init() {
-  const res = await fetch('/api/items');
-  const items = await res.json();
-  if (items.length < 2) {
-    document.getElementById('loading').textContent = '항목이 2개 이상 필요합니다. 설정 페이지에서 추가해주세요.';
+  const setId = sessionStorage.getItem('selectedSetId');
+  const bracketSize = parseInt(sessionStorage.getItem('bracketSize') || '16');
+
+  if (!setId) { location.href = '/'; return; }
+  currentSetId = parseInt(setId);
+
+  const res = await fetch(`/api/sets/${setId}`);
+  if (!res.ok) { location.href = '/'; return; }
+  const setData = await res.json();
+
+  const qEl = document.getElementById('game-question');
+  qEl.textContent = `"${setData.question}"`;
+  qEl.style.display = 'block';
+
+  const pool = setData.items;
+  if (pool.length < 2) {
+    document.getElementById('loading').textContent = '항목이 2개 이상 필요합니다.';
     return;
   }
-  totalRounds = Math.ceil(Math.log2(items.length));
+
+  const count = Math.min(bracketSize, pool.length);
+  const items = shuffle([...pool]).slice(0, count);
+
   buildBracket(items);
   showMatch();
 
   document.getElementById('card-a').addEventListener('click', () => {
-    const a = bracket[currentMatch * 2];
-    onChoose(a);
+    onChoose(bracket[currentMatch * 2]);
   });
   document.getElementById('card-b').addEventListener('click', () => {
-    const b = bracket[currentMatch * 2 + 1];
-    onChoose(b);
+    onChoose(bracket[currentMatch * 2 + 1]);
   });
 }
 

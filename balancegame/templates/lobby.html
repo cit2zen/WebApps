@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}셋 선택{% endblock %}
+{% block body %}
+<div class="lobby-wrap">
+  <h1 class="game-title">⚖ 밸런스 게임</h1>
+  <p class="lobby-sub">플레이할 셋을 선택하세요</p>
+  <div id="sets-grid" class="lobby-grid"></div>
+  <p id="no-sets" style="display:none;font-style:italic;color:var(--ink-light)">
+    셋이 없습니다. 설정 페이지에서 만들어주세요.
+  </p>
+  <a href="/logout" class="nav-link" style="margin-top:auto">로그아웃</a>
+</div>
+
+<!-- 강수 선택 오버레이 -->
+<div id="size-overlay" class="size-overlay" style="display:none">
+  <div class="size-modal">
+    <p id="size-question" class="size-question-text"></p>
+    <p class="size-label">몇 강?</p>
+    <div class="size-btns">
+      <button class="size-btn" data-size="8">8강</button>
+      <button class="size-btn" data-size="16">16강</button>
+      <button class="size-btn" data-size="32">32강</button>
+      <button class="size-btn" data-size="64">64강</button>
+    </div>
+    <button class="size-cancel" id="size-cancel">취소</button>
+  </div>
+</div>
+
+<script>
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+let selectedSet = null;
+
+async function loadSets() {
+  const res = await fetch('/api/sets');
+  const sets = await res.json();
+  const grid = document.getElementById('sets-grid');
+  if (!sets.length) {
+    document.getElementById('no-sets').style.display = 'block';
+    return;
+  }
+  sets.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'lobby-card';
+    card.innerHTML = `
+      <div class="lobby-card-q">"${esc(s.question)}"</div>
+      <div class="lobby-card-meta">${s.item_count}개 항목</div>
+    `;
+    card.addEventListener('click', () => openSizePicker(s));
+    grid.appendChild(card);
+  });
+}
+
+function openSizePicker(set) {
+  selectedSet = set;
+  document.getElementById('size-question').textContent = '"' + set.question + '"';
+  const btns = document.querySelectorAll('.size-btn');
+  btns.forEach(btn => {
+    const size = parseInt(btn.dataset.size);
+    btn.disabled = set.item_count < 2;
+    btn.classList.toggle('size-btn-dim', set.item_count < size);
+  });
+  document.getElementById('size-overlay').style.display = 'flex';
+}
+
+document.querySelectorAll('.size-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (!selectedSet) return;
+    const size = parseInt(btn.dataset.size);
+    sessionStorage.setItem('selectedSetId', selectedSet.id);
+    sessionStorage.setItem('bracketSize', size);
+    location.href = '/game';
+  });
+});
+
+document.getElementById('size-cancel').addEventListener('click', () => {
+  document.getElementById('size-overlay').style.display = 'none';
+  selectedSet = null;
+});
+
+document.getElementById('size-overlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) {
+    document.getElementById('size-overlay').style.display = 'none';
+    selectedSet = null;
+  }
+});
+
+loadSets();
+</script>
+{% endblock %}

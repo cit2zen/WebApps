@@ -4,7 +4,7 @@
 <div class="result-wrap">
   <h1 class="game-title">🏆 최종 우승</h1>
   <div id="winner-card" class="pol-card winner-card"></div>
-  <h2 style="font-style:italic;font-weight:200;color:var(--ink-mid)">전체 랭킹</h2>
+  <h2 style="font-style:italic;font-weight:200;color:var(--ink-mid)">이 셋 랭킹</h2>
   <table class="ranking-table">
     <thead>
       <tr>
@@ -16,18 +16,14 @@
     <tbody id="ranking-body"></tbody>
   </table>
   <div style="display:flex;gap:1.5rem;margin-top:1rem">
-    <a href="/" class="nav-link">다시 하기</a>
+    <a href="/" class="nav-link">다시 선택</a>
     <a href="/logout" class="nav-link">로그아웃</a>
   </div>
 </div>
 <script>
 function esc(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 function imageUrl(path) { return path ? '/uploads/' + path : null; }
 
@@ -35,16 +31,17 @@ const winner = JSON.parse(sessionStorage.getItem('winner') || 'null');
 if (winner) {
   const card = document.getElementById('winner-card');
   const img = imageUrl(winner.image_path);
-  const initial = esc(winner.title.charAt(0).toUpperCase());
   card.innerHTML = `
     <div class="pol-photo">
-      ${img ? `<img src="${img}" alt="${esc(winner.title)}">` : `<div class="pol-placeholder">${initial}</div>`}
+      ${img ? `<img src="${img}" alt="${esc(winner.title)}">` : `<div class="pol-placeholder">${esc(winner.title.charAt(0).toUpperCase())}</div>`}
     </div>
     <div class="pol-caption">${esc(winner.title)}</div>
   `;
 }
 
-fetch('/api/rankings').then(r => r.json()).then(items => {
+const setId = sessionStorage.getItem('selectedSetId');
+const url = setId ? `/api/rankings?set_id=${setId}` : '/api/rankings';
+fetch(url).then(r => r.json()).then(items => {
   const tbody = document.getElementById('ranking-body');
   tbody.innerHTML = items.map((item, i) => `
     <tr>
