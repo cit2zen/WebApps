@@ -11,6 +11,14 @@ function esc(s) {
 
 function imageUrl(path) { return path ? '/uploads/' + path : null; }
 
+// 항상 2의거듭제곱: prevPow2(6)=4, prevPow2(8)=8, prevPow2(10)=8
+function prevPow2(n) {
+  if (n < 2) return 2;
+  let p = 1;
+  while (p * 2 <= n) p *= 2;
+  return p;
+}
+
 function renderCard(el, item) {
   const img = imageUrl(item.image_path);
   el.innerHTML = `
@@ -33,22 +41,14 @@ function shuffle(arr) {
 }
 
 function buildBracket(items) {
-  const shuffled = shuffle([...items]);
-  if (shuffled.length % 2 === 1) {
-    roundWinners = [shuffled.pop()];
-  } else {
-    roundWinners = [];
-  }
-  bracket = shuffled;
+  // 2의거듭제곱이 보장되므로 bye 없음
+  roundWinners = [];
+  bracket = shuffle([...items]);
 }
 
 function getRoundLabel() {
   const total = bracket.length + roundWinners.length;
   if (total === 2) return '결승';
-  if (total <= 4) return '4강';
-  if (total <= 8) return '8강';
-  if (total <= 16) return '16강';
-  if (total <= 32) return '32강';
   return `${total}강`;
 }
 
@@ -89,6 +89,7 @@ async function onChoose(winner) {
       goToResult(roundWinners[0]);
       return;
     }
+    // 다음 라운드도 2의거듭제곱이 보장됨
     buildBracket(roundWinners);
     currentMatch = 0;
     roundNum++;
@@ -130,9 +131,11 @@ async function init() {
     return;
   }
 
-  const count = Math.min(bracketSize, pool.length);
-  const items = shuffle([...pool]).slice(0, count);
+  // 선택한 강수와 보유 항목 중 작은 값을, 2의거듭제곱으로 내림
+  const rawCount = Math.min(bracketSize, pool.length);
+  const count = prevPow2(rawCount);
 
+  const items = shuffle([...pool]).slice(0, count);
   buildBracket(items);
   showMatch();
 

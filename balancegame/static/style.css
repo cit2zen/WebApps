@@ -530,6 +530,32 @@ body {
   text-align: center;
 }
 
+/* ── Settings nav tabs ── */
+.settings-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--cream-400);
+  padding-bottom: 0.75rem;
+}
+
+.snav-btn {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--ink-light);
+  text-decoration: none;
+  padding: 0.35rem 0.9rem;
+  transition: color var(--pol-ease), background var(--pol-ease);
+}
+
+.snav-btn:hover { color: var(--ink-mid); }
+
+.snav-btn.snav-active {
+  color: var(--ink-warm);
+  border-bottom: 2px solid var(--gold-mid);
+}
+
 /* ── Sets management ── */
 .item-checkboxes {
   display: flex;

@@ -1,27 +1,218 @@
 {% extends "base.html" %}
 {% block title %}셋 선택{% endblock %}
 {% block body %}
+<style>
+.lobby-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5rem 4rem;
+  justify-content: center;
+  padding: 1rem 2rem 2rem;
+  max-width: 960px;
+}
+
+.lset-group {
+  --lw: 180px;
+  position: relative;
+  width: var(--lw);
+  height: 290px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.lset-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--lw);
+  margin-left: calc(var(--lw) / -2);
+  margin-top: calc(var(--lw) / -2);
+  background: var(--bg-card);
+  padding: 8px 8px 42px 8px;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--pol-ease), box-shadow var(--pol-ease);
+  will-change: transform;
+  display: flex;
+  flex-direction: column;
+}
+
+.lset-group .lset-card:nth-child(1) { transform: translate(-18px,-6px) rotate(-8deg); z-index:1; }
+.lset-group .lset-card:nth-child(2) { transform: translate(4px,10px)   rotate(4deg);  z-index:2; }
+.lset-group .lset-card:nth-child(3) { transform: translate(14px,-4px)  rotate(-2deg); z-index:3; }
+
+.lset-group:hover .lset-card:nth-child(3) {
+  transform: translate(14px,-14px) rotate(-2deg);
+  box-shadow: var(--shadow-card-lift);
+}
+
+.lset-photo {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background: var(--cream-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lset-initial {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 2.8rem;
+  color: var(--ink-light);
+}
+
+.lset-deco { font-size: 2rem; opacity: 0.2; }
+
+.lset-q {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 200;
+  font-size: 0.82rem;
+  color: var(--ink-mid);
+  text-align: center;
+  margin-top: 8px;
+  padding: 0 4px;
+  line-height: 1.35;
+}
+
+.lset-meta {
+  font-style: italic;
+  font-size: 0.68rem;
+  color: var(--gold-mid);
+  text-align: center;
+  margin-top: 3px;
+}
+
+/* ── Size overlay ── */
+.size-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26,16,5,.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.size-modal {
+  background: var(--bg-warm);
+  padding: 2rem;
+  box-shadow: 0 12px 40px rgba(0,0,0,.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+  max-width: 400px;
+  width: 92%;
+}
+
+.size-modal-q {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 1rem;
+  color: var(--ink-mid);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.size-modal-label {
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--ink-light);
+  letter-spacing: .05em;
+}
+
+.size-btns {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.size-btn {
+  background: var(--bg-card);
+  border: none;
+  width: 72px;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: transform var(--pol-ease), box-shadow var(--pol-ease);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 10px;
+  outline: none;
+}
+
+.size-btn:hover {
+  transform: translateY(-5px) rotate(-1deg);
+  box-shadow: var(--shadow-card-lift);
+}
+
+.size-btn:active { transform: scale(.97); }
+
+.size-btn .size-photo {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background: var(--cream-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.size-btn .size-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 200;
+  font-size: 1.6rem;
+  color: var(--ink-mid);
+  line-height: 1;
+}
+
+.size-btn .size-label-text {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.72rem;
+  color: var(--ink-light);
+  margin-top: 5px;
+}
+
+.size-unavail {
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--ink-light);
+  text-align: center;
+}
+
+.size-cancel {
+  background: transparent;
+  border: none;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--ink-light);
+  cursor: pointer;
+  padding: 0;
+}
+.size-cancel:hover { color: var(--gold-mid); }
+</style>
+
 <div class="lobby-wrap">
   <h1 class="game-title">⚖ 밸런스 게임</h1>
   <p class="lobby-sub">플레이할 셋을 선택하세요</p>
-  <div id="sets-grid" class="lobby-grid"></div>
+  <div id="sets-grid" class="lobby-groups"></div>
   <p id="no-sets" style="display:none;font-style:italic;color:var(--ink-light)">
     셋이 없습니다. 설정 페이지에서 만들어주세요.
   </p>
-  <a href="/logout" class="nav-link" style="margin-top:auto">로그아웃</a>
+  <a href="/logout" class="nav-link" style="margin-top:2rem">로그아웃</a>
 </div>
 
-<!-- 강수 선택 오버레이 -->
 <div id="size-overlay" class="size-overlay" style="display:none">
   <div class="size-modal">
-    <p id="size-question" class="size-question-text"></p>
-    <p class="size-label">몇 강?</p>
-    <div class="size-btns">
-      <button class="size-btn" data-size="8">8강</button>
-      <button class="size-btn" data-size="16">16강</button>
-      <button class="size-btn" data-size="32">32강</button>
-      <button class="size-btn" data-size="64">64강</button>
-    </div>
+    <p id="size-q" class="size-modal-q"></p>
+    <p class="size-modal-label">몇 강으로 플레이할까요?</p>
+    <div id="size-btns" class="size-btns"></div>
     <button class="size-cancel" id="size-cancel">취소</button>
   </div>
 </div>
@@ -32,49 +223,38 @@ function esc(s) {
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+const SIZES = [8, 16, 32];
 let selectedSet = null;
 
-async function loadSets() {
-  const res = await fetch('/api/sets');
-  const sets = await res.json();
-  const grid = document.getElementById('sets-grid');
-  if (!sets.length) {
-    document.getElementById('no-sets').style.display = 'block';
-    return;
-  }
-  sets.forEach(s => {
-    const card = document.createElement('div');
-    card.className = 'lobby-card';
-    card.innerHTML = `
-      <div class="lobby-card-q">"${esc(s.question)}"</div>
-      <div class="lobby-card-meta">${s.item_count}개 항목</div>
-    `;
-    card.addEventListener('click', () => openSizePicker(s));
-    grid.appendChild(card);
-  });
-}
+function openSizePicker(s) {
+  selectedSet = s;
+  document.getElementById('size-q').textContent = '"' + s.question + '"';
 
-function openSizePicker(set) {
-  selectedSet = set;
-  document.getElementById('size-question').textContent = '"' + set.question + '"';
-  const btns = document.querySelectorAll('.size-btn');
-  btns.forEach(btn => {
-    const size = parseInt(btn.dataset.size);
-    btn.disabled = set.item_count < 2;
-    btn.classList.toggle('size-btn-dim', set.item_count < size);
-  });
+  const available = SIZES.filter(size => s.item_count >= size);
+  const container = document.getElementById('size-btns');
+  container.innerHTML = '';
+
+  if (!available.length) {
+    container.innerHTML = `<p class="size-unavail">항목을 8개 이상 추가해야 플레이할 수 있어요.</p>`;
+  } else {
+    available.forEach(size => {
+      const btn = document.createElement('button');
+      btn.className = 'size-btn';
+      btn.innerHTML = `
+        <div class="size-photo"><span class="size-num">${size}</span></div>
+        <span class="size-label-text">강</span>
+      `;
+      btn.addEventListener('click', () => {
+        sessionStorage.setItem('selectedSetId', selectedSet.id);
+        sessionStorage.setItem('bracketSize', size);
+        location.href = '/game';
+      });
+      container.appendChild(btn);
+    });
+  }
+
   document.getElementById('size-overlay').style.display = 'flex';
 }
-
-document.querySelectorAll('.size-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (!selectedSet) return;
-    const size = parseInt(btn.dataset.size);
-    sessionStorage.setItem('selectedSetId', selectedSet.id);
-    sessionStorage.setItem('bracketSize', size);
-    location.href = '/game';
-  });
-});
 
 document.getElementById('size-cancel').addEventListener('click', () => {
   document.getElementById('size-overlay').style.display = 'none';
@@ -87,6 +267,39 @@ document.getElementById('size-overlay').addEventListener('click', e => {
     selectedSet = null;
   }
 });
+
+async function loadSets() {
+  const res = await fetch('/api/sets');
+  const sets = await res.json();
+  const grid = document.getElementById('sets-grid');
+  if (!sets.length) {
+    document.getElementById('no-sets').style.display = 'block';
+    return;
+  }
+  sets.forEach(s => {
+    const initial = esc(s.question.charAt(0).toUpperCase());
+    const group = document.createElement('div');
+    group.className = 'lset-group';
+
+    for (let i = 0; i < 2; i++) {
+      const card = document.createElement('div');
+      card.className = 'lset-card';
+      card.innerHTML = `<div class="lset-photo"><span class="lset-deco">⚖</span></div>`;
+      group.appendChild(card);
+    }
+
+    const front = document.createElement('div');
+    front.className = 'lset-card';
+    front.innerHTML = `
+      <div class="lset-photo"><span class="lset-initial">${initial}</span></div>
+      <div class="lset-q">"${esc(s.question)}"</div>
+      <div class="lset-meta">${s.item_count}개 항목</div>
+    `;
+    group.appendChild(front);
+    group.addEventListener('click', () => openSizePicker(s));
+    grid.appendChild(group);
+  });
+}
 
 loadSets();
 </script>

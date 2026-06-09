@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}셋 관리{% endblock %}
+{% block body %}
+<style>
+/* ── Set card cascade grid ── */
+.sets-cascade-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5rem 4rem;
+  padding: 1rem 0 2rem;
+}
+
+.sset-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sset-group {
+  --lw: 160px;
+  position: relative;
+  width: var(--lw);
+  height: 260px;
+  cursor: default;
+  user-select: none;
+}
+
+.sset-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--lw);
+  margin-left: calc(var(--lw) / -2);
+  margin-top: calc(var(--lw) / -2);
+  background: var(--bg-card);
+  padding: 8px 8px 38px 8px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+}
+
+.sset-group .sset-card:nth-child(1) { transform: translate(-16px,-5px) rotate(-8deg); z-index:1; }
+.sset-group .sset-card:nth-child(2) { transform: translate(3px,9px)   rotate(4deg);  z-index:2; }
+.sset-group .sset-card:nth-child(3) { transform: translate(13px,-3px) rotate(-2deg); z-index:3; }
+
+.sset-photo {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background: var(--cream-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sset-initial {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 2.4rem;
+  color: var(--ink-light);
+}
+
+.sset-deco { font-size: 1.8rem; opacity: 0.2; }
+
+.sset-q {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 200;
+  font-size: 0.76rem;
+  color: var(--ink-mid);
+  text-align: center;
+  margin-top: 6px;
+  padding: 0 4px;
+  line-height: 1.3;
+}
+
+.sset-meta {
+  font-style: italic;
+  font-size: 0.64rem;
+  color: var(--gold-mid);
+  text-align: center;
+  margin-top: 2px;
+}
+
+/* ── Action buttons ── */
+.sset-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sset-btn {
+  flex: 1;
+  padding: 0.5rem 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.82rem;
+  border: none;
+  cursor: pointer;
+  transition: background var(--pol-ease), color var(--pol-ease);
+}
+
+.sset-btn-edit {
+  background: var(--bg-card);
+  color: var(--ink-mid);
+  box-shadow: var(--shadow-card);
+}
+
+.sset-btn-edit:hover {
+  background: var(--ink-mid);
+  color: var(--bg-warm);
+}
+
+.sset-btn-del {
+  background: var(--bg-card);
+  color: #b94040;
+  box-shadow: var(--shadow-card);
+}
+
+.sset-btn-del:hover {
+  background: #b94040;
+  color: #fff;
+}
+</style>
+
+<div class="settings-wrap">
+  <div class="settings-nav">
+    <a href="/" class="snav-btn">항목 관리</a>
+    <a href="/sets-manage" class="snav-btn snav-active">셋 관리</a>
+    <a href="/logout" class="nav-link" style="margin-left:auto">로그아웃</a>
+  </div>
+
+  <!-- 셋 만들기 / 수정 폼 -->
+  <div class="upload-form" id="set-form">
+    <label>질문</label>
+    <input type="text" id="inp-question" placeholder="이 중에 가장 좋은 것은?">
+    <label>항목 선택 (2개 이상)</label>
+    <div id="item-checkboxes" class="item-checkboxes"></div>
+    <button class="btn" id="btn-save-set">셋 만들기</button>
+    <p class="status-msg" id="set-status"></p>
+  </div>
+
+  <!-- 기존 셋 목록 (cascade 카드) -->
+  <div id="sets-cascade" class="sets-cascade-grid"></div>
+</div>
+<script src="/static/sets.js"></script>
+{% endblock %}

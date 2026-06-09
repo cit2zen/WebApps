@@ -94,8 +94,16 @@ def is_settings_host():
 @login_required
 def index():
     if is_settings_host():
-        return render_template("settings.html")
+        return render_template("items.html")
     return render_template("lobby.html")
+
+
+@app.route("/sets-manage")
+@login_required
+def sets_manage_page():
+    if not is_settings_host():
+        return redirect(url_for("index"))
+    return render_template("sets_manage.html")
 
 
 @app.route("/game")

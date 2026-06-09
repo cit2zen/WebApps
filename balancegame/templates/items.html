@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}항목 관리{% endblock %}
+{% block body %}
+<div class="settings-wrap">
+  <div class="settings-nav">
+    <a href="/" class="snav-btn snav-active">항목 관리</a>
+    <a href="/sets-manage" class="snav-btn">셋 관리</a>
+    <a href="/logout" class="nav-link" style="margin-left:auto">로그아웃</a>
+  </div>
+
+  <div class="upload-form">
+    <label>이름 (필수)</label>
+    <input type="text" id="inp-title" placeholder="예: 피자">
+    <label>사진 (선택, jpg/png/webp, 최대 5MB)</label>
+    <div class="drop-zone" id="drop-zone">
+      <img class="drop-preview" id="drop-preview">
+      <span id="drop-hint">여기에 이미지를 끌어다 놓거나 클릭하세요</span>
+      <input type="file" id="inp-file" accept="image/jpeg,image/png,image/webp">
+    </div>
+    <button class="btn" id="btn-add">추가하기</button>
+    <p class="status-msg" id="status"></p>
+  </div>
+
+  <div id="items-grid" class="items-grid"></div>
+</div>
+<script src="/static/settings.js"></script>
+{% endblock %}

@@ -1,10 +1,10 @@
 let editingSetId = null;
 
-const inpQuestion  = document.getElementById('inp-question');
-const btnSaveSet   = document.getElementById('btn-save-set');
-const setStatus    = document.getElementById('set-status');
-const itemCbWrap   = document.getElementById('item-checkboxes');
-const setsList     = document.getElementById('sets-list');
+const inpQuestion = document.getElementById('inp-question');
+const btnSaveSet  = document.getElementById('btn-save-set');
+const setStatus   = document.getElementById('set-status');
+const itemCbWrap  = document.getElementById('item-checkboxes');
+const setsCascade = document.getElementById('sets-cascade');
 
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -32,28 +32,67 @@ async function loadCheckboxes() {
   `).join('');
 }
 
-function renderSetItem(set) {
-  const div = document.createElement('div');
-  div.className = 'set-list-item';
-  div.dataset.id = set.id;
-  div.innerHTML = `
-    <div>
-      <div class="set-list-q">"${esc(set.question)}"</div>
-      <div class="set-list-meta">${set.item_count}개 항목</div>
-    </div>
-    <div class="set-actions">
-      <button class="btn-sm btn-edit-set" data-id="${set.id}">수정</button>
-      <button class="btn-sm btn-del-set" data-id="${set.id}">삭제</button>
-    </div>
+function renderSetGroup(set) {
+  const initial = esc(set.question.charAt(0).toUpperCase());
+  const wrap = document.createElement('div');
+  wrap.className = 'sset-wrap';
+  wrap.dataset.id = set.id;
+
+  // Cascade group
+  const group = document.createElement('div');
+  group.className = 'sset-group';
+
+  for (let i = 0; i < 2; i++) {
+    const card = document.createElement('div');
+    card.className = 'sset-card';
+    card.innerHTML = `<div class="sset-photo"><span class="sset-deco">⚖</span></div>`;
+    group.appendChild(card);
+  }
+
+  const front = document.createElement('div');
+  front.className = 'sset-card';
+  front.innerHTML = `
+    <div class="sset-photo"><span class="sset-initial">${initial}</span></div>
+    <div class="sset-q">"${esc(set.question)}"</div>
+    <div class="sset-meta">${set.item_count}개 항목</div>
   `;
-  return div;
+  group.appendChild(front);
+
+  // Action buttons
+  const actions = document.createElement('div');
+  actions.className = 'sset-actions';
+  actions.style.width = 'calc(var(--lw, 160px) + 2rem)';
+  actions.innerHTML = `
+    <button class="sset-btn sset-btn-edit" data-id="${set.id}">수정</button>
+    <button class="sset-btn sset-btn-del"  data-id="${set.id}">삭제</button>
+  `;
+
+  actions.querySelector('.sset-btn-del').addEventListener('click', async () => {
+    if (!confirm('셋을 삭제할까요?')) return;
+    await fetch(`/api/sets/${set.id}`, { method: 'DELETE' });
+    wrap.remove();
+  });
+
+  actions.querySelector('.sset-btn-edit').addEventListener('click', async () => {
+    const res = await fetch(`/api/sets/${set.id}`);
+    const s = await res.json();
+    inpQuestion.value = s.question;
+    setChecked(s.items.map(i => i.id));
+    editingSetId = parseInt(set.id);
+    btnSaveSet.textContent = '수정하기';
+    document.getElementById('set-form').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  wrap.appendChild(group);
+  wrap.appendChild(actions);
+  return wrap;
 }
 
 async function loadSets() {
   const res = await fetch('/api/sets');
   const sets = await res.json();
-  setsList.innerHTML = '';
-  sets.forEach(s => setsList.appendChild(renderSetItem(s)));
+  setsCascade.innerHTML = '';
+  sets.forEach(s => setsCascade.appendChild(renderSetGroup(s)));
 }
 
 btnSaveSet.addEventListener('click', async () => {
@@ -85,29 +124,6 @@ btnSaveSet.addEventListener('click', async () => {
   } else {
     const err = await res.json().catch(() => ({}));
     setStatus.textContent = err.error || '오류가 발생했어요.';
-  }
-});
-
-setsList.addEventListener('click', async e => {
-  const delBtn = e.target.closest('.btn-del-set');
-  if (delBtn) {
-    const id = delBtn.dataset.id;
-    if (!confirm('셋을 삭제할까요?')) return;
-    await fetch(`/api/sets/${id}`, { method: 'DELETE' });
-    document.querySelector(`.set-list-item[data-id="${id}"]`)?.remove();
-    return;
-  }
-
-  const editBtn = e.target.closest('.btn-edit-set');
-  if (editBtn) {
-    const id = editBtn.dataset.id;
-    const res = await fetch(`/api/sets/${id}`);
-    const set = await res.json();
-    inpQuestion.value = set.question;
-    setChecked(set.items.map(i => i.id));
-    editingSetId = parseInt(id);
-    btnSaveSet.textContent = '수정하기';
-    document.getElementById('set-form').scrollIntoView({ behavior: 'smooth' });
   }
 });
 
