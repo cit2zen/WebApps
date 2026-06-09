@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}게임{% endblock %}
+{% block body %}
+<div class="game-wrap">
+  <h1 class="game-title">⚖ 밸런스 게임</h1>
+  <div id="round-badge" class="round-badge" style="display:none"></div>
+
+  <div id="battle-area" class="battle-area" style="display:none">
+    <div id="card-a" class="pol-card"></div>
+    <span class="vs-label">VS</span>
+    <div id="card-b" class="pol-card"></div>
+  </div>
+
+  <div id="loading" style="font-style:italic;color:var(--ink-light)">불러오는 중...</div>
+  <a href="/logout" class="nav-link" style="margin-top:auto">로그아웃</a>
+</div>
+<script src="/static/game.js"></script>
+{% endblock %}

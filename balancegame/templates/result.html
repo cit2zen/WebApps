@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}결과{% endblock %}
+{% block body %}
+<div class="result-wrap">
+  <h1 class="game-title">🏆 최종 우승</h1>
+  <div id="winner-card" class="pol-card winner-card"></div>
+  <h2 style="font-style:italic;font-weight:200;color:var(--ink-mid)">전체 랭킹</h2>
+  <table class="ranking-table">
+    <thead>
+      <tr>
+        <th class="rank-num">#</th>
+        <th>이름</th>
+        <th style="text-align:right">우승 횟수</th>
+      </tr>
+    </thead>
+    <tbody id="ranking-body"></tbody>
+  </table>
+  <div style="display:flex;gap:1.5rem;margin-top:1rem">
+    <a href="/" class="nav-link">다시 하기</a>
+    <a href="/logout" class="nav-link">로그아웃</a>
+  </div>
+</div>
+<script>
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function imageUrl(path) { return path ? '/uploads/' + path : null; }
+
+const winner = JSON.parse(sessionStorage.getItem('winner') || 'null');
+if (winner) {
+  const card = document.getElementById('winner-card');
+  const img = imageUrl(winner.image_path);
+  const initial = esc(winner.title.charAt(0).toUpperCase());
+  card.innerHTML = `
+    <div class="pol-photo">
+      ${img ? `<img src="${img}" alt="${esc(winner.title)}">` : `<div class="pol-placeholder">${initial}</div>`}
+    </div>
+    <div class="pol-caption">${esc(winner.title)}</div>
+  `;
+}
+
+fetch('/api/rankings').then(r => r.json()).then(items => {
+  const tbody = document.getElementById('ranking-body');
+  tbody.innerHTML = items.map((item, i) => `
+    <tr>
+      <td class="rank-num">${i + 1}</td>
+      <td>${esc(item.title)}</td>
+      <td style="text-align:right;color:var(--gold-mid)">${item.win_count}회</td>
+    </tr>
+  `).join('');
+});
+</script>
+{% endblock %}

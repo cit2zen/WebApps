@@ -1,0 +1,395 @@
+/* ── Design Tokens (Polaroid Editorial) ── */
+:root {
+  --bg-base:   #ece7dc;
+  --bg-warm:   #f5f0e8;
+  --bg-card:   #ffffff;
+  --cream-400: #e0d8cc;
+  --gold-mid:  #c0a060;
+  --gold-dark: #9a7840;
+  --ink-warm:  #1a1005;
+  --ink-mid:   #4a3820;
+  --ink-light: #a09060;
+  --shadow-card:      0 3px 12px rgba(0,0,0,0.18);
+  --shadow-card-lift: 0 8px 24px rgba(0,0,0,0.28);
+  --font-display: 'Fraunces', serif;
+  --pol-ease: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-base);
+  font-family: var(--font-display);
+  color: var(--ink-warm);
+  min-height: 100vh;
+}
+
+/* ── Login ── */
+.login-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  gap: 1.5rem;
+}
+
+.login-card {
+  background: var(--bg-card);
+  padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-card);
+  max-width: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.login-card h1 {
+  font-style: italic;
+  font-weight: 300;
+  font-size: 1.5rem;
+  color: var(--ink-mid);
+  text-align: center;
+}
+
+.login-card .question {
+  font-style: italic;
+  color: var(--ink-light);
+  font-size: 1rem;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.login-card input[type="text"] {
+  border: 1px solid var(--cream-400);
+  padding: 0.7rem 1rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  width: 100%;
+  background: var(--bg-warm);
+  color: var(--ink-warm);
+  outline: none;
+}
+
+.login-card input[type="text"]:focus {
+  border-color: var(--gold-mid);
+}
+
+.btn {
+  background: var(--ink-warm);
+  color: var(--bg-warm);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  transition: background var(--pol-ease);
+}
+
+.btn:hover { background: var(--gold-dark); }
+
+.error-msg {
+  color: #b94040;
+  font-style: italic;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+/* ── Game: battle ── */
+.game-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  gap: 2rem;
+}
+
+.game-title {
+  font-style: italic;
+  font-weight: 200;
+  font-size: 2rem;
+  color: var(--ink-mid);
+  letter-spacing: 0.05em;
+}
+
+.round-badge {
+  background: var(--gold-mid);
+  color: #fff;
+  font-style: italic;
+  font-size: 0.85rem;
+  padding: 0.3rem 1rem;
+  letter-spacing: 0.08em;
+}
+
+.battle-area {
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.vs-label {
+  font-style: italic;
+  font-weight: 300;
+  font-size: 2rem;
+  color: var(--ink-light);
+}
+
+/* ── Polaroid card (battle size) ── */
+.pol-card {
+  background: var(--bg-card);
+  padding: 8px 8px 36px 8px;
+  box-shadow: var(--shadow-card);
+  width: 220px;
+  cursor: pointer;
+  transition: transform var(--pol-ease), box-shadow var(--pol-ease);
+  user-select: none;
+  position: relative;
+}
+
+.pol-card:hover {
+  transform: translateY(-6px) rotate(1deg);
+  box-shadow: var(--shadow-card-lift);
+}
+
+.pol-card.chosen {
+  transform: scale(1.08);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.32);
+  z-index: 10;
+}
+
+.pol-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: var(--cream-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pol-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pol-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-style: italic;
+  color: var(--ink-light);
+  font-family: var(--font-display);
+}
+
+.pol-caption {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 200;
+  font-size: 0.9rem;
+  color: var(--ink-mid);
+  text-align: center;
+  margin-top: 8px;
+  padding: 0 4px;
+  line-height: 1.3;
+}
+
+/* ── Result page ── */
+.result-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 3rem 1rem;
+  gap: 2rem;
+}
+
+.winner-card {
+  transform: rotate(-2deg);
+  width: 280px;
+}
+
+.winner-card .pol-photo { aspect-ratio: 1/1; }
+
+.ranking-table {
+  width: 100%;
+  max-width: 480px;
+  border-collapse: collapse;
+}
+
+.ranking-table th,
+.ranking-table td {
+  padding: 0.6rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--cream-400);
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.ranking-table th {
+  color: var(--gold-dark);
+  font-weight: 300;
+}
+
+.ranking-table .rank-num {
+  color: var(--gold-mid);
+  font-weight: 400;
+  width: 2rem;
+}
+
+/* ── Settings page ── */
+.settings-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.settings-title {
+  font-style: italic;
+  font-weight: 200;
+  font-size: 1.8rem;
+  color: var(--ink-mid);
+}
+
+.upload-form {
+  background: var(--bg-card);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.upload-form label {
+  font-style: italic;
+  color: var(--ink-light);
+  font-size: 0.85rem;
+}
+
+.upload-form input[type="text"],
+.upload-form input[type="file"] {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--cream-400);
+  background: var(--bg-warm);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--ink-warm);
+  outline: none;
+}
+
+.upload-form input:focus { border-color: var(--gold-mid); }
+
+.drop-zone {
+  border: 2px dashed var(--cream-400);
+  padding: 2rem;
+  text-align: center;
+  font-style: italic;
+  color: var(--ink-light);
+  cursor: pointer;
+  transition: border-color var(--pol-ease);
+  position: relative;
+}
+
+.drop-zone.drag-over { border-color: var(--gold-mid); background: var(--bg-warm); }
+
+.drop-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.drop-zone .drop-preview {
+  max-width: 120px;
+  max-height: 120px;
+  object-fit: cover;
+  display: none;
+  margin: 0 auto 0.5rem;
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.5rem;
+}
+
+.item-card {
+  background: var(--bg-card);
+  padding: 8px 8px 28px 8px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+
+.item-card .pol-photo { aspect-ratio: 1/1; }
+
+.item-card .item-title {
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--ink-mid);
+  text-align: center;
+}
+
+.item-card .win-badge {
+  font-style: italic;
+  font-size: 0.75rem;
+  color: var(--gold-mid);
+  text-align: center;
+}
+
+.item-card .btn-delete {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(180, 60, 60, 0.85);
+  color: #fff;
+  border: none;
+  width: 22px;
+  height: 22px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.status-msg {
+  font-style: italic;
+  font-size: 0.88rem;
+  color: var(--gold-dark);
+  text-align: center;
+}
+
+.nav-link {
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--ink-light);
+  text-decoration: none;
+}
+
+.nav-link:hover { color: var(--gold-mid); }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .battle-area { gap: 1.5rem; }
+  .pol-card { width: 160px; }
+  .vs-label { font-size: 1.5rem; }
+}
