@@ -821,6 +821,7 @@ body {
 .sset-actions {
   display: flex;
   gap: 0.5rem;
+  width: 160px;
 }
 
 .sset-btn {
