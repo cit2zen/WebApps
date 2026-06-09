@@ -856,6 +856,47 @@ body {
   color: #fff;
 }
 
+/* ── Empty states ── */
+.empty-msg {
+  font-style: italic;
+  color: var(--ink-light);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+/* ── Edit mode (set form) ── */
+.edit-badge {
+  align-self: flex-start;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--gold-dark);
+  border: 1.5px solid var(--gold-mid);
+  padding: 0.2rem 0.7rem;
+  background: var(--bg-warm);
+}
+
+.form-btn-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.form-btn-row .btn { flex: 1; }
+
+.btn-cancel {
+  flex: 0 0 auto !important;
+  background: transparent;
+  color: var(--ink-mid);
+  border: 1.5px solid var(--cream-400);
+  padding-left: 1.4rem;
+  padding-right: 1.4rem;
+}
+
+.btn-cancel:hover {
+  border-color: var(--ink-mid);
+  background: var(--bg-warm);
+}
+
 /* ── Responsive ── */
 @media (max-width: 960px) {
   .pol-card { width: 280px; padding: 8px 8px 44px 8px; }
@@ -866,4 +907,5 @@ body {
   .battle-area { gap: 1.5rem; flex-direction: column; }
   .pol-card { width: 80vw; max-width: 320px; padding: 8px 8px 40px 8px; }
   .vs-label { font-size: 1.5rem; }
+  .item-chip { padding: 0.5rem 1rem; font-size: 0.95rem; }
 }

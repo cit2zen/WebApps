@@ -207,9 +207,12 @@ def api_get_sets():
     with get_db() as conn:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute("""
-                SELECT s.id, s.question, COUNT(si.item_id) AS item_count
+                SELECT s.id, s.question, COUNT(si.item_id) AS item_count,
+                       COALESCE(array_agg(i.title ORDER BY i.title)
+                                FILTER (WHERE i.title IS NOT NULL), '{}') AS item_titles
                 FROM bg_sets s
                 LEFT JOIN bg_set_items si ON s.id = si.set_id
+                LEFT JOIN bg_items i ON i.id = si.item_id
                 GROUP BY s.id
                 ORDER BY s.created_at DESC
             """)

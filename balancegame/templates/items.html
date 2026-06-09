@@ -28,19 +28,24 @@
   <!-- 셋 관리 패널 -->
   <div class="tab-panel" id="panel-sets">
     <div class="upload-form" id="set-form">
+      <span class="edit-badge" id="edit-badge" style="display:none">✏ 셋 수정 중</span>
       <label>질문</label>
       <input type="text" id="inp-question" placeholder="이 중에 가장 좋은 것은?">
       <label>항목 선택 <span style="font-weight:300;color:var(--ink-light)">(2개 이상)</span></label>
       <div id="item-checkboxes" class="item-chips"></div>
-      <button class="btn" id="btn-save-set">셋 만들기</button>
+      <div class="form-btn-row">
+        <button class="btn" id="btn-save-set">셋 만들기</button>
+        <button class="btn btn-cancel" id="btn-cancel-edit" style="display:none">취소</button>
+      </div>
       <p class="status-msg" id="set-status"></p>
     </div>
     <div id="sets-cascade" class="sets-cascade-grid"></div>
   </div>
 </div>
 
-<script src="/static/settings.js?v=2"></script>
-<script src="/static/sets.js?v=3"></script>
+<script src="/static/utils.js?v=1"></script>
+<script src="/static/settings.js?v=3"></script>
+<script src="/static/sets.js?v=4"></script>
 <script>
 (function () {
   function getInitTab() {

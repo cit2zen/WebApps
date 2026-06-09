@@ -7,15 +7,6 @@ const dropZone = document.getElementById('drop-zone');
 const dropPreview = document.getElementById('drop-preview');
 const dropHint = document.getElementById('drop-hint');
 
-function esc(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-function imageUrl(path) { return path ? '/uploads/' + path : null; }
 function initial(title) { return esc(title.charAt(0).toUpperCase()); }
 
 function showPreview(file) {
@@ -64,20 +55,26 @@ function renderItem(item) {
   return card;
 }
 
+function showEmptyIfNeeded() {
+  if (grid.querySelector('.item-card')) return;
+  grid.innerHTML = `<p class="empty-msg">아직 항목이 없어요. 위 폼에서 이름과 사진으로 첫 항목을 추가해보세요.</p>`;
+}
+
 async function loadItems() {
   const res = await fetch('/api/items');
   const items = await res.json();
   grid.innerHTML = '';
   items.forEach(item => grid.appendChild(renderItem(item)));
+  showEmptyIfNeeded();
 }
 
 btnAdd.addEventListener('click', async () => {
   const title = inpTitle.value.trim();
-  if (!title) { status.textContent = '이름을 입력해주세요.'; return; }
+  if (!title) { showMsg(status, '이름을 입력해주세요.'); return; }
 
   const file = inpFile.files[0];
   if (file && file.size > 5 * 1024 * 1024) {
-    status.textContent = '이미지가 5MB를 초과합니다.';
+    showMsg(status, '이미지가 5MB를 초과합니다.');
     return;
   }
 
@@ -86,23 +83,26 @@ btnAdd.addEventListener('click', async () => {
   if (file) fd.append('image', file);
 
   btnAdd.disabled = true;
-  status.textContent = '업로드 중...';
+  btnAdd.textContent = '추가 중...';
+  status.textContent = '';
 
   const res = await fetch('/api/items', { method: 'POST', body: fd });
   btnAdd.disabled = false;
+  btnAdd.textContent = '추가하기';
 
   if (res.ok) {
     const item = await res.json();
+    grid.querySelector('.empty-msg')?.remove();
     grid.appendChild(renderItem(item));
     inpTitle.value = '';
     inpFile.value = '';
     dropPreview.style.display = 'none';
     dropHint.style.display = 'block';
-    status.textContent = '추가됐어요!';
-    setTimeout(() => { status.textContent = ''; }, 2000);
+    showMsg(status, '추가됐어요!');
+    window.refreshSetsUI?.();
   } else {
-    const err = await res.json();
-    status.textContent = err.error || '오류가 발생했어요.';
+    const err = await res.json().catch(() => ({}));
+    showMsg(status, err.error || '오류가 발생했어요.');
   }
 });
 
@@ -111,9 +111,14 @@ grid.addEventListener('click', async e => {
   if (!btn) return;
   const id = btn.dataset.id;
   if (!confirm('삭제할까요?')) return;
+  btn.disabled = true;
   const res = await fetch(`/api/items/${id}`, { method: 'DELETE' });
   if (res.ok) {
     document.querySelector(`.item-card[data-id="${id}"]`)?.remove();
+    showEmptyIfNeeded();
+    window.refreshSetsUI?.();
+  } else {
+    btn.disabled = false;
   }
 });
 
