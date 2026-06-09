@@ -1,27 +1,78 @@
 {% extends "base.html" %}
-{% block title %}항목 관리{% endblock %}
+{% block title %}설정{% endblock %}
 {% block body %}
 <div class="settings-wrap">
-  <div class="settings-nav">
-    <a href="/" class="snav-btn snav-active">항목 관리</a>
-    <a href="/sets-manage" class="snav-btn">셋 관리</a>
+  <nav class="settings-nav">
+    <a href="/" class="snav-btn" data-tab="items">항목 관리</a>
+    <a href="/sets-manage" class="snav-btn" data-tab="sets">셋 관리</a>
     <a href="/logout" class="nav-link" style="margin-left:auto">로그아웃</a>
-  </div>
+  </nav>
 
-  <div class="upload-form">
-    <label>이름 (필수)</label>
-    <input type="text" id="inp-title" placeholder="예: 피자">
-    <label>사진 (선택, jpg/png/webp, 최대 5MB)</label>
-    <div class="drop-zone" id="drop-zone">
-      <img class="drop-preview" id="drop-preview">
-      <span id="drop-hint">여기에 이미지를 끌어다 놓거나 클릭하세요</span>
-      <input type="file" id="inp-file" accept="image/jpeg,image/png,image/webp">
+  <!-- 항목 관리 패널 -->
+  <div class="tab-panel" id="panel-items">
+    <div class="upload-form">
+      <label>이름 (필수)</label>
+      <input type="text" id="inp-title" placeholder="예: 피자">
+      <label>사진 (선택, jpg/png/webp, 최대 5MB)</label>
+      <div class="drop-zone" id="drop-zone">
+        <img class="drop-preview" id="drop-preview">
+        <span id="drop-hint">여기에 이미지를 끌어다 놓거나 클릭하세요</span>
+        <input type="file" id="inp-file" accept="image/jpeg,image/png,image/webp">
+      </div>
+      <button class="btn" id="btn-add">추가하기</button>
+      <p class="status-msg" id="status"></p>
     </div>
-    <button class="btn" id="btn-add">추가하기</button>
-    <p class="status-msg" id="status"></p>
+    <div id="items-grid" class="items-grid"></div>
   </div>
 
-  <div id="items-grid" class="items-grid"></div>
+  <!-- 셋 관리 패널 -->
+  <div class="tab-panel" id="panel-sets">
+    <div class="upload-form" id="set-form">
+      <label>질문</label>
+      <input type="text" id="inp-question" placeholder="이 중에 가장 좋은 것은?">
+      <label>항목 선택 <span style="font-weight:300;color:var(--ink-light)">(2개 이상)</span></label>
+      <div id="item-checkboxes" class="item-chips"></div>
+      <button class="btn" id="btn-save-set">셋 만들기</button>
+      <p class="status-msg" id="set-status"></p>
+    </div>
+    <div id="sets-cascade" class="sets-cascade-grid"></div>
+  </div>
 </div>
+
 <script src="/static/settings.js?v=2"></script>
+<script src="/static/sets.js?v=3"></script>
+<script>
+(function () {
+  function getInitTab() {
+    return location.pathname.startsWith('/sets') ? 'sets' : 'items';
+  }
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-panel').forEach(function (p) {
+      p.classList.toggle('active', p.id === 'panel-' + tab);
+    });
+    document.querySelectorAll('.snav-btn[data-tab]').forEach(function (b) {
+      b.classList.toggle('snav-active', b.dataset.tab === tab);
+    });
+  }
+
+  document.querySelectorAll('.snav-btn[data-tab]').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var tab = this.dataset.tab;
+      if (document.getElementById('panel-' + tab).classList.contains('active')) return;
+      history.pushState({ tab: tab }, '', this.getAttribute('href'));
+      switchTab(tab);
+      if (tab === 'sets' && typeof loadCheckboxes === 'function') loadCheckboxes();
+    });
+  });
+
+  window.addEventListener('popstate', function (e) {
+    var tab = (e.state && e.state.tab) ? e.state.tab : getInitTab();
+    switchTab(tab);
+  });
+
+  switchTab(getInitTab());
+}());
+</script>
 {% endblock %}

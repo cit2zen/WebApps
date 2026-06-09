@@ -103,7 +103,7 @@ def index():
 def sets_manage_page():
     if not is_settings_host():
         return redirect(url_for("index"))
-    return render_template("sets_manage.html")
+    return render_template("items.html")
 
 
 @app.route("/game")

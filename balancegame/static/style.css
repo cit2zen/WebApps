@@ -690,6 +690,172 @@ body {
   color: var(--bg-warm);
 }
 
+/* ── Tab panels ── */
+.tab-panel { display: none; }
+
+.tab-panel.active {
+  display: block;
+  animation: tabFadeIn 0.22s ease;
+}
+
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+/* ── Item selection chips ── */
+.item-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding: 0.15rem 0 0.5rem;
+}
+
+.item-chip {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.88rem;
+  padding: 0.32rem 0.85rem;
+  border: 1.5px solid var(--cream-400);
+  background: var(--bg-warm);
+  color: var(--ink-mid);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.18s ease, background 0.18s ease,
+              color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.item-chip:hover {
+  border-color: var(--gold-mid);
+  color: var(--gold-dark);
+}
+
+.item-chip.selected {
+  background: var(--gold-mid);
+  border-color: var(--gold-mid);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(192,160,96,.35);
+}
+
+/* ── Set cascade (settings) ── */
+.sets-cascade-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5rem 4rem;
+  padding: 1rem 0 2rem;
+}
+
+.sset-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sset-group {
+  --lw: 160px;
+  position: relative;
+  width: var(--lw);
+  height: 260px;
+  cursor: default;
+  user-select: none;
+}
+
+.sset-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--lw);
+  margin-left: calc(var(--lw) / -2);
+  margin-top: calc(var(--lw) / -2);
+  background: var(--bg-card);
+  padding: 8px 8px 38px 8px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+}
+
+.sset-group .sset-card:nth-child(1) { transform: translate(-16px,-5px) rotate(-8deg); z-index:1; }
+.sset-group .sset-card:nth-child(2) { transform: translate(3px,9px)   rotate(4deg);  z-index:2; }
+.sset-group .sset-card:nth-child(3) { transform: translate(13px,-3px) rotate(-2deg); z-index:3; }
+
+.sset-photo {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background: var(--cream-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sset-initial {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 2.4rem;
+  color: var(--ink-light);
+}
+
+.sset-deco { font-size: 1.8rem; opacity: 0.2; }
+
+.sset-q {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 200;
+  font-size: 0.76rem;
+  color: var(--ink-mid);
+  text-align: center;
+  margin-top: 6px;
+  padding: 0 4px;
+  line-height: 1.3;
+}
+
+.sset-meta {
+  font-style: italic;
+  font-size: 0.64rem;
+  color: var(--gold-mid);
+  text-align: center;
+  margin-top: 2px;
+}
+
+.sset-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sset-btn {
+  flex: 1;
+  padding: 0.5rem 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.82rem;
+  border: none;
+  cursor: pointer;
+  transition: background var(--pol-ease), color var(--pol-ease);
+}
+
+.sset-btn-edit {
+  background: var(--bg-card);
+  color: var(--ink-mid);
+  box-shadow: var(--shadow-card);
+}
+
+.sset-btn-edit:hover {
+  background: var(--ink-mid);
+  color: var(--bg-warm);
+}
+
+.sset-btn-del {
+  background: var(--bg-card);
+  color: #b94040;
+  box-shadow: var(--shadow-card);
+}
+
+.sset-btn-del:hover {
+  background: #b94040;
+  color: #fff;
+}
+
 /* ── Responsive ── */
 @media (max-width: 960px) {
   .pol-card { width: 280px; padding: 8px 8px 44px 8px; }

@@ -12,12 +12,12 @@ function esc(s) {
 }
 
 function getSelectedIds() {
-  return Array.from(document.querySelectorAll('.item-pick-card.selected'))
+  return Array.from(document.querySelectorAll('.item-chip.selected'))
     .map(c => parseInt(c.dataset.id));
 }
 
 function setChecked(ids) {
-  document.querySelectorAll('.item-pick-card').forEach(c => {
+  document.querySelectorAll('.item-chip').forEach(c => {
     c.classList.toggle('selected', ids.includes(parseInt(c.dataset.id)));
   });
 }
@@ -29,26 +29,18 @@ async function loadCheckboxes() {
 
   if (!items.length) {
     itemCbWrap.innerHTML = `<p style="font-style:italic;color:var(--ink-light);font-size:0.85rem">
-      항목이 없습니다. <a href="/" style="color:var(--gold-mid)">항목 관리</a>에서 추가해주세요.</p>`;
+      항목이 없습니다. 항목 관리에서 추가해주세요.</p>`;
     return;
   }
 
   items.forEach(item => {
-    const img = item.image_path ? '/uploads/' + esc(item.image_path) : null;
-    const card = document.createElement('div');
-    card.className = 'item-pick-card';
-    card.dataset.id = item.id;
-    card.innerHTML = `
-      <div class="item-pick-photo">
-        ${img
-          ? `<img src="${img}" alt="${esc(item.title)}">`
-          : `<div class="item-pick-init">${esc(item.title.charAt(0).toUpperCase())}</div>`}
-      </div>
-      <div class="item-pick-check">✓</div>
-      <div class="item-pick-title">${esc(item.title)}</div>
-    `;
-    card.addEventListener('click', () => card.classList.toggle('selected'));
-    itemCbWrap.appendChild(card);
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'item-chip';
+    chip.dataset.id = item.id;
+    chip.textContent = item.title;
+    chip.addEventListener('click', () => chip.classList.toggle('selected'));
+    itemCbWrap.appendChild(chip);
   });
 }
 
@@ -81,12 +73,14 @@ function renderSetGroup(set) {
   actions.className = 'sset-actions';
 
   const editBtn = document.createElement('button');
+  editBtn.type = 'button';
   editBtn.className = 'sset-btn sset-btn-edit';
   editBtn.textContent = '수정';
   editBtn.addEventListener('click', async () => {
     const r = await fetch(`/api/sets/${set.id}`);
     const s = await r.json();
     inpQuestion.value = s.question;
+    await loadCheckboxes();
     setChecked(s.items.map(i => i.id));
     editingSetId = parseInt(set.id);
     btnSaveSet.textContent = '수정하기';
@@ -94,6 +88,7 @@ function renderSetGroup(set) {
   });
 
   const delBtn = document.createElement('button');
+  delBtn.type = 'button';
   delBtn.className = 'sset-btn sset-btn-del';
   delBtn.textContent = '삭제';
   delBtn.addEventListener('click', async () => {
