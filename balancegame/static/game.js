@@ -47,7 +47,8 @@ function buildBracket(items) {
 }
 
 function getRoundLabel() {
-  const total = bracket.length + roundWinners.length;
+  // bracket은 현재 라운드 전체 참가자 배열 (2의거듭제곱 보장)
+  const total = bracket.length;
   if (total === 2) return '결승';
   return `${total}강`;
 }
