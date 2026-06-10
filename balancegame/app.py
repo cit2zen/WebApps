@@ -14,7 +14,7 @@ from PIL import Image
 app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]
 app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["SESSION_COOKIE_SECURE"] = False
+app.config["SESSION_COOKIE_SECURE"] = os.environ.get("COOKIE_SECURE", "true").lower() == "true"
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
 UPLOAD_FOLDER = Path(os.environ.get("UPLOAD_FOLDER", "/app/uploads"))
@@ -22,6 +22,9 @@ UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 MAX_IMAGE_SIZE = 800
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
 PASSWORD = os.environ["BALANCE_PASSWORD"]
+# 크로스 링크용 고정 호스트 (request.host = Host 헤더 신뢰 회피). 기본값=운영 도메인.
+GAME_HOST = os.environ.get("GAME_HOST", "balancegame.cityzen.kr")
+SETTINGS_HOST = os.environ.get("SETTINGS_HOST", "balancegame-settings.cityzen.kr")
 
 
 # ── DB ──────────────────────────────────────────────────────────────
@@ -90,14 +93,10 @@ def is_settings_host():
 
 @app.context_processor
 def inject_cross_url():
-    """게임 ↔ 설정 호스트 전환 링크 (balancegame ↔ balancegame-settings)."""
-    host = request.host
+    """게임 ↔ 설정 호스트 전환 링크 — request.host(조작 가능) 대신 고정 호스트 사용."""
     if is_settings_host():
-        return {"cross_url": "//" + host.replace("-settings", "") + "/",
-                "cross_label": "게임으로 →"}
-    first, _, rest = host.partition(".")
-    return {"cross_url": f"//{first}-settings.{rest}/",
-            "cross_label": "설정 →"}
+        return {"cross_url": f"//{GAME_HOST}/", "cross_label": "게임으로 →"}
+    return {"cross_url": f"//{SETTINGS_HOST}/", "cross_label": "설정 →"}
 
 
 # ── Pages ─────────────────────────────────────────────────────────────
