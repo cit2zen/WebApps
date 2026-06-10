@@ -21,6 +21,7 @@
 !/portfolio
 !/deeplearning
 !/balancegame
+!/onvoicing
 
 # 의존성/빌드 산출물은 어느 앱이든 추적 제외
 node_modules/
