@@ -1,0 +1,55 @@
+/* SOURCE OF TRUTH: develop_web/design-system/ — 직접 수정 금지, develop_web/scripts/sync_design.py로 동기 */
+/* Requires design-tokens.css */
+/* Requires Fraunces + Space Mono loaded via <link> or next/font */
+
+.t-display {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  color: var(--ink-warm);
+  line-height: 1.0;
+}
+
+.t-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 200;
+  font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+  color: var(--ink-warm);
+  line-height: 1.1;
+}
+
+.t-body {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 200;
+  font-size: 0.9rem;
+  color: var(--ink-mid);
+  line-height: 1.6;
+}
+
+.t-caption {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 200;
+  font-size: 0.7rem;
+  color: var(--gold-mid);
+  letter-spacing: 0.03em;
+}
+
+.t-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 100;
+  font-size: 0.65rem;
+  color: var(--gold-mid);
+}
+
+.t-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--ink-light);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}

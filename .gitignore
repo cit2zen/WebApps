@@ -41,3 +41,8 @@ __pycache__/
 !/Dockerfile
 !/default.conf.template
 !/.dockerignore
+
+# 디자인 정본 사본(루트 공유 — 전 게임이 ../로 참조)
+!/design-tokens.css
+!/typography.css
+!/polaroid.css

@@ -1,0 +1,43 @@
+/* SOURCE OF TRUTH: develop_web/design-system/ — 직접 수정 금지, develop_web/scripts/sync_design.py로 동기 */
+:root {
+  /* Backgrounds */
+  --bg-base:   #ece7dc;
+  --bg-warm:   #f5f0e8;
+  --bg-card:   #ffffff;
+
+  /* Cream scale */
+  --cream-100: #faf7f2;
+  --cream-200: #f5f0e8;
+  --cream-300: #ece7dc;
+  --cream-400: #e0d8cc;
+  --cream-500: #d0c8b8;
+
+  /* Gold accent */
+  --gold-light: #d4b87a;
+  --gold-mid:   #c0a060;
+  --gold-dark:  #9a7840;
+
+  /* Ink */
+  --ink-warm:  #1a1005;
+  --ink-mid:   #4a3820;
+  --ink-light: #a09060;
+
+  /* Rule / divider */
+  --rule-color: rgba(192, 160, 96, 0.3);
+
+  /* Shadows */
+  --shadow-card:      0 3px 12px rgba(0, 0, 0, 0.18);
+  --shadow-card-lift: 0 8px 24px rgba(0, 0, 0, 0.24);
+  --shadow-card-open: 0 6px 20px rgba(0, 0, 0, 0.14);
+
+  /* Typography */
+  --font-display: 'Fraunces', serif;
+  --font-mono:    'Space Mono', monospace;
+
+  /* Polaroid card */
+  --pol-width:  160px;
+  --pol-pad:    5px 5px 24px 5px;
+
+  /* Interaction */
+  --pol-ease: 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
