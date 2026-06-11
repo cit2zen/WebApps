@@ -1,0 +1,13 @@
+# games 통합 정적 서비스 컨텍스트 — 정적 게임·허브 파일만 포함 (화이트리스트)
+*
+!index.html
+!cityzen-ui.css
+!cityzen-ui.js
+!default.conf.template
+!pacman/
+!tetris/
+!apple-game/
+!yaong/
+!doom-shooter/
+!aurora-hands/
+!deeplearning/

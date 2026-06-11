@@ -38,3 +38,6 @@ onmantle/_data/
 next-env.d.ts
 .env.local
 __pycache__/
+!/Dockerfile
+!/default.conf.template
+!/.dockerignore
