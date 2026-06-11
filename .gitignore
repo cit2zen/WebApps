@@ -28,3 +28,7 @@ node_modules/
 .next/
 dist/
 *.log
+
+# CI·서비스 레지스트리
+!/.github/
+!/services.json

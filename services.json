@@ -1,0 +1,26 @@
+{
+  "$comment": "cityzen 서비스 레지스트리 — 단일 진실 소스. status: live(배포·업타임 감시), pending(이전 대기·현재 다운), local(미배포). 갱신 후 _wa_deploy로 동기·푸시(.github/scripts/uptime.py가 사용).",
+  "updated": "2026-06-11",
+  "railway": {
+    "projectId": "55a3acbd-18cd-40ea-ad8b-50d7bef0cc93",
+    "environmentId": "937ec3a0-c873-40c5-9d42-42590ded3f3e"
+  },
+  "services": [
+    { "name": "onvoicing", "type": "static", "dir": "onvoicing", "url": "https://onvoicing.cityzen.kr", "railwayServiceId": "72ff7999-e523-4607-bdd3-4e120d35551a", "db": null, "status": "live" },
+    { "name": "balancegame", "type": "flask", "dir": "balancegame", "url": "https://balancegame.cityzen.kr", "extraDomains": ["balancegame-settings.cityzen.kr"], "railwayServiceId": "b6cd1c70-368e-4550-8c85-3b18841fe84c", "db": "balancegame-db", "status": "live" },
+    { "name": "onmantle", "type": "flask", "dir": "onmantle", "url": "https://onmantle.cityzen.kr", "railwayServiceId": "c76bb404-c94b-4319-9752-37f3c236273d", "db": "onmantle-db", "status": "live" },
+    { "name": "portfolio", "type": "static", "dir": "portfolio", "url": "https://portfolio.cityzen.kr", "railwayServiceId": null, "db": null, "status": "pending" },
+    { "name": "pacman", "type": "static", "dir": "pacman", "url": null, "railwayServiceId": null, "db": null, "status": "pending" },
+    { "name": "tetris", "type": "static", "dir": "tetris", "url": null, "railwayServiceId": null, "db": null, "status": "pending" },
+    { "name": "apple-game", "type": "static", "dir": "apple-game", "url": null, "railwayServiceId": null, "db": null, "status": "pending" },
+    { "name": "yaong", "type": "static", "dir": "yaong", "url": null, "railwayServiceId": null, "db": null, "status": "pending" },
+    { "name": "doom-shooter", "type": "static", "dir": "doom-shooter", "url": null, "railwayServiceId": null, "db": null, "status": "pending" },
+    { "name": "aurora-hands", "type": "static", "dir": "aurora-hands", "url": null, "railwayServiceId": null, "db": null, "status": "pending" },
+    { "name": "deeplearning", "type": "static", "dir": "deeplearning", "url": null, "railwayServiceId": null, "db": null, "status": "pending" },
+    { "name": "aura", "type": "node", "dir": "aura", "url": null, "railwayServiceId": null, "db": null, "status": "local" },
+    { "name": "jarvis", "type": "next", "dir": "jarvis", "url": null, "railwayServiceId": null, "db": null, "status": "local" },
+    { "name": "shopscout", "type": "next", "dir": "shopscout", "url": null, "railwayServiceId": null, "db": null, "status": "local" },
+    { "name": "studyai", "type": "next", "dir": "studyai", "url": null, "railwayServiceId": null, "db": null, "status": "local" },
+    { "name": "cityzen-web", "type": "next", "dir": null, "repo": "cit2zen/cityzen-web", "url": "https://cityzen.kr", "railwayServiceId": null, "db": null, "status": "pending" }
+  ]
+}
