@@ -3,6 +3,9 @@
 !index.html
 !cityzen-ui.css
 !cityzen-ui.js
+!design-tokens.css
+!typography.css
+!polaroid.css
 !default.conf.template
 !pacman/
 !tetris/

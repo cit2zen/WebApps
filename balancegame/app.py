@@ -1,4 +1,6 @@
+import hmac
 import os
+import time
 import uuid
 from pathlib import Path
 from functools import wraps
@@ -16,6 +18,7 @@ app.secret_key = os.environ["SECRET_KEY"]
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SECURE"] = os.environ.get("COOKIE_SECURE", "true").lower() == "true"
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 업로드 폭주 방지 (10MB)
 
 UPLOAD_FOLDER = Path(os.environ.get("UPLOAD_FOLDER", "/app/uploads"))
 UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
@@ -88,7 +91,13 @@ def login_required(f):
 
 
 def is_settings_host():
-    return "settings" in request.host
+    # Host 헤더의 포트는 떼고 호스트명 정확 비교 (부분 문자열 매칭 금지)
+    return request.host.partition(":")[0] == SETTINGS_HOST.partition(":")[0]
+
+
+@app.errorhandler(413)
+def request_too_large(e):
+    return jsonify({"error": "요청이 너무 커요. 파일은 10MB 이하로 올려주세요."}), 413
 
 
 @app.context_processor
@@ -123,15 +132,33 @@ def game_page():
     return render_template("game.html")
 
 
+LOGIN_MAX_FAILS = 5
+LOGIN_LOCK_SECONDS = 60
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login_page():
     error = None
     if request.method == "POST":
-        answer = request.form.get("answer", "").strip()
-        if answer == PASSWORD:
-            session["authenticated"] = True
-            return redirect(url_for("index"))
-        error = "틀렸어요. 다시 생각해봐요 👀"
+        now = time.time()
+        locked_until = session.get("login_locked_until", 0)
+        if now < locked_until:
+            error = f"시도가 너무 많아요. {int(locked_until - now) + 1}초 후 다시 시도해주세요."
+        else:
+            answer = request.form.get("answer", "").strip()
+            if hmac.compare_digest(answer, PASSWORD):
+                session.pop("login_fails", None)
+                session.pop("login_locked_until", None)
+                session["authenticated"] = True
+                return redirect(url_for("index"))
+            fails = session.get("login_fails", 0) + 1
+            if fails >= LOGIN_MAX_FAILS:
+                session["login_locked_until"] = now + LOGIN_LOCK_SECONDS
+                session["login_fails"] = 0
+                error = f"{LOGIN_MAX_FAILS}회 틀렸어요. {LOGIN_LOCK_SECONDS}초 후 다시 시도해주세요."
+            else:
+                session["login_fails"] = fails
+                error = "틀렸어요. 다시 생각해봐요 👀"
     return render_template("login.html", error=error)
 
 
@@ -162,6 +189,8 @@ def api_items():
 @app.route("/api/items", methods=["POST"])
 @login_required
 def api_add_item():
+    if not is_settings_host():
+        return jsonify({"error": "forbidden"}), 403
     title = request.form.get("title", "").strip()
     if not title:
         return jsonify({"error": "title required"}), 400
@@ -245,6 +274,8 @@ def api_rotate_item(item_id):
 @app.route("/api/items/<int:item_id>", methods=["DELETE"])
 @login_required
 def api_delete_item(item_id):
+    if not is_settings_host():
+        return jsonify({"error": "forbidden"}), 403
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT image_path FROM bg_items WHERE id = %s", (item_id,))
@@ -272,7 +303,13 @@ def api_get_sets():
             cur.execute("""
                 SELECT s.id, s.question, COUNT(si.item_id) AS item_count,
                        COALESCE(array_agg(i.title ORDER BY i.title)
-                                FILTER (WHERE i.title IS NOT NULL), '{}') AS item_titles
+                                FILTER (WHERE i.title IS NOT NULL), '{}') AS item_titles,
+                       (SELECT i2.image_path
+                        FROM bg_items i2
+                        JOIN bg_set_items si2 ON i2.id = si2.item_id
+                        WHERE si2.set_id = s.id AND i2.image_path IS NOT NULL
+                        ORDER BY i2.title
+                        LIMIT 1) AS cover_image
                 FROM bg_sets s
                 LEFT JOIN bg_set_items si ON s.id = si.set_id
                 LEFT JOIN bg_items i ON i.id = si.item_id

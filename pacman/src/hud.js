@@ -1,4 +1,6 @@
-// HUD DOM 갱신.
+// HUD DOM 갱신 + 오버레이 제어.
+// 오버레이 이중화: 로비(#lobby — 타이틀/게임오버, 불투명 풀스크린)
+//                인게임(#overlay — READY!/PAUSED, 반투명·미로 위)
 const $ = (id) => document.getElementById(id);
 
 export class Hud {
@@ -9,7 +11,10 @@ export class Hud {
     this.levelEl = $("level");
     this.overlay = $("overlay");
     this.msgEl = $("overlay-msg");
-    this.titleEl = document.querySelector(".neon-title");
+    this.lobby = $("lobby");
+    this.lobbyTitleEl = $("lobby-title");
+    this.lobbyDescEl = $("lobby-desc");
+    this.startBtn = $("start-btn");
   }
 
   setScore(s) { this.scoreEl.textContent = s; }
@@ -17,8 +22,17 @@ export class Hud {
   setLevel(l) { this.levelEl.textContent = l; }
   setLives(n) { this.livesEl.textContent = "ᗧ".repeat(Math.max(0, n)); }
 
-  showOverlay(title, msg) {
-    if (title) this.titleEl.innerHTML = title;
+  showLobby(title, desc) {
+    if (title) this.lobbyTitleEl.textContent = title;
+    if (desc) this.lobbyDescEl.textContent = desc;
+    this.lobby.classList.remove("hidden");
+  }
+
+  hideLobby() {
+    this.lobby.classList.add("hidden");
+  }
+
+  showOverlay(msg) {
     this.msgEl.textContent = msg;
     this.overlay.classList.remove("hidden");
   }

@@ -115,12 +115,15 @@ export function createAudio() {
     // called every frame from the game loop — schedules notes ~0.15s ahead
     tick() {
       if (!playing || !ctx) return;
-      const horizon = ctx.currentTime + 0.15;
+      const now = ctx.currentTime;
+      const horizon = now + 0.15;
       while (true) {
         const e = EVENTS[idx];
         const at = loopStart + cycle * LOOP_LEN + e.t;
         if (at >= horizon) break;
-        tone(musicGain, freq(e.n), at, e.dur, e.type, e.vol);
+        // 탭 비활성화로 rAF가 멈춘 사이 지나간 노트는 재생하지 않고
+        // idx/cycle만 전진(fast-forward) — 복귀 시 밀린 노트 일괄 재생 방지.
+        if (at >= now) tone(musicGain, freq(e.n), at, e.dur, e.type, e.vol);
         if (++idx >= EVENTS.length) { idx = 0; cycle++; }
       }
     },

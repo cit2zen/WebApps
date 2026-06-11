@@ -132,6 +132,8 @@ export class Audio {
 
   update() {
     if (!this.ctx || !this.bgmOn) return;
+    // 탭 비활성 후 복귀 시 밀린 스텝이 한꺼번에 울리지 않도록 현재 시각으로 재동기
+    this._nextTime = Math.max(this._nextTime, this.ctx.currentTime);
     const lookahead = 0.25;
     while (this._nextTime < this.ctx.currentTime + lookahead) {
       const i = this._step % MELODY.length;

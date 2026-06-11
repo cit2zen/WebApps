@@ -11,15 +11,17 @@ export class Score {
   }
 
   _injectDOM() {
+    // #hud 안에 넣어 메뉴/일시정지/사망 화면에서 HUD와 함께 숨겨지게 한다
+    const host = document.getElementById('hud') ?? document.body;
     if (!document.getElementById('score')) {
       const s = document.createElement('div');
       s.id = 'score';
-      document.body.appendChild(s);
+      host.appendChild(s);
     }
     if (!document.getElementById('combo')) {
       const c = document.createElement('div');
       c.id = 'combo';
-      document.body.appendChild(c);
+      host.appendChild(c);
     }
     this._scoreEl = document.getElementById('score');
     this._comboEl = document.getElementById('combo');

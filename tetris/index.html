@@ -3,22 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>NEON TETRIS</title>
+  <title>TETRIS — 테트리스</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2306060b'/%3E%3Crect x='6' y='6' width='8' height='8' fill='%235ef2ff'/%3E%3Crect x='14' y='6' width='8' height='8' fill='%23ff4fc8'/%3E%3Crect x='14' y='14' width='8' height='8' fill='%23a98bff'/%3E%3Crect x='14' y='22' width='8' height='8' fill='%2339ff96'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fraunces:ital,opsz,wght@1,9..144,100..900&family=Space+Mono&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../cityzen-ui.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../design-tokens.css" />
+  <link rel="stylesheet" href="../typography.css" />
+  <link rel="stylesheet" href="../polaroid.css" />
   <link rel="stylesheet" href="style.css" />
-  <style>
-    /* cityzen header integration: body is a centering flex container
-       (align-items/justify-content:center). Switch to a column so the
-       prepended .cz-gamehead sits on top and the game stays centered
-       in the remaining space. Layout-only; no game/canvas logic touched. */
-    body { flex-direction: column; }
-    body > .cz-gamehead { flex: 0 0 auto; align-self: stretch; }
-    body > .game { flex: 1 1 auto; }
-  </style>
 </head>
 <body data-level="1">
   <div class="scanlines" aria-hidden="true"></div>
@@ -38,9 +31,9 @@
 
     <div class="stage">
       <canvas id="board" width="280" height="560" class="board" role="img" aria-label="테트리스 게임 보드"></canvas>
-      <!-- 게임오버/일시정지 시 캔버스 위에 뜨는 실제 버튼(터치 가능) -->
+      <!-- 시작 로비 + 게임오버/일시정지 시 캔버스 위에 뜨는 실제 버튼(터치 가능) -->
       <div class="board-overlay pol-lobby" id="board-overlay" hidden>
-        <span id="overlay-title" style="display:none" aria-live="polite"></span>
+        <span class="pol-ovtitle" id="overlay-title" aria-live="polite"></span>
         <div class="pol-lcard">
           <div class="pol-lphoto" style="background:linear-gradient(145deg,#4a6ab0,#1a2a60)"></div>
           <span class="pol-lnum">cityzen</span>
@@ -48,7 +41,9 @@
         </div>
         <h2 class="pol-ltitle">tetris</h2>
         <p class="pol-ldesc">쌓고, 지워라.</p>
-        <div class="pol-lbtn" id="overlay-action" style="cursor:pointer">다시하기</div>
+        <p class="pol-lstats" id="overlay-stats" hidden></p>
+        <p class="pol-lhelp" id="overlay-help">←→ 이동 · ↑/X 회전 · Space 하드드롭 · C 홀드 · P 일시정지<br />모바일: 스와이프 이동 · 탭 회전 · 아래로 쓸어 하드드롭</p>
+        <button type="button" class="pol-lbtn" id="overlay-action">시작하기</button>
         <span class="pol-llabel">cityzen &middot; Game - Puzzle</span>
       </div>
     </div>
@@ -92,16 +87,14 @@
     <button type="button" class="tp-btn" data-act="left" aria-label="왼쪽 이동">◀</button>
     <button type="button" class="tp-btn" data-act="rotate" aria-label="회전">⟳</button>
     <button type="button" class="tp-btn" data-act="right" aria-label="오른쪽 이동">▶</button>
+    <button type="button" class="tp-btn tp-btn--sys" data-act="pause" aria-label="일시정지">⏸</button>
     <button type="button" class="tp-btn" data-act="hold" aria-label="홀드">⤓</button>
     <button type="button" class="tp-btn" data-act="soft" aria-label="소프트 드롭">▼</button>
     <button type="button" class="tp-btn tp-btn--hard" data-act="hard" aria-label="하드 드롭">⬇</button>
+    <button type="button" class="tp-btn tp-btn--sys" data-act="mute" aria-label="음소거">🔇</button>
   </nav>
 
   <script type="module" src="main.js"></script>
-  <script type="module">
-    import { czHeader } from '../cityzen-ui.js';
-    czHeader({ title: 'Neon Tetris' });
-  </script>
-  <a class="pol-back-btn" href="https://portfolio.cityzen.kr">&#8592; cityzen</a>
+  <a class="pol-back-btn" href="https://games.cityzen.kr">&#8592; 게임 허브</a>
 </body>
 </html>

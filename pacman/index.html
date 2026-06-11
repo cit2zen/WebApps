@@ -3,26 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>NEON PAC-MAN</title>
+  <title>PAC-MAN</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23ffe600'/%3E%3Cpath d='M16 16 L31 7 A15 15 0 0 1 31 25 Z' fill='%23000'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,100;1,200;1,300&family=Space+Mono&display=swap" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,100..700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../design-tokens.css" />
+  <link rel="stylesheet" href="../typography.css" />
+  <link rel="stylesheet" href="../polaroid.css" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="../cityzen-ui.css" />
-  <style>
-    /* cityzen 공통 헤더가 가려지지 않도록 최소 레이아웃 보정 (게임 로직/캔버스 무관) */
-    body:has(> .cz-gamehead) {
-      flex-direction: column;
-      justify-content: flex-start;
-      overflow-y: auto;
-    }
-    body:has(> .cz-gamehead) #game-wrap {
-      flex: 1 0 auto;
-      justify-content: center;
-    }
-    .cz-gamehead { width: 100%; flex: 0 0 auto; }
-  </style>
 </head>
 <body>
   <div id="game-wrap">
@@ -48,18 +37,47 @@
 
     <div id="stage">
       <canvas id="board" role="img" aria-label="팩맨 미로 게임 보드"></canvas>
-      <div id="overlay" class="overlay pol-lobby">
-        <div class="pol-lcard">
-          <div class="pol-lphoto" style="background:linear-gradient(145deg,#c8b040,#6a5a18)"></div>
-          <span class="pol-lnum">cityzen</span>
-          <span class="pol-ltag">pac-man</span>
-        </div>
-        <h2 class="pol-ltitle">pac-man</h2>
-        <p class="pol-ldesc">먹어라, 도망쳐라.</p>
-        <div class="pol-lbtn" style="cursor:pointer">클릭하여 시작</div>
-        <span class="pol-llabel">cityzen &middot; Game - Arcade</span>
+      <!-- 인게임 상태 오버레이 (READY!/PAUSED) — 반투명, 미로·HUD가 비쳐 보임 -->
+      <div id="overlay" class="overlay hidden">
+        <p id="overlay-msg" class="overlay-msg" aria-live="polite"></p>
       </div>
     </div>
+  </div>
+
+  <!-- 로비 오버레이 (타이틀/게임오버) — 불투명 풀스크린 폴라로이드 -->
+  <div id="lobby" class="pol-lobby">
+    <div class="pol-lcard">
+      <div class="pol-lphoto" aria-hidden="true">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <rect class="lp-bg" width="100" height="100" />
+          <g class="lp-wall" fill="none" stroke-width="3" stroke-linecap="round">
+            <rect x="8" y="8" width="84" height="84" rx="6" />
+            <path d="M24 26 H42 M58 26 H76" />
+            <path d="M24 74 H42 M58 74 H76" />
+            <path d="M50 8 V20 M50 80 V92" />
+            <path d="M8 38 H18 M82 38 H92" />
+            <path d="M8 62 H18 M82 62 H92" />
+          </g>
+          <g class="lp-dot">
+            <circle cx="26" cy="17" r="1.8" /><circle cx="38" cy="17" r="1.8" />
+            <circle cx="62" cy="17" r="1.8" /><circle cx="74" cy="17" r="1.8" />
+            <circle cx="46" cy="50" r="2.2" /><circle cx="53" cy="50" r="2.2" />
+            <circle cx="26" cy="83" r="1.8" /><circle cx="38" cy="83" r="1.8" />
+            <circle cx="62" cy="83" r="1.8" /><circle cx="74" cy="83" r="1.8" />
+          </g>
+          <path class="lp-pac" d="M30 50 L37.8 45.5 A9 9 0 1 0 37.8 54.5 Z" />
+          <path class="lp-ghost" d="M61 59 V49 A9 9 0 0 1 79 49 V59 L76 56 L73 59 L70 56 L67 59 L64 56 Z" />
+          <circle class="lp-eye" cx="66.5" cy="47.5" r="2.2" />
+          <circle class="lp-eye" cx="73.5" cy="47.5" r="2.2" />
+        </svg>
+      </div>
+      <span class="pol-lnum">cityzen</span>
+      <span class="pol-ltag">pac-man</span>
+    </div>
+    <h2 id="lobby-title" class="pol-ltitle">pac-man</h2>
+    <p id="lobby-desc" class="pol-ldesc">먹어라, 도망쳐라.</p>
+    <button id="start-btn" class="pol-lbtn" type="button">클릭하여 시작</button>
+    <span class="pol-llabel">cityzen &middot; Game - Arcade</span>
   </div>
 
   <div id="settings" class="settings hidden">
@@ -80,10 +98,6 @@
   </div>
 
   <script type="module" src="src/main.js"></script>
-  <script type="module">
-    import { czHeader } from '../cityzen-ui.js';
-    czHeader({ title: 'Neon Pac-Man' });
-  </script>
-  <a class="pol-back-btn" href="https://portfolio.cityzen.kr">&#8592; cityzen</a>
+  <a class="pol-back-btn" href="https://games.cityzen.kr">&#8592; 게임 허브</a>
 </body>
 </html>

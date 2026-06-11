@@ -30,8 +30,9 @@ export class Background {
     for (const c of this.clouds) {
       c.x -= speed * c.speed * dt;
       if (c.x < -120 * c.scale) {
+        // 리스폰 y는 매번 무작위로 분산(고정식이면 모든 구름이 같은 높이로 수렴)
         c.x = this.width + 60;
-        c.y = 30 + ((c.x * 13) % (this.groundY - 140));
+        c.y = 30 + Math.random() * (this.groundY - 140);
       }
     }
     this.groundOffset = (this.groundOffset + speed * dt) % 48;

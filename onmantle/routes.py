@@ -5,7 +5,8 @@ import pytz
 from flask import Blueprint, request, jsonify
 from sqlalchemy import text
 
-from models import db, Secret, Nearest, Similarity, Score, LunchPick
+from config import NUM_SECRETS
+from models import db, Secret, Nearest, Score, LunchPick, Feedback
 from puzzle import get_current_puzzle_number, get_current_slot, get_next_change_time
 from hints import get_hint
 
@@ -91,15 +92,15 @@ def hint():
 
 @api_bp.route("/nearest/<int:puzzle_number>", methods=["GET"])
 def nearest_words(puzzle_number: int):
-    if puzzle_number == get_current_puzzle_number():
-        return jsonify({"error": "현재 활성 퍼즐은 공개할 수 없습니다"}), 403
+    # 이미 종료된 퍼즐(현재 번호 미만)만 공개. 정답 단어는 응답에 포함하지 않는다.
+    if puzzle_number >= get_current_puzzle_number():
+        return jsonify({"error": "종료된 퍼즐만 공개할 수 있습니다"}), 403
     secret = db.session.get(Secret, puzzle_number)
     if secret is None:
         return jsonify({"error": "해당 퍼즐이 존재하지 않습니다"}), 404
     rows = Nearest.query.filter_by(secret_idx=puzzle_number).order_by(Nearest.rank).all()
     return jsonify({
         "puzzle_number": puzzle_number,
-        "word": secret.word,
         "nearest": [{"rank": r.rank, "word": r.word, "similarity": r.similarity} for r in rows],
     })
 
@@ -141,7 +142,12 @@ def post_score():
         return jsonify({"error": "이름이 필요합니다"}), 400
     if len(name) > 20:
         return jsonify({"error": "이름은 20자 이하로 입력해주세요"}), 400
-    if guess_count < 0 or hints_used < 0:
+    # 최소 방어: 합리 범위 밖 값 거부
+    if not (0 <= puzzle_number < NUM_SECRETS):
+        return jsonify({"error": "잘못된 퍼즐 번호입니다"}), 400
+    if not (1 <= guess_count <= 100000):
+        return jsonify({"error": "잘못된 값입니다"}), 400
+    if not (0 <= hints_used <= 5):
         return jsonify({"error": "잘못된 값입니다"}), 400
 
     score = Score(
@@ -205,9 +211,51 @@ def post_lunch():
 
 @api_bp.route("/lunch/<int:pick_id>/like", methods=["POST"])
 def like_lunch(pick_id: int):
-    pick = db.session.get(LunchPick, pick_id)
-    if pick is None:
+    # 원자적 증가(동시 요청 유실 방지)
+    row = db.session.execute(
+        text("UPDATE lunch_picks SET likes = likes + 1 WHERE id = :id RETURNING likes"),
+        {"id": pick_id},
+    ).first()
+    if row is None:
+        db.session.rollback()
         return jsonify({"error": "해당 항목이 없습니다"}), 404
-    pick.likes += 1
     db.session.commit()
-    return jsonify({"ok": True, "likes": pick.likes})
+    return jsonify({"ok": True, "likes": row.likes})
+
+
+# --- 피드백 ---
+
+@api_bp.route("/feedback", methods=["GET"])
+def get_feedback():
+    rows = Feedback.query.order_by(Feedback.id.desc()).limit(30).all()
+    return jsonify({
+        "items": [
+            {
+                "id": r.id,
+                "nickname": r.nickname,
+                "content": r.content,
+                "created_at": r.created_at,
+            }
+            for r in rows
+        ],
+    })
+
+
+@api_bp.route("/feedback", methods=["POST"])
+def post_feedback():
+    data = request.get_json(silent=True) or {}
+    nickname = data.get("nickname", "").strip() or "익명"
+    content = data.get("content", "").strip()
+    if not content:
+        return jsonify({"error": "피드백 내용을 입력해주세요"}), 400
+    if len(nickname) > 20 or len(content) > 500:
+        return jsonify({"error": "닉네임 20자, 내용 500자 이하"}), 400
+
+    fb = Feedback(
+        nickname=nickname,
+        content=content,
+        created_at=datetime.now(KST).isoformat(),
+    )
+    db.session.add(fb)
+    db.session.commit()
+    return jsonify({"ok": True, "id": fb.id}), 201

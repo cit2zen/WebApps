@@ -54,6 +54,7 @@ body {
 }
 .hero-copy {
   max-width: 280px;
+  word-break: keep-all;
 }
 .hero-copy .t-display {
   line-height: 0.95;
@@ -85,6 +86,8 @@ body {
   color: var(--ink-light);
   transition: opacity .3s;
   text-align: right;
+  white-space: pre-line;
+  word-break: keep-all;
 }
 
 /* Hero pol-group: 5 cards */
@@ -112,11 +115,39 @@ body {
 .hero-group.open .pol-card:nth-child(4) { transform: translate( 110px, -52px) rotate(  8deg); }
 .hero-group.open .pol-card:nth-child(5) { transform: translate( 220px,  18px) rotate( 16deg); }
 /* Card links in expanded hero */
+a.pol-card {
+  color: inherit;
+  text-decoration: none;
+}
 .hero-group.open .pol-card {
   cursor: pointer;
 }
-.hero-group.open .pol-card:hover .pol-caption {
+.hero-group.open .pol-card:not(.is-pending):hover .pol-caption {
   color: var(--gold-mid);
+}
+.hero-group.open .pol-card.is-pending {
+  cursor: default;
+}
+.hero-group.open .pol-card.is-pending:hover {
+  box-shadow: var(--shadow-card-open);
+  filter: none;
+}
+
+/* ── 준비 중 (pending) badge ── */
+.is-pending .pol-photo { position: relative; }
+.pol-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-mid);
+  background: var(--cream-200);
+  border: 1px solid var(--rule-color);
+  padding: 3px 7px;
+  word-break: keep-all;
+  white-space: nowrap;
 }
 
 /* ── Section divider ── */
@@ -186,9 +217,13 @@ body {
 .service-link:hover .service-card {
   transform: rotate(0deg);
 }
+.service-link.is-pending { cursor: default; }
+.service-link.is-pending:hover { transform: none; }
+.service-link.is-pending:hover .pol-card { box-shadow: var(--shadow-card); }
+.service-link.is-pending:hover .service-card { transform: rotate(var(--rot)); }
 
 /* Photo gradients (fallback only) */
-.ph-aurora{ background: linear-gradient(145deg, #9ab0be, #5a7080); }
+.ph-aurora{ background: linear-gradient(145deg, var(--cream-200), var(--cream-500)); }
 
 /* Screenshot thumbnails */
 .pol-photo img {
@@ -246,6 +281,25 @@ footer {
   .divider { padding: 0 24px; }
   footer { padding: 24px; flex-direction: column; gap: 12px; text-align: center; }
 }
+@media (max-width: 640px) {
+  /* polaroid.css flat list 모드(≤640px)에서 5장용 데스크톱 transform이
+     이겨서 카드가 화면 밖으로 클립됨 → 전부 리셋 */
+  .hero-group { min-height: auto; min-width: auto; }
+  .hero-group .pol-card { top: auto; }
+  .hero-group .pol-card:nth-child(1) { transform: rotate(-3deg); }
+  .hero-group .pol-card:nth-child(2) { transform: rotate(2deg); }
+  .hero-group .pol-card:nth-child(3) { transform: rotate(-1deg); }
+  .hero-group .pol-card:nth-child(4) { transform: rotate(2.5deg); }
+  .hero-group .pol-card:nth-child(5) { transform: rotate(-2deg); }
+  .hero-group.open .pol-card:nth-child(1),
+  .hero-group.open .pol-card:nth-child(2),
+  .hero-group.open .pol-card:nth-child(3),
+  .hero-group.open .pol-card:nth-child(4),
+  .hero-group.open .pol-card:nth-child(5) {
+    transform: none;
+    box-shadow: var(--shadow-card);
+  }
+}
 @media (max-width: 480px) {
   .service-grid { grid-template-columns: 1fr 1fr; gap: 20px 12px; }
 }
@@ -267,43 +321,43 @@ footer {
   <div class="hero-copy">
     <h1 class="t-display">Works<br>living<br>online.</h1>
     <p class="t-body" style="margin-top:20px">
-      홈서버에서 직접 운영하는<br>
+      직접 만들어 운영하는<br>
       AI · 게임 · 툴의 작업물 모음.
     </p>
     <p class="t-caption" style="margin-top:28px">← 카드를 클릭해서 펼치기</p>
   </div>
 
   <div class="pol-group hero-group" id="heroGroup">
-    <!-- Card 1: Jarvis (AI) -->
-    <div class="pol-card" data-url="https://jarvis.cityzen.kr">
-      <div class="pol-photo"><img src="thumbs/jarvis.jpg" alt="Jarvis"></div>
+    <!-- Card 1: Jarvis (AI) — 준비 중 -->
+    <div class="pol-card is-pending" aria-disabled="true">
+      <div class="pol-photo"><img src="thumbs/jarvis.jpg" alt="Jarvis"><span class="pol-badge">준비 중</span></div>
       <span class="pol-num">01</span>
       <p class="pol-caption">Jarvis<span class="pol-tag">AI · Voice</span></p>
     </div>
-    <!-- Card 2: ShopScout (Tool) -->
-    <div class="pol-card" data-url="https://shopscout.cityzen.kr">
-      <div class="pol-photo"><img src="thumbs/shopscout.jpg" alt="ShopScout"></div>
+    <!-- Card 2: ShopScout (Tool) — 준비 중 -->
+    <div class="pol-card is-pending" aria-disabled="true">
+      <div class="pol-photo"><img src="thumbs/shopscout.jpg" alt="ShopScout"><span class="pol-badge">준비 중</span></div>
       <span class="pol-num">02</span>
       <p class="pol-caption">ShopScout<span class="pol-tag">Tool · Chat</span></p>
     </div>
     <!-- Card 3: Onmantle (Game) -->
-    <div class="pol-card" data-url="https://onmantle.cityzen.kr">
+    <a class="pol-card" href="https://onmantle.cityzen.kr" target="_blank" rel="noopener">
       <div class="pol-photo"><img src="thumbs/onmantle.jpg" alt="Onmantle"></div>
       <span class="pol-num">03</span>
       <p class="pol-caption">Onmantle<span class="pol-tag">Game · Words</span></p>
-    </div>
-    <!-- Card 4: Aura (AI TTS) -->
-    <div class="pol-card" data-url="https://aura.cityzen.kr">
-      <div class="pol-photo"><img src="thumbs/aura.jpg" alt="Aura"></div>
+    </a>
+    <!-- Card 4: Aura (AI TTS) — 준비 중 -->
+    <div class="pol-card is-pending" aria-disabled="true">
+      <div class="pol-photo"><img src="thumbs/aura.jpg" alt="Aura"><span class="pol-badge">준비 중</span></div>
       <span class="pol-num">04</span>
       <p class="pol-caption">Aura<span class="pol-tag">AI · TTS</span></p>
     </div>
     <!-- Card 5: Aurora Hands (AI Vision) -->
-    <div class="pol-card" data-url="https://aurora-hands.cityzen.kr">
+    <a class="pol-card" href="https://games.cityzen.kr/aurora-hands/" target="_blank" rel="noopener">
       <div class="pol-photo ph-aurora"></div>
       <span class="pol-num">05</span>
       <p class="pol-caption">Aurora Hands<span class="pol-tag">AI · Vision</span></p>
-    </div>
+    </a>
   </div>
 
   <div class="hero-right">
@@ -327,17 +381,17 @@ footer {
   </div>
   <div class="service-grid">
 
-    <!-- StudyAI -->
-    <a class="service-link" href="https://study.cityzen.kr" target="_blank" rel="noopener">
+    <!-- StudyAI — 준비 중 -->
+    <div class="service-link is-pending" aria-disabled="true">
       <div class="pol-card service-card" style="--rot:-3deg">
-        <div class="pol-photo"><img src="thumbs/study.jpg" alt="StudyAI"></div>
+        <div class="pol-photo"><img src="thumbs/study.jpg" alt="StudyAI"><span class="pol-badge">준비 중</span></div>
         <span class="pol-num">06</span>
         <p class="pol-caption">StudyAI<span class="pol-tag">Tool · Learn</span></p>
       </div>
-    </a>
+    </div>
 
     <!-- Doom Shooter -->
-    <a class="service-link" href="https://games.cityzen.kr/doom-shooter" target="_blank" rel="noopener">
+    <a class="service-link" href="https://games.cityzen.kr/doom-shooter/" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:2.5deg">
         <div class="pol-photo"><img src="thumbs/doom-shooter.jpg" alt="Doom Shooter"></div>
         <span class="pol-num">07</span>
@@ -346,7 +400,7 @@ footer {
     </a>
 
     <!-- Pacman -->
-    <a class="service-link" href="https://games.cityzen.kr/pacman" target="_blank" rel="noopener">
+    <a class="service-link" href="https://games.cityzen.kr/pacman/" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:-2deg">
         <div class="pol-photo"><img src="thumbs/pacman.jpg" alt="Pacman"></div>
         <span class="pol-num">08</span>
@@ -355,7 +409,7 @@ footer {
     </a>
 
     <!-- Tetris -->
-    <a class="service-link" href="https://games.cityzen.kr/tetris" target="_blank" rel="noopener">
+    <a class="service-link" href="https://games.cityzen.kr/tetris/" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:1.5deg">
         <div class="pol-photo"><img src="thumbs/tetris.jpg" alt="Tetris"></div>
         <span class="pol-num">09</span>
@@ -364,7 +418,7 @@ footer {
     </a>
 
     <!-- Apple Game -->
-    <a class="service-link" href="https://games.cityzen.kr/apple-game" target="_blank" rel="noopener">
+    <a class="service-link" href="https://games.cityzen.kr/apple-game/" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:-2.5deg">
         <div class="pol-photo"><img src="thumbs/apple-game.jpg" alt="Apple Game"></div>
         <span class="pol-num">10</span>
@@ -373,7 +427,7 @@ footer {
     </a>
 
     <!-- Yaong -->
-    <a class="service-link" href="https://games.cityzen.kr/yaong" target="_blank" rel="noopener">
+    <a class="service-link" href="https://games.cityzen.kr/yaong/" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:2deg">
         <div class="pol-photo"><img src="thumbs/yaong.jpg" alt="Yaong"></div>
         <span class="pol-num">11</span>
@@ -382,7 +436,7 @@ footer {
     </a>
 
     <!-- Deep Learning -->
-    <a class="service-link" href="https://deeplearning.cityzen.kr" target="_blank" rel="noopener">
+    <a class="service-link" href="https://games.cityzen.kr/deeplearning/" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:-1.5deg">
         <div class="pol-photo"><img src="thumbs/deeplearning.jpg" alt="Deep Learning"></div>
         <span class="pol-num">12</span>
@@ -405,29 +459,33 @@ footer {
 <!-- ── Footer ── -->
 <footer>
   <a class="footer-link" href="https://cityzen.kr">← cityzen.kr</a>
-  <span class="t-label">© 2026 cityzen · home-hosted</span>
+  <span class="t-label">© 2026 cityzen</span>
 </footer>
 
 <script>
   const heroGroup = document.getElementById('heroGroup');
   const heroHint  = document.getElementById('heroHint');
+  const flatList  = window.matchMedia('(max-width: 640px)');
 
   heroGroup.addEventListener('click', function(e) {
+    // 모바일 flat list: 토글 없이 링크 기본 동작 그대로
+    if (flatList.matches) return;
     const isOpen = heroGroup.classList.contains('open');
-    if (isOpen) {
-      // In expanded state: individual card clicks navigate
-      const card = e.target.closest('.pol-card');
-      if (card && card.dataset.url) {
-        window.open(card.dataset.url, '_blank', 'noopener');
-        return;
-      }
-      // Click outside cards: collapse
-      heroGroup.classList.remove('open');
-      heroHint.textContent = '클릭 → 펼치기\n다시 클릭 → 접기';
-    } else {
+    const link = e.target.closest('a.pol-card');
+    if (!isOpen) {
+      // 접힘 상태: 링크 이동 막고 펼치기만 (Enter 키도 동일 동작)
+      if (link) e.preventDefault();
       heroGroup.classList.add('open');
       heroHint.textContent = '카드 클릭 → 방문\n빈 곳 클릭 → 접기';
+      return;
     }
+    // 펼침 상태: 라이브 카드(<a>)는 브라우저 기본 이동
+    if (link) return;
+    // 준비 중 카드 클릭: 무시
+    if (e.target.closest('.pol-card')) return;
+    // 빈 곳 클릭: 접기
+    heroGroup.classList.remove('open');
+    heroHint.textContent = '클릭 → 펼치기\n다시 클릭 → 접기';
   });
 </script>
 </body>

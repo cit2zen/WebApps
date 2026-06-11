@@ -1,4 +1,4 @@
-// 작은 설정 창: 배경 테마 / 효과음 볼륨 / 배경음악 볼륨·켜기.
+// 작은 설정 창: 보드 테마 / 효과음 볼륨 / 배경음악 볼륨·켜기.
 import { setSfxVolume, setBgmVolume, unlock } from "./audio.js";
 import { startBgm } from "./bgm.js";
 
@@ -11,9 +11,21 @@ const THEMES = [
 ];
 const DEFAULTS = { theme: "orchard", sfx: 60, bgm: 35 };
 
+// 0~100 숫자로 강제(숫자가 아니면 기본값) — localStorage 값은 신뢰하지 않는다.
+function clampPct(v, fallback) {
+  const n = Number(v);
+  return Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : fallback;
+}
+
 function load() {
-  try { return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(KEY) || "{}") }; }
-  catch { return { ...DEFAULTS }; }
+  let stored;
+  try { stored = JSON.parse(localStorage.getItem(KEY) || "{}"); }
+  catch { stored = {}; }
+  const s = { ...DEFAULTS, ...stored };
+  s.sfx = clampPct(s.sfx, DEFAULTS.sfx);
+  s.bgm = clampPct(s.bgm, DEFAULTS.bgm);
+  if (!THEMES.some((t) => t.id === s.theme)) s.theme = DEFAULTS.theme; // 테마 화이트리스트
+  return s;
 }
 function save(s) { localStorage.setItem(KEY, JSON.stringify(s)); }
 
@@ -28,7 +40,7 @@ export function initSettings() {
     <div class="panel" id="panel" hidden>
       <h3>설정</h3>
       <div class="panel__group">
-        <label>배경 테마</label>
+        <label>보드 테마</label>
         <div class="swatches">
           ${THEMES.map((t) => `<button class="sw sw--${t.id}" data-theme="${t.id}">${t.label}</button>`).join("")}
         </div>

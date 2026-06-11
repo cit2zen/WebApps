@@ -1,7 +1,6 @@
+/* Polaroid 공통 토큰(--bg-base·--ink-* 등)은 ../design-tokens.css에서 로드 */
 :root {
-  --felt-1: #1d3b29;
-  --felt-2: #12241a;
-  --cream: #f4ecd8;
+  --cream: #f4ecd8; /* 다크 보드 칩 위 밝은 텍스트 전용 */
   --gold: #e8b54a;
   --apple-hi: #ff6a5a;
   --apple-lo: #b81e22;
@@ -10,24 +9,14 @@
   --rows: 10;
   --cell: 46px;
   --gap: 6px;
-  /* 테마 변수 (settings.js가 body[data-theme]로 교체) */
-  --bg-glow: #2a533a;
+  /* 보드 테마 변수 (settings.js가 body[data-theme]로 교체) */
   --board-top: #2f5a3f;
   --board-bot: #173021;
 }
 
-body[data-theme="night"] {
-  --felt-1: #16233a; --felt-2: #0a1120;
-  --bg-glow: #25406b; --board-top: #233a5e; --board-bot: #0e1830;
-}
-body[data-theme="sunset"] {
-  --felt-1: #3a1e22; --felt-2: #1d0f12;
-  --bg-glow: #7a3b2e; --board-top: #5e2f2a; --board-bot: #2a1214;
-}
-body[data-theme="mono"] {
-  --felt-1: #2b2f33; --felt-2: #15171a;
-  --bg-glow: #4a4f55; --board-top: #3a3f44; --board-bot: #181a1d;
-}
+body[data-theme="night"]  { --board-top: #233a5e; --board-bot: #0e1830; }
+body[data-theme="sunset"] { --board-top: #5e2f2a; --board-bot: #2a1214; }
+body[data-theme="mono"]   { --board-top: #3a3f44; --board-bot: #181a1d; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -35,12 +24,10 @@ body {
   min-height: 100vh;
   font-family: "Nunito", sans-serif;
   color: var(--cream);
-  background:
-    radial-gradient(120% 90% at 50% -10%, var(--bg-glow) 0%, var(--felt-1) 38%, var(--felt-2) 100%);
-  transition: background .4s ease;
+  background: var(--bg-base);
   display: grid;
   place-items: center;
-  padding: 28px 16px;
+  padding: 56px 16px 28px; /* 상단 고정 '게임 허브' 버튼(≈43px)과 타이틀 겹침 방지 */
   overflow-x: hidden;
 }
 
@@ -71,11 +58,12 @@ body[data-theme="orchard"] .scene {
   background-repeat: no-repeat, no-repeat, no-repeat, repeat;
   background-size: auto, auto, auto, 120px 120px;
 }
+/* night: 크림 배경에서도 보이도록 달·별을 골드 계열로 (흰색·크림 장식은 비가시) */
 body[data-theme="night"] .scene {
   background:
-    radial-gradient(circle at 83% 16%, #f4ecd8 0 13px, rgba(244,236,216,.22) 14px 17px, transparent 18px),
+    radial-gradient(circle at 83% 16%, var(--gold-mid) 0 13px, rgba(192,160,96,.25) 14px 17px, transparent 18px),
     radial-gradient(60% 50% at 50% 112%, rgba(60,90,150,.3), transparent 70%),
-    url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='200'%20height='200'%3E%3Cg%20fill='white'%20fill-opacity='0.75'%3E%3Ccircle%20cx='20'%20cy='30'%20r='1'/%3E%3Ccircle%20cx='160'%20cy='50'%20r='1.4'/%3E%3Ccircle%20cx='90'%20cy='120'%20r='1'/%3E%3Ccircle%20cx='40'%20cy='170'%20r='1.2'/%3E%3Ccircle%20cx='130'%20cy='150'%20r='1'/%3E%3Ccircle%20cx='180'%20cy='110'%20r='1'/%3E%3Ccircle%20cx='70'%20cy='70'%20r='1.3'/%3E%3C/g%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='200'%20height='200'%3E%3Cg%20fill='%239a7840'%20fill-opacity='0.55'%3E%3Ccircle%20cx='20'%20cy='30'%20r='1'/%3E%3Ccircle%20cx='160'%20cy='50'%20r='1.4'/%3E%3Ccircle%20cx='90'%20cy='120'%20r='1'/%3E%3Ccircle%20cx='40'%20cy='170'%20r='1.2'/%3E%3Ccircle%20cx='130'%20cy='150'%20r='1'/%3E%3Ccircle%20cx='180'%20cy='110'%20r='1'/%3E%3Ccircle%20cx='70'%20cy='70'%20r='1.3'/%3E%3C/g%3E%3C/svg%3E");
   background-repeat: no-repeat, no-repeat, repeat;
   background-size: auto, auto, 200px 200px;
 }
@@ -87,40 +75,38 @@ body[data-theme="sunset"] .scene {
   background-repeat: no-repeat;
 }
 body[data-theme="mono"] .scene {
-  background: radial-gradient(circle, rgba(255,255,255,.05) 1.4px, transparent 1.6px);
+  background: radial-gradient(circle, rgba(0,0,0,.07) 1.4px, transparent 1.6px);
   background-size: 26px 26px;
 }
 
 /* ── top bar ── */
 .topbar { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; flex-wrap: wrap; }
 .brand h1 {
-  font-family: "Fraunces", serif;
+  font-family: var(--font-display);
   font-weight: 900;
   font-size: clamp(2.2rem, 6vw, 3.4rem);
   line-height: .92;
   letter-spacing: -.02em;
-  color: var(--cream);
-  text-shadow: 0 2px 0 rgba(0,0,0,.25);
+  color: var(--ink-warm);
 }
-.brand p { margin-top: 6px; font-weight: 700; color: #bcd3bf; font-size: .95rem; }
-.brand b { color: var(--gold); }
+.brand p { margin-top: 6px; font-weight: 700; color: var(--ink-mid); font-size: .95rem; word-break: keep-all; }
+.brand b { color: var(--gold-dark); }
 
 .stats { display: flex; gap: 12px; flex-wrap: wrap; }
 .stat {
-  background: rgba(0,0,0,.28);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--rule-color);
   padding: 8px 16px;
   text-align: center;
   min-width: 84px;
-  backdrop-filter: blur(4px);
+  box-shadow: var(--shadow-card);
 }
-.stat__label { display: block; font-family: var(--cz-mono, "Nunito"), monospace; font-size: .68rem; letter-spacing: .22em; color: #9fb8a4; font-weight: 800; }
-.stat__value { font-family: "Fraunces", serif; font-weight: 900; font-size: 1.9rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
-/* 강조 수치(SCORE)는 cityzen amber로 정렬해 헤더 톤과 연속성 확보 */
-.stat--score .stat__value { color: var(--cz-amb, var(--gold)); }
-.stat--best .stat__value { color: var(--cz-vio, #a98bff); }
-.stat--time.low .stat__value { color: #ff7a6b; }
+.stat__label { display: block; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .22em; color: var(--ink-light); font-weight: 700; }
+.stat__value { font-family: var(--font-display); font-weight: 900; font-size: 1.9rem; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--ink-warm); }
+/* 강조 수치(SCORE)는 Polaroid 골드로 */
+.stat--score .stat__value { color: var(--gold-dark); }
+.stat--best .stat__value { color: var(--ink-mid); }
+.stat--time.low .stat__value { color: var(--apple-lo); }
 
 /* ── timer bar ── */
 .timebar { height: 10px; border-radius: 99px; background: rgba(0,0,0,.32); overflow: hidden; border: 1px solid rgba(255,255,255,.06); }
@@ -209,9 +195,9 @@ body[data-theme="mono"] .scene {
   animation: fade .25s ease;
 }
 .overlay[hidden] { display: none; }
-.overlay--win { background: rgba(10,22,14,.82); }
-.overlay--win .overlay__kicker { color: #ffd76b; letter-spacing: .18em; }
-.overlay--win .overlay__score { color: var(--gold); text-shadow: 0 4px 24px rgba(232,181,74,.5); }
+/* 승리: 흰 카드 위에서 대비가 확보되는 골드/잉크 토큰 사용 */
+.overlay--win .overlay__kicker { color: var(--gold-dark); letter-spacing: .18em; }
+.overlay--win .overlay__score { color: var(--gold-dark); }
 
 /* 클리어 축하 컨페티 */
 .confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; border-radius: 22px; }
@@ -226,7 +212,7 @@ body[data-theme="mono"] .scene {
 .overlay__card { text-align: center; padding: 10px 30px; }
 .overlay__kicker { letter-spacing: .3em; font-weight: 800; color: var(--gold); font-size: .8rem; }
 .overlay__score { font-family: "Fraunces", serif; font-weight: 900; font-size: 5rem; line-height: 1; margin: 6px 0; }
-.overlay__sub { color: #bcd3bf; font-weight: 700; margin-bottom: 22px; }
+.overlay__sub { color: var(--ink-mid); font-weight: 700; margin-bottom: 22px; }
 
 /* ── buttons ── */
 .btn {
@@ -238,28 +224,33 @@ body[data-theme="mono"] .scene {
   transition: transform .08s ease, box-shadow .08s ease;
 }
 .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #b07e26, 0 4px 10px rgba(0,0,0,.3); }
+/* '새 게임' — 크림 배경 위에서 또렷하도록 흰 카드 + 골드 보더 (Polaroid 버튼) */
 .btn--ghost {
-  background: rgba(255,255,255,.06); color: var(--cream);
-  box-shadow: none; border: 1px solid rgba(255,255,255,.16);
+  font-family: var(--font-display); font-style: italic; font-weight: 200;
+  font-size: .92rem; letter-spacing: .14em;
+  background: var(--bg-card); color: var(--gold-mid);
+  box-shadow: 0 3px 10px rgba(0,0,0,.1); border: 1px solid rgba(192,160,96,.45);
+  border-radius: 0;
 }
-.btn--ghost:active { transform: translateY(2px); }
+.btn--ghost:hover { box-shadow: 0 8px 22px rgba(0,0,0,.15); transform: translateY(-2px); }
+.btn--ghost:active { transform: translateY(2px); box-shadow: 0 1px 4px rgba(0,0,0,.1); }
 .actionbar { display: flex; justify-content: center; }
 
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
 /* ── settings ── */
-/* cz-gamehead(상단 고정 헤더)와 겹치지 않도록 헤더 높이만큼 내림 */
+/* 고정 헤더(cz-gamehead) 제거됨 — 우상단 스탯 카드와 겹치지 않게 우하단 고정 */
 .gear {
-  position: fixed; top: 64px; right: 18px; z-index: 50;
+  position: fixed; bottom: 18px; right: 18px; z-index: 50;
   width: 46px; height: 46px; border-radius: 50%;
-  font-size: 1.4rem; line-height: 1; cursor: pointer; color: var(--cream);
-  background: rgba(0,0,0,.32); border: 1px solid rgba(255,255,255,.14);
-  backdrop-filter: blur(4px); transition: transform .25s ease, background .2s;
+  font-size: 1.4rem; line-height: 1; cursor: pointer; color: var(--ink-mid);
+  background: var(--bg-card); border: 1px solid rgba(192,160,96,.45);
+  box-shadow: var(--shadow-card); transition: transform .25s ease, background .2s;
 }
-.gear:hover { transform: rotate(45deg); background: rgba(0,0,0,.5); }
+.gear:hover { transform: rotate(45deg); background: var(--cream-100); }
 
 .panel {
-  position: fixed; top: 120px; right: 18px; z-index: 50; width: 248px;
+  position: fixed; bottom: 74px; right: 18px; z-index: 50; width: 248px;
   background: rgba(14,26,18,.92); backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,.12); border-radius: 16px;
   padding: 16px 18px; color: var(--cream);
@@ -287,9 +278,9 @@ body[data-theme="mono"] .scene {
 .sw--sunset  { background: linear-gradient(135deg, #5e2f2a, #2a1214); }
 .sw--mono    { background: linear-gradient(135deg, #3a3f44, #181a1d); }
 
-/* keyboard focus ring (WCAG 2.4.7) */
+/* keyboard focus ring (WCAG 2.4.7) — 크림 배경에서 보이는 골드 다크 */
 :focus-visible {
-  outline: 2px solid var(--cz-cyan, #5ef2ff);
+  outline: 2px solid var(--gold-dark);
   outline-offset: 3px;
 }
 .btn:focus-visible { outline-offset: 4px; }
@@ -313,50 +304,50 @@ body[data-theme="mono"] .scene {
   .overlay, .panel, .gear { animation: none !important; }
 }
 
-/* Polaroid Editorial overrides 2026-06-07 */
-body { background: #ece7dc; }
-.brand h1 { font-family: 'Fraunces', serif; font-style: italic; font-weight: 300; }
+/* Polaroid Editorial overrides 2026-06-07 (색·폰트는 ../design-tokens.css 토큰) */
+.brand h1 { font-family: var(--font-display); font-style: italic; font-weight: 300; }
 
 /* game-over overlay — Polaroid style */
 .overlay__card {
-  background: #fff;
+  background: var(--bg-card);
   padding: 8px 8px 28px;
-  box-shadow: 0 4px 18px rgba(0,0,0,.18);
+  box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
 }
 .overlay__kicker {
-  font-family: 'Space Mono', monospace;
+  font-family: var(--font-mono);
   font-size: .62rem;
-  color: #a09060;
+  color: var(--ink-light);
   letter-spacing: .12em;
   text-transform: uppercase;
 }
 .overlay__score {
-  font-family: 'Fraunces', serif;
+  font-family: var(--font-display);
   font-style: italic;
   font-weight: 100;
   font-size: clamp(3rem, 10vw, 5rem);
-  color: #1a1005;
+  color: var(--ink-warm);
   line-height: 1;
 }
 .overlay__sub {
-  font-family: 'Fraunces', serif;
+  font-family: var(--font-display);
   font-style: italic;
   font-weight: 200;
   font-size: .88rem;
-  color: #4a3820;
+  color: var(--ink-mid);
+  word-break: keep-all;
 }
 .overlay .btn {
-  font-family: 'Fraunces', serif;
+  font-family: var(--font-display);
   font-style: italic;
   font-weight: 200;
   font-size: .88rem;
   letter-spacing: .16em;
-  color: #c0a060;
-  background: #fff;
+  color: var(--gold-mid);
+  background: var(--bg-card);
   border: 1px solid rgba(192,160,96,.45);
   padding: 10px 38px;
   box-shadow: 0 3px 10px rgba(0,0,0,.1);
@@ -365,18 +356,34 @@ body { background: #ece7dc; }
 }
 .overlay .btn:hover { box-shadow: 0 8px 22px rgba(0,0,0,.15); transform: translateY(-2px); }
 
-/* Polaroid Lobby 2026-06-07 */
-.pol-lobby{position:fixed;inset:0;background:#ece7dc;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:500}
-.pol-lcard{background:#fff;padding:5px 5px 22px;width:140px;box-shadow:0 3px 12px rgba(0,0,0,.18);transform:rotate(-3deg);flex-shrink:0}
-.pol-lphoto{width:100%;aspect-ratio:1 / 1}
-.pol-lnum{font-family:'Fraunces',serif;font-style:italic;font-weight:100;font-size:.6rem;color:#c0a060;display:block;margin-top:5px}
-.pol-ltag{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.66rem;color:#a09060;text-align:center;margin-top:2px;display:block}
-.pol-ltitle{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:clamp(1.9rem,5vw,3rem);color:#1a1005;line-height:1;text-align:center}
-.pol-ldesc{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.86rem;color:#4a3820;text-align:center;max-width:260px;line-height:1.55}
-.pol-lbtn{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.88rem;letter-spacing:.16em;color:#c0a060;background:#fff;border:1px solid rgba(192,160,96,.45);padding:11px 46px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:box-shadow .3s,transform .3s;margin-top:6px}
+/* Polaroid Lobby 2026-06-07 — 시작 게이트 + 게임 종료 오버레이 공용 */
+.pol-lobby{position:fixed;inset:0;background:var(--bg-base);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:500}
+.pol-lobby[hidden]{display:none}
+.pol-lcard{background:var(--bg-card);padding:5px 5px 22px;width:140px;box-shadow:var(--shadow-card);transform:rotate(-3deg);flex-shrink:0}
+.pol-lphoto{width:100%;aspect-ratio:1 / 1;background:var(--cream-200);display:grid;place-items:center;font-size:3rem}
+.pol-lnum{font-family:var(--font-display);font-style:italic;font-weight:100;font-size:.6rem;color:var(--gold-mid);display:block;margin-top:5px}
+.pol-ltag{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.66rem;color:var(--ink-light);text-align:center;margin-top:2px;display:block}
+.pol-ltitle{font-family:var(--font-display);font-style:italic;font-weight:300;font-size:clamp(1.9rem,5vw,3rem);color:var(--ink-warm);line-height:1;text-align:center}
+.pol-ldesc{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.86rem;color:var(--ink-mid);text-align:center;max-width:260px;line-height:1.55;word-break:keep-all}
+.pol-lbtn{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.88rem;letter-spacing:.16em;color:var(--gold-mid);background:var(--bg-card);border:1px solid rgba(192,160,96,.45);padding:11px 46px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:box-shadow .3s,transform .3s;margin-top:6px}
 .pol-lbtn:hover{box-shadow:0 8px 22px rgba(0,0,0,.15);transform:translateY(-2px)}
-.pol-llabel{font-family:'Space Mono',monospace;font-size:.57rem;color:#a09060;letter-spacing:.09em;text-transform:uppercase}
+.pol-llabel{font-family:var(--font-mono);font-size:.57rem;color:var(--ink-light);letter-spacing:.09em;text-transform:uppercase}
 
 /* pol-back-btn */
-.pol-back-btn{position:fixed;top:14px;left:14px;font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.78rem;color:#c0a060;text-decoration:none;letter-spacing:.06em;z-index:9999;background:rgba(236,231,220,.88);padding:6px 14px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1px solid rgba(192,160,96,.25);transition:color .2s,background .2s}
-.pol-back-btn:hover{color:#1a1005;background:rgba(236,231,220,.98)}
+.pol-back-btn{position:fixed;top:14px;left:14px;font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.78rem;color:var(--gold-mid);text-decoration:none;letter-spacing:.06em;z-index:9999;background:rgba(236,231,220,.88);padding:6px 14px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1px solid rgba(192,160,96,.25);transition:color .2s,background .2s}
+.pol-back-btn:hover{color:var(--ink-warm);background:rgba(236,231,220,.98)}
+
+/* ── 모바일(≤540px): 17×10 보드를 10×17로 전치해 터치 타겟 ~26px+ 확보 ──
+   가로 셀 수가 17→10이 되어 390px 화면에서 셀 ≈32px.
+   게임 로직·인덱스·이웃 관계는 그대로 — CSS grid 흐름만 column으로 전치(전치된
+   직사각형 선택은 원래 보드의 직사각형과 1:1 대응, 게임성 동일). */
+@media (max-width: 540px) {
+  :root {
+    --cell: min(calc((min(96vw, 880px) - 2 * (var(--gap) + 8px) - (var(--rows) - 1) * var(--gap)) / var(--rows)), 46px);
+  }
+  .grid {
+    grid-auto-flow: column;
+    grid-template-columns: repeat(var(--rows), var(--cell));
+    grid-template-rows: repeat(var(--cols), var(--cell));
+  }
+}

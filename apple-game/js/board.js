@@ -31,6 +31,17 @@ export class Board {
 
   setEnabled(on) {
     this.enabled = on;
+    if (!on) this._cancelDrag(); // 시간 종료 시 진행 중 드래그를 즉시 무효화
+  }
+
+  // 진행 중 드래그 상태 강제 해제: 선택 표시·선택 목록·사각형 정리.
+  _cancelDrag() {
+    this.drag = null;
+    this.selRectEl.hidden = true;
+    if (this.selected) {
+      for (const i of this.selected) this.appleEls[i]?.classList.remove("sel");
+    }
+    this.selected = [];
   }
 
   _bindEvents() {
@@ -65,7 +76,7 @@ export class Board {
   }
 
   _onMove(e) {
-    if (!this.drag) return;
+    if (!this.enabled || !this.drag) return;
     const p = this._localPoint(e);
     const x = Math.min(this.drag.x0, p.x);
     const y = Math.min(this.drag.y0, p.y);
@@ -92,7 +103,7 @@ export class Board {
   }
 
   _onUp() {
-    if (!this.drag) return;
+    if (!this.enabled || !this.drag) return; // 비활성 상태의 release로 점수 획득 방지
     this.drag = null;
     this.selRectEl.hidden = true;
 

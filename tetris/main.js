@@ -21,12 +21,15 @@ const volMusic = document.getElementById('vol-music');
 const volSfx = document.getElementById('vol-sfx');
 const boardOverlay = document.getElementById('board-overlay');
 const overlayTitle = document.getElementById('overlay-title');
+const overlayStats = document.getElementById('overlay-stats');
+const overlayHelp = document.getElementById('overlay-help');
 const overlayAction = document.getElementById('overlay-action');
 const touchpad = document.getElementById('touchpad');
+const tpMute = touchpad.querySelector('[data-act="mute"]');
 
 const audio = createAudio();
 const effects = createEffects();
-let game = createGame();
+let game = createGame('ready'); // 로드 즉시 시작하지 않고 로비에서 대기
 
 function clearLabel(n, tspin) {
   if (tspin === 'full') return n > 0 ? `T-SPIN ${['', 'SINGLE', 'DOUBLE', 'TRIPLE'][n]}` : 'T-SPIN';
@@ -84,23 +87,38 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 
-// 키보드 없는 기기를 위해 게임오버/일시정지를 실제 DOM 버튼으로 노출.
+// 키보드 없는 기기를 위해 로비/게임오버/일시정지를 실제 DOM 버튼으로 노출.
 let overlayState = '';
 function syncOverlay() {
   if (game.state === overlayState) return;
   overlayState = game.state;
-  if (game.state === 'over') {
+  if (game.state === 'ready') {
+    overlayTitle.textContent = '';
+    overlayStats.hidden = true;
+    overlayHelp.hidden = false;
+    overlayAction.textContent = '시작하기';
+    boardOverlay.hidden = false;
+    overlayAction.focus();
+  } else if (game.state === 'over') {
     overlayTitle.textContent = 'GAME OVER · 게임 오버';
+    showFinalStats();
     overlayAction.textContent = '다시 하기';
     boardOverlay.hidden = false;
     overlayAction.focus();
   } else if (game.state === 'paused') {
     overlayTitle.textContent = 'PAUSE · 일시정지';
+    showFinalStats();
     overlayAction.textContent = '계속하기';
     boardOverlay.hidden = false;
   } else {
     boardOverlay.hidden = true;
   }
+}
+
+function showFinalStats() {
+  overlayStats.textContent = `SCORE ${game.score.toLocaleString()} · LINES ${game.lines}`;
+  overlayStats.hidden = false;
+  overlayHelp.hidden = true;
 }
 
 const input = createInput({
@@ -122,9 +140,10 @@ function doRestart() {
   document.body.style.setProperty('--level-hue', '0deg');
 }
 
-// 게임오버=재시작, 일시정지=재개. 키보드 없이 터치만으로 조작 가능.
+// 로비=시작, 게임오버=재시작, 일시정지=재개. 키보드 없이 터치만으로 조작 가능.
 overlayAction.addEventListener('click', () => {
-  if (game.state === 'over') doRestart();
+  if (game.state === 'ready') game.state = 'playing';
+  else if (game.state === 'over') doRestart();
   else if (game.state === 'paused') pause(game);
 });
 
@@ -136,6 +155,8 @@ const TP = {
   soft: () => softDrop(game),
   hard: () => hardDrop(game),
   hold: () => hold(game),
+  pause: () => pause(game),
+  mute: () => updateMute(),
 };
 touchpad.addEventListener('pointerdown', (e) => {
   const btn = e.target.closest('.tp-btn');
@@ -151,6 +172,10 @@ function updateMute() {
   const muted = audio.toggleMute();
   muteBtn.textContent = muted ? '♪ OFF' : '♪ ON';
   muteBtn.classList.toggle('off', muted);
+  if (tpMute) {
+    tpMute.textContent = muted ? '🔊' : '🔇';
+    tpMute.classList.toggle('off', muted);
+  }
 }
 
 // unlock audio + start music on first interaction (browser autoplay policy)

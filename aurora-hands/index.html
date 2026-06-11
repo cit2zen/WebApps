@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>오로라 핸드 — 손동작 인터랙티브 시뮬레이션</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🖐️</text></svg>" />
-<link rel="stylesheet" href="../cityzen-ui.css">
+<link rel="stylesheet" href="../design-tokens.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,100;1,200;1,300&family=Space+Mono&display=swap">
 <style>
   :root { color-scheme: dark; }
@@ -28,6 +29,7 @@
     padding: 10px 14px; border-radius: 12px;
     font-size: 12.5px; line-height: 1.45; max-width: 360px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+    word-break: keep-all;
   }
   #ui h1 {
     margin: 0 0 6px 0; font-size: 13.5px; font-weight: 600;
@@ -50,33 +52,16 @@
     position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
     z-index: 10; color: #9aa6c7; font-size: 12px; letter-spacing:.3px;
     background: rgba(10,14,24,0.35); padding: 6px 12px; border-radius: 999px;
-    border:1px solid rgba(255,255,255,0.06); white-space: nowrap;
+    border:1px solid rgba(255,255,255,0.06);
+    max-width: 90vw; text-align: center; word-break: keep-all;
   }
   #overlay {
     position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
-    background: #ece7dc;
+    background: var(--bg-base);
     transition: opacity .4s ease; opacity: 1; pointer-events: auto;
   }
   #overlay.hidden { opacity: 0; pointer-events: none; }
-  #overlay .card {
-    text-align: center; padding: 28px 30px; border-radius: 18px;
-    background: rgba(15,18,30,0.65); border:1px solid rgba(255,255,255,0.08);
-    box-shadow: 0 30px 80px rgba(0,0,0,.6);
-    max-width: 460px;
-  }
-  #overlay h2 {
-    margin: 0 0 6px 0; font-size: 22px;
-    background: linear-gradient(90deg,#7df9ff,#b388ff,#ff6ec7);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  #overlay p { color:#b4bbd1; font-size: 13.5px; margin: 6px 0 18px; }
-  #overlay button {
-    appearance:none; border: 1px solid rgba(255,255,255,0.15);
-    background: linear-gradient(135deg, rgba(125,249,255,.18), rgba(255,110,199,.18));
-    color: #fff; font-size: 14px; padding: 10px 18px; border-radius: 10px; cursor: pointer;
-  }
-  #overlay button:hover { filter: brightness(1.15); }
-  #err { color:#ff8a8a; font-size:12px; margin-top:10px; min-height: 16px; }
+  #err { color:#a03020; font-size:12px; margin-top:10px; min-height: 16px; max-width: 320px; text-align: center; word-break: keep-all; }
   #loader { margin-top: 14px; display: flex; justify-content: center; }
   #loader.hidden { display: none; }
   #loader .spin {
@@ -92,35 +77,28 @@
     border:1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04);
     color:#cfd6ec;
   }
-  /* cityzen common header: float above the fixed fullscreen canvas/overlay,
-     and nudge the in-game UI chrome below it so nothing is obscured.
-     (Canvas/#stage spans the full viewport untouched — game sizing logic intact.) */
-  .cz-gamehead {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 30;
-    background: rgba(5,6,10,0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  }
+  /* keep the in-game UI panel clear of the fixed .pol-back-btn (top-left) */
   #ui { top: 60px; }
-  #overlay .card { margin-top: 52px; }
   @media (prefers-reduced-motion: reduce) {
     #loader .spin { animation: none; border-top-color: rgba(255,255,255,0.3); }
     #overlay { transition: none; }
   }
 
 /* Polaroid Lobby 2026-06-07 */
-.pol-lobby{position:fixed;inset:0;background:#ece7dc;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:500}
-.pol-lcard{background:#fff;padding:5px 5px 22px;width:140px;box-shadow:0 3px 12px rgba(0,0,0,.18);transform:rotate(-3deg);flex-shrink:0}
+#overlay.pol-lobby{position:fixed;inset:0;background:var(--bg-base);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:500}
+.pol-lcard{background:var(--bg-card);padding:5px 5px 22px;width:140px;box-shadow:var(--shadow-card);transform:rotate(-3deg);flex-shrink:0}
 .pol-lphoto{width:100%;aspect-ratio:1 / 1}
-.pol-lnum{font-family:'Fraunces',serif;font-style:italic;font-weight:100;font-size:.6rem;color:#c0a060;display:block;margin-top:5px}
-.pol-ltag{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.66rem;color:#a09060;text-align:center;margin-top:2px;display:block}
-.pol-ltitle{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:clamp(1.9rem,5vw,3rem);color:#1a1005;line-height:1;text-align:center}
-.pol-ldesc{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.86rem;color:#4a3820;text-align:center;max-width:260px;line-height:1.55}
-.pol-lbtn{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.88rem;letter-spacing:.16em;color:#c0a060;background:#fff;border:1px solid rgba(192,160,96,.45);padding:11px 46px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:box-shadow .3s,transform .3s;margin-top:6px}
+.pol-lnum{font-family:var(--font-display);font-style:italic;font-weight:100;font-size:.6rem;color:var(--gold-mid);display:block;margin-top:5px}
+.pol-ltag{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.66rem;color:var(--ink-light);text-align:center;margin-top:2px;display:block}
+.pol-ltitle{font-family:var(--font-display);font-style:italic;font-weight:300;font-size:clamp(1.9rem,5vw,3rem);color:var(--ink-warm);line-height:1;text-align:center}
+.pol-ldesc{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.86rem;color:var(--ink-mid);text-align:center;max-width:260px;line-height:1.55;word-break:keep-all}
+.pol-lbtn{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.88rem;letter-spacing:.16em;color:var(--gold-mid);background:var(--bg-card);border:1px solid rgba(192,160,96,.45);padding:11px 46px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:box-shadow .3s,transform .3s;margin-top:6px}
 .pol-lbtn:hover{box-shadow:0 8px 22px rgba(0,0,0,.15);transform:translateY(-2px)}
-.pol-llabel{font-family:'Space Mono',monospace;font-size:.57rem;color:#a09060;letter-spacing:.09em;text-transform:uppercase}
+.pol-llabel{font-family:var(--font-mono);font-size:.57rem;color:var(--ink-light);letter-spacing:.09em;text-transform:uppercase}
 
 /* pol-back-btn */
-.pol-back-btn{position:fixed;top:14px;left:14px;font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.78rem;color:#c0a060;text-decoration:none;letter-spacing:.06em;z-index:9999;background:rgba(236,231,220,.88);padding:6px 14px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1px solid rgba(192,160,96,.25);transition:color .2s,background .2s}
-.pol-back-btn:hover{color:#1a1005;background:rgba(236,231,220,.98)}
+.pol-back-btn{position:fixed;top:14px;left:14px;font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.78rem;color:var(--gold-mid);text-decoration:none;letter-spacing:.06em;z-index:9999;background:rgba(236,231,220,.88);padding:6px 14px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1px solid rgba(192,160,96,.25);transition:color .2s,background .2s}
+.pol-back-btn:hover{color:var(--ink-warm);background:rgba(236,231,220,.98)}
 </style>
 </head>
 <body>
@@ -376,15 +354,6 @@ function makeHandState() {
   };
 }
 const TIPS  = [4, 8, 12, 16, 20];
-const BASES = [2, 5, 9, 13, 17];
-const CONNECTIONS = [
-  [0,1],[1,2],[2,3],[3,4],
-  [0,5],[5,6],[6,7],[7,8],
-  [5,9],[9,10],[10,11],[11,12],
-  [9,13],[13,14],[14,15],[15,16],
-  [13,17],[17,18],[18,19],[19,20],
-  [0,17],
-];
 
 function landmarkToWorld(p) {
   // p.x in [0,1] left→right of raw frame; MIRROR flips it.
@@ -782,7 +751,7 @@ async function tryGetUserMedia(deviceId) {
     attempts.push({ video: { deviceId: { exact: deviceId }, width: { ideal: 960 }, height: { ideal: 540 } }, audio: false });
     attempts.push({ video: { deviceId: { exact: deviceId } }, audio: false });
   } else {
-    attempts.push({ video: { width: { ideal: 960 }, height: { ideal: 540 } }, audio: false });
+    attempts.push({ video: { facingMode: { ideal: 'user' }, width: { ideal: 960 }, height: { ideal: 540 } }, audio: false });
   }
   attempts.push({ video: true, audio: false }); // last resort, no constraints
   let lastErr = null;
@@ -899,10 +868,6 @@ function animate() {
 animate();
 </script>
 
-<script type="module">
-  import { czHeader } from '../cityzen-ui.js';
-  czHeader({ title: '오로라 핸드' });
-</script>
-<a class="pol-back-btn" href="https://portfolio.cityzen.kr">&#8592; cityzen</a>
+<a class="pol-back-btn" href="https://games.cityzen.kr">&#8592; 게임 허브</a>
 </body>
 </html>

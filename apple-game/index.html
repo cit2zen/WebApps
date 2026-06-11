@@ -7,8 +7,10 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%8E%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,900;1,9..144,100;1,9..144,200;1,9..144,300;1,9..144,500&family=Nunito:wght@700;800;900&family=Space+Mono&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../cityzen-ui.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,900;1,9..144,100;1,9..144,200;1,9..144,300;1,9..144,500&family=Nunito:wght@700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../design-tokens.css" />
+  <link rel="stylesheet" href="../typography.css" />
+  <link rel="stylesheet" href="../polaroid.css" />
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -60,11 +62,20 @@
     </footer>
   </main>
 
-  <a class="pol-back-btn" href="https://portfolio.cityzen.kr">&#8592; cityzen</a>
+  <!-- 시작 게이트: 첫 화면. '시작하기'를 눌러야 보드 생성·타이머 시작 -->
+  <div class="pol-lobby" id="startOverlay">
+    <div class="pol-lcard">
+      <div class="pol-lphoto" aria-hidden="true">&#127822;</div>
+      <span class="pol-lnum">&#8470; 01 &mdash; make ten</span>
+      <span class="pol-ltag">apple game</span>
+    </div>
+    <h2 class="pol-ltitle">사과게임</h2>
+    <p class="pol-ldesc">드래그해서 사과 숫자의 합이 10이 되면 수확! 제한시간 2분 동안 최대한 많이 모아보세요.</p>
+    <button class="pol-lbtn" id="start">시작하기</button>
+    <span class="pol-llabel">drag &middot; sum to 10 &middot; 2:00</span>
+  </div>
+
+  <a class="pol-back-btn" href="https://games.cityzen.kr">&#8592; 게임 허브</a>
   <script type="module" src="./js/main.js"></script>
-  <script type="module">
-    import { czHeader } from '../cityzen-ui.js';
-    czHeader({ title: 'Apple 10' });
-  </script>
 </body>
 </html>

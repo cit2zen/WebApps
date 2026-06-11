@@ -28,24 +28,6 @@ function block(ctx, px, py, size, color, glow) {
   ctx.strokeRect(px + 0.5, py + 0.5, size - 1, size - 1);
 }
 
-function overlay(ctx, text, sub) {
-  ctx.fillStyle = 'rgba(8,7,18,0.78)';
-  ctx.fillRect(0, 0, COLS * CELL, ROWS * CELL);
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillStyle = '#fef9c3';
-  ctx.shadowColor = '#f472b6';
-  ctx.shadowBlur = 18;
-  ctx.font = '700 30px "Press Start 2P", monospace';
-  ctx.fillText(text, (COLS * CELL) / 2, (ROWS * CELL) / 2 - 14);
-  ctx.shadowBlur = 0;
-  if (sub) {
-    ctx.fillStyle = '#a5b4fc';
-    ctx.font = '12px "Geist Mono", ui-monospace, monospace';
-    ctx.fillText(sub, (COLS * CELL) / 2, (ROWS * CELL) / 2 + 24);
-  }
-}
-
 function drawBoard(ctx, g) {
   ctx.clearRect(0, 0, COLS * CELL, ROWS * CELL);
   // playfield backdrop
@@ -82,8 +64,6 @@ function drawMini(ctx, type, areaX, areaY, areaW, size) {
 export function render(ctx, g, holdCtx, nextCtx, effects) {
   drawBoard(ctx, g);
   effects.draw(ctx);
-  if (g.state === 'paused') overlay(ctx, 'PAUSE', '일시정지 · P/탭');
-  if (g.state === 'over') overlay(ctx, 'GAME OVER', '다시 시작 · R');
 
   holdCtx.clearRect(0, 0, holdCtx.canvas.width, holdCtx.canvas.height);
   if (g.hold) drawMini(holdCtx, g.hold, 0, 20, holdCtx.canvas.width, 20);

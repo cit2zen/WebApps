@@ -72,6 +72,7 @@ export class Game {
   }
 
   stop() {
+    this.state = "idle";
     cancelAnimationFrame(this._raf);
   }
 

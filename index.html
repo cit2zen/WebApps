@@ -3,66 +3,269 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>cityzen games — 네온 아케이드</title>
-  <meta name="description" content="cityzen 홈서버에서 운영하는 브라우저 게임 모음. 광고 없이, 빠르게." />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='9' width='28' height='15' rx='5' fill='%230c0c14' stroke='%235ef2ff' stroke-width='2'/%3E%3Crect x='7' y='14' width='2.6' height='6' rx='1.3' fill='%235ef2ff'/%3E%3Crect x='4.7' y='16.3' width='6' height='2.6' rx='1.3' fill='%235ef2ff'/%3E%3Ccircle cx='22' cy='15.5' r='1.7' fill='%23ff4fc8'/%3E%3Ccircle cx='25.5' cy='18.5' r='1.7' fill='%2339ff96'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="./cityzen-ui.css" />
+  <title>cityzen games</title>
+  <meta name="description" content="cityzen이 직접 만들어 운영하는 브라우저 게임 모음 — 설치 없이, 광고 없이, 빠르게." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23ece7dc'/%3E%3Cg transform='rotate(-5 16 16)'%3E%3Crect x='6' y='3.5' width='20' height='25' fill='%23ffffff'/%3E%3Crect x='8.5' y='6' width='15' height='15' fill='%23e0d8cc'/%3E%3Crect x='10' y='23.5' width='12' height='1.8' fill='%23c0a060'/%3E%3C/g%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./design-tokens.css">
+  <link rel="stylesheet" href="./typography.css">
+  <link rel="stylesheet" href="./polaroid.css">
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{min-height:100vh;overflow-x:hidden;padding-bottom:60px}
-    /* 외부 도메인 타일·앱 카드 신호 (게임 로직 무관, 프레젠테이션) */
-    .cz-tile{position:relative}
-    .cz-ext{position:absolute;top:9px;right:9px;font-family:var(--cz-mono);font-size:.62rem;color:var(--cz-cyan);opacity:.7;z-index:2}
-    .cz-tile .cz-sub{font-family:var(--cz-mono);font-size:.56rem;letter-spacing:.06em;color:var(--cz-tx-dim);z-index:1;margin-top:-4px}
-    footer{position:relative;z-index:2;text-align:center;color:var(--cz-tx-mute);font-size:.82rem;margin-top:40px}
-    footer a{color:var(--cz-vio);text-decoration:none}
-    footer a:hover{color:#fff}
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-base);
+      color: var(--ink-warm);
+      min-height: 100vh;
+      overflow-x: hidden;
+      word-break: keep-all;
+    }
+
+    /* ── Masthead ── */
+    .masthead {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 36px 48px 24px;
+      border-bottom: 1px solid var(--rule-color);
+    }
+    .masthead-brand {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      color: var(--ink-warm);
+      letter-spacing: -0.02em;
+      line-height: 1;
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .masthead-brand:hover { color: var(--gold-dark); }
+    .masthead-meta { text-align: right; }
+    .masthead-meta .t-label { display: block; }
+    .masthead-meta .t-label + .t-label { margin-top: 4px; }
+
+    /* ── Hero ── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 40px;
+      padding: 56px 48px 32px;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .hero-copy { max-width: 360px; }
+    .hero-copy .t-display { line-height: 1.0; margin-bottom: 20px; }
+    .hero-copy .t-body { max-width: 300px; }
+    .hero-kicker { display: block; margin-bottom: 14px; }
+    .hero-hint {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 300;
+      font-size: 0.72rem;
+      color: var(--ink-light);
+      margin-top: 24px;
+    }
+    .hero-group-wrap { min-width: 480px; }
+    .hero-group { min-height: 340px; }
+
+    /* ── Section divider ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 0 48px;
+      margin: 16px 0 44px;
+      max-width: 1080px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--rule-color);
+    }
+    .divider-label {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 300;
+      font-size: 0.8rem;
+      color: var(--gold-mid);
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+    }
+
+    /* ── Card grid ── */
+    .grid-section {
+      padding: 0 48px 64px;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(186px, 1fr));
+      gap: 36px 20px;
+      justify-items: center;
+    }
+    .card-link {
+      text-decoration: none;
+      display: block;
+      transition: transform .3s var(--pol-ease);
+    }
+    a.card-link:hover { transform: translateY(-4px); }
+    a.card-link:hover .pol-card {
+      box-shadow: var(--shadow-card-lift);
+      transform: rotate(0deg);
+    }
+    .grid-card {
+      transform: rotate(var(--rot, 0deg));
+      transition: transform .3s var(--pol-ease), box-shadow .3s;
+    }
+    .card-link.is-soon { cursor: default; }
+    .card-link.is-soon .pol-card { opacity: .65; }
+
+    /* Emoji photo */
+    .ph-emoji {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.2rem;
+      background: linear-gradient(145deg, var(--cream-100), var(--cream-400));
+      user-select: none;
+    }
+
+    /* Category tag in caption */
+    .pol-tag {
+      font-family: var(--font-mono);
+      font-size: 0.52rem;
+      color: var(--ink-light);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: block;
+      margin-top: 3px;
+      text-align: center;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--rule-color);
+      padding: 26px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-link {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 300;
+      font-size: 0.85rem;
+      color: var(--gold-mid);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .footer-link:hover { color: var(--ink-warm); }
+
+    /* ── Mobile ── */
+    @media (max-width: 900px) {
+      .masthead { padding: 26px 24px 18px; }
+      .hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 40px 24px 24px;
+      }
+      .hero-copy { max-width: none; margin: 0 auto; }
+      .hero-copy .t-body { max-width: none; }
+      .hero-group-wrap { min-width: auto; }
+      .grid-section { padding: 0 24px 52px; }
+      .divider { padding: 0 24px; }
+      footer { padding: 22px 24px; flex-direction: column; gap: 10px; text-align: center; }
+    }
+    @media (max-width: 640px) {
+      .hero-group-wrap, .hero-hint { display: none; }
+      .card-grid { grid-template-columns: repeat(2, 1fr); gap: 24px 12px; }
+    }
   </style>
 </head>
-<body class="cz-root">
-  <nav class="cz-nav" aria-label="주요">
-    <a class="cz-logo" href="https://cityzen.kr">city<b>zen</b></a>
-    <span class="cz-navlinks">
-      <a href="https://cityzen.kr">앱</a>
-      <a href="./" aria-current="page">게임</a>
-      <a class="cz-cta" href="https://cityzen.kr/login">로그인</a>
-    </span>
-  </nav>
+<body>
 
-  <main class="cz-wrap">
-    <section class="cz-hero">
-      <div class="cz-kicker"><span class="cz-dot"></span>홈서버에서 직접 운영 · 광고 없음</div>
-      <h1>브라우저에서 즐기는<br><span class="cz-glow">cityzen 게임</span></h1>
-      <p>설치 없이 바로 플레이하는 바닐라 JS 게임 모음. 광고 없이, 빠르게.</p>
-    </section>
+  <!-- ── Masthead ── -->
+  <header class="masthead">
+    <a class="masthead-brand" href="https://cityzen.kr">cityzen</a>
+    <div class="masthead-meta">
+      <span class="t-label">games</span>
+      <span class="t-label">2026</span>
+    </div>
+  </header>
 
-    <h2 class="cz-label">게임 선택</h2>
-    <nav class="cz-grid-games" aria-label="게임 목록" id="cz-games"></nav>
+  <!-- ── Hero ── -->
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="t-label hero-kicker">직접 만들어 운영 · 광고 없음</span>
+      <h1 class="t-display">브라우저에서<br>바로 플레이.</h1>
+      <p class="t-body">설치 없이 즐기는 바닐라 JS 게임 모음. 가볍고 빠르게, 광고 없이.</p>
+      <p class="hero-hint" id="heroHint">카드를 클릭해서 펼치기 →</p>
+    </div>
+    <div class="hero-group-wrap" aria-hidden="true">
+      <div class="pol-group hero-group" id="heroGroup">
+        <div class="pol-card">
+          <div class="pol-photo ph-emoji">👻</div>
+          <span class="pol-num">01</span>
+          <p class="pol-caption">팩맨</p>
+        </div>
+        <div class="pol-card">
+          <div class="pol-photo ph-emoji">🧱</div>
+          <span class="pol-num">02</span>
+          <p class="pol-caption">테트리스</p>
+        </div>
+        <div class="pol-card">
+          <div class="pol-photo ph-emoji">🍎</div>
+          <span class="pol-num">03</span>
+          <p class="pol-caption">사과게임</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <h2 class="cz-label">cityzen 앱</h2>
-    <section class="cz-grid-svc" aria-label="앱 목록" id="cz-apps"></section>
-  </main>
+  <!-- ── Games ── -->
+  <div class="divider"><span class="divider-label">Games</span></div>
+  <section class="grid-section">
+    <nav class="card-grid" aria-label="게임 목록" id="grid-games"></nav>
+  </section>
 
-  <footer><a href="https://cityzen.kr">← cityzen.kr</a> · 홈서버에서 운영</footer>
+  <!-- ── cityzen 앱 ── -->
+  <div class="divider"><span class="divider-label">cityzen 앱</span></div>
+  <section class="grid-section">
+    <div class="card-grid" aria-label="앱 목록" id="grid-apps"></div>
+  </section>
 
-  <script type="module">
-    import { czFx } from './cityzen-ui.js';
-    czFx();
+  <!-- ── Footer ── -->
+  <footer>
+    <a class="footer-link" href="https://cityzen.kr">← cityzen.kr</a>
+    <span class="t-label">© 2026 cityzen · 직접 만들어 운영 · 광고 없음</span>
+  </footer>
 
+  <script>
     // 게임/앱 메타데이터 — 타일·카드를 한 곳에서 렌더(일관·확장 용이).
     const games = [
-      { e:'👻', n:'PAC-MAN',   sub:'네온 팩맨',  href:'./pacman/' },
-      { e:'🧱', n:'TETRIS',    sub:'테트리스',   href:'./tetris/' },
-      { e:'🍎', n:'APPLE 10',  sub:'사과 게임',  href:'./apple-game/' },
-      { e:'🐱', n:'YAONG',     sub:'야옹',       href:'./yaong/' },
-      { e:'✋', n:'AURORA',    sub:'손 추적',    href:'./aurora-hands/' },
-      { e:'🔫', n:'DOOMBLAST', sub:'슈팅',       href:'./doom-shooter/' },
-      { e:'🎙️', n:'AURA',      sub:'음성 AI',    href:'https://aura.cityzen.kr', ext:true },
+      { e: '👻', n: '팩맨',           tag: 'arcade', href: './pacman/' },
+      { e: '🧱', n: '테트리스',       tag: 'puzzle', href: './tetris/' },
+      { e: '🍎', n: '사과게임',       tag: 'puzzle', href: './apple-game/' },
+      { e: '🐱', n: '야옹',           tag: 'cat',    href: './yaong/' },
+      { e: '🔫', n: '둠블래스트',     tag: 'fps',    href: './doom-shooter/' },
+      { e: '✋', n: '오로라 핸드',    tag: 'vision', href: './aurora-hands/' },
+      { e: '🧠', n: '딥러닝 강의노트', tag: 'study',  href: './deeplearning/' },
     ];
 
     const apps = [
-      { ic:'🎙️', ttl:'AURA',     dsc:'브라우저 음성 대화 AI',        href:'https://aura.cityzen.kr',     status:'live' },
-      { ic:'🧠', ttl:'onmantle', dsc:'한국어 단어 유사도 추측 게임', href:'https://onmantle.cityzen.kr', status:'live' },
+      { e: '🧠', n: 'onmantle',    tag: '한국어 단어 유사도',   href: 'https://onmantle.cityzen.kr' },
+      { e: '⚖️', n: 'balancegame', tag: 'VS 밸런스 게임',       href: 'https://balancegame.cityzen.kr' },
+      { e: '🎤', n: 'onvoicing',   tag: 'onvoicing 게임 허브',  href: 'https://onvoicing.cityzen.kr' },
+      { e: '🗂', n: 'portfolio',   tag: '전체 작업물',          href: 'https://portfolio.cityzen.kr' },
+      { e: '🎙️', n: 'AURA',        tag: '음성 AI · 준비 중',    soon: true },
     ];
 
     // 안전한 DOM 생성(문자열 HTML 미사용 → XSS 차단).
@@ -73,55 +276,62 @@
       return n;
     };
     const isExternal = (href) => /^https?:\/\//.test(href);
+    const ROTS = [-3, 2.5, -2, 1.5, -2.5, 2, -1.5, 1, -2, 2.5, -1, 1.5];
 
-    const gamesRoot = document.getElementById('cz-games');
+    // 폴라로이드 카드 1장 생성(이모지 사진 + 번호 + 캡션).
+    const makeCard = (item, num) => {
+      const card = el('div', 'pol-card grid-card');
+      card.style.setProperty('--rot', ROTS[(num - 1) % ROTS.length] + 'deg');
+      const photo = el('div', 'pol-photo ph-emoji', item.e);
+      photo.setAttribute('aria-hidden', 'true');
+      const cap = el('p', 'pol-caption', item.n);
+      cap.append(el('span', 'pol-tag', item.tag));
+      card.append(photo, el('span', 'pol-num', String(num).padStart(2, '0')), cap);
+      return card;
+    };
+
+    let num = 0;
+
+    const gamesRoot = document.getElementById('grid-games');
     for (const g of games) {
-      const a = el('a', 'cz-tile');
+      const a = el('a', 'card-link');
       a.href = g.href;
-      if (g.ext || isExternal(g.href)) {
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        const ext = el('span', 'cz-ext', '↗');
-        ext.setAttribute('aria-hidden', 'true');
-        a.append(ext);
-        a.setAttribute('aria-label', `${g.n} (새 탭에서 열림)`);
-      }
-      const e = el('span', 'cz-e', g.e);
-      e.setAttribute('aria-hidden', 'true');
-      a.append(e, el('span', 'cz-n', g.n));
-      if (g.sub) a.append(el('span', 'cz-sub', g.sub));
+      a.setAttribute('aria-label', `${g.n} 플레이`);
+      a.append(makeCard(g, ++num));
       gamesRoot.append(a);
     }
 
-    const appsRoot = document.getElementById('cz-apps');
+    const appsRoot = document.getElementById('grid-apps');
     for (const app of apps) {
-      const live = app.status === 'live';
+      ++num;
       // 라이브 앱은 링크(<a>), 준비 중 앱은 비활성 카드(<div>).
-      const card = el(live ? 'a' : 'div', 'cz-card');
-      if (live) {
-        card.href = app.href;
-        if (isExternal(app.href)) {
-          card.target = '_blank';
-          card.rel = 'noopener noreferrer';
-          card.setAttribute('aria-label', `${app.ttl} (새 탭에서 열림)`);
-        }
-      } else {
-        card.setAttribute('aria-disabled', 'true');
-        card.style.opacity = '.7';
+      if (app.soon) {
+        const d = el('div', 'card-link is-soon');
+        d.setAttribute('aria-disabled', 'true');
+        d.append(makeCard(app, num));
+        appsRoot.append(d);
+        continue;
       }
-      const inner = el('div', 'cz-inner');
-      const ic = el('span', 'cz-ic', app.ic);
-      ic.setAttribute('aria-hidden', 'true');
-      const meta = el('div');
-      meta.append(el('div', 'cz-ttl', app.ttl), el('div', 'cz-dsc', app.dsc));
-      const badge = el('span', `cz-badge ${live ? 'live' : 'soon'}`);
-      const bdot = el('span', 'cz-bdot');
-      bdot.setAttribute('aria-hidden', 'true');
-      badge.append(bdot, document.createTextNode(live ? 'LIVE' : 'SOON'));
-      inner.append(ic, meta, badge);
-      card.append(inner);
-      appsRoot.append(card);
+      const a = el('a', 'card-link');
+      a.href = app.href;
+      if (isExternal(app.href)) {
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.setAttribute('aria-label', `${app.n} (새 탭에서 열림)`);
+      }
+      a.append(makeCard(app, num));
+      appsRoot.append(a);
     }
+
+    // Cascade ↔ Pyramid 토글 (장식용 히어로 그룹).
+    const heroGroup = document.getElementById('heroGroup');
+    const heroHint = document.getElementById('heroHint');
+    heroGroup.addEventListener('click', () => {
+      heroGroup.classList.toggle('open');
+      heroHint.textContent = heroGroup.classList.contains('open')
+        ? '← 다시 클릭해서 접기'
+        : '카드를 클릭해서 펼치기 →';
+    });
   </script>
 </body>
 </html>

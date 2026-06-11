@@ -6,13 +6,12 @@
   <title>DOOMBLAST — 3D Shooter</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🔫</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,100;1,9..144,200;1,9..144,300&family=Space+Mono&display=swap" />
-  <link rel="stylesheet" href="../cityzen-ui.css" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../design-tokens.css" />
+  <link rel="stylesheet" href="../typography.css" />
+  <link rel="stylesheet" href="../polaroid.css" />
   <link rel="stylesheet" href="./style.css" />
-  <style>
-    /* cityzen 공통 헤더가 전체화면 캔버스/오버레이 위에 보이도록 보정 (게임 로직 무관) */
-    .cz-gamehead { position: fixed; top: 0; left: 0; right: 0; z-index: 30; }
-  </style>
   <script type="importmap">
   {
     "imports": {
@@ -41,20 +40,24 @@
       <div id="banner"></div>
     </div>
 
-    <!-- viewmodel -->
-    <div id="muzzle"></div>
-    <img id="gun" alt="" />
     <div id="damage"></div>
 
-    <!-- overlays -->
+    <!-- overlays: 로비(메뉴)와 인게임(PAUSED/사망/승리)이 같은 #overlay를 공유.
+         game.js showOverlay()가 #o-title/#o-text/#o-controls/#o-btn 콘텐츠를 상태별로 교체한다. -->
     <div id="overlay" class="pol-lobby">
       <div class="pol-lcard">
         <div class="pol-lphoto" style="background:linear-gradient(145deg,#8a4a3a,#3a1a18)"></div>
         <span class="pol-lnum">cityzen</span>
         <span class="pol-ltag">doom</span>
       </div>
-      <h2 class="pol-ltitle">doom</h2>
-      <p class="pol-ldesc">살아남아라.</p>
+      <h2 id="o-title" class="pol-ltitle">doom</h2>
+      <p id="o-text" class="pol-ldesc">살아남아라.</p>
+      <ul id="o-controls">
+        <li><b>WASD</b> 이동 · <b>Shift</b> 달리기 · <b>Space</b> 점프</li>
+        <li><b>마우스</b> 시점 · <b>좌클릭</b> 발사 · <b>R</b> 재장전 · <b>1·2·3</b> 무기</li>
+        <li><b>Esc</b> 일시정지</li>
+      </ul>
+      <p id="touch-notice">터치 기기에서는 시점 조작이 지원되지 않습니다.<br />데스크톱 + 마우스 환경에서 플레이를 권장합니다.</p>
       <button id="o-btn" class="pol-lbtn">시작하기</button>
       <span class="pol-llabel">cityzen &middot; Game - FPS</span>
 
@@ -68,10 +71,6 @@
   </div>
 
   <script type="module" src="./js/game.js"></script>
-  <script type="module">
-    import { czHeader } from '../cityzen-ui.js';
-    czHeader({ title: 'DOOMBLAST' });
-  </script>
-  <a class="pol-back-btn" href="https://portfolio.cityzen.kr">&#8592; cityzen</a>
+  <a class="pol-back-btn" href="https://games.cityzen.kr">&#8592; 게임 허브</a>
 </body>
 </html>

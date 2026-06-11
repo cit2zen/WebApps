@@ -7,14 +7,11 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🐱</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,100;1,200;1,300&family=Space+Mono&display=swap" />
-  <link rel="stylesheet" href="../cityzen-ui.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Space+Mono:wght@400;700&display=swap" />
+  <link rel="stylesheet" href="../design-tokens.css" />
+  <link rel="stylesheet" href="../typography.css" />
+  <link rel="stylesheet" href="../polaroid.css" />
   <link rel="stylesheet" href="styles.css" />
-  <!-- cz 헤더가 화면 상단에 놓이고 게임 스테이지는 남은 공간 중앙에 유지되도록 body 레이아웃만 보정(게임 캔버스 크기 계산은 미변경) -->
-  <style>
-    body { display: flex; flex-direction: column; }
-    #stage { margin: auto; z-index: 1; }
-  </style>
 </head>
 <body>
   <div id="stage">
@@ -29,13 +26,35 @@
     <!-- 시작 화면 -->
     <div id="start-screen" class="overlay pol-lobby">
       <div class="pol-lcard">
-        <div class="pol-lphoto" style="background:linear-gradient(145deg,#d4a08a,#8a5040)"></div>
+        <div class="pol-lphoto">
+          <!-- 크림/골드 톤 고양이 일러스트 (디자인 토큰 색상값) -->
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="점프하는 고양이 일러스트">
+            <rect width="100" height="100" fill="#f5f0e8" />
+            <line x1="12" y1="79" x2="88" y2="79" stroke="#d0c8b8" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M67 68 Q81 63 78 49" fill="none" stroke="#c0a060" stroke-width="5" stroke-linecap="round" />
+            <ellipse cx="54" cy="64" rx="18" ry="12" fill="#c0a060" />
+            <rect x="45" y="70" width="4.5" height="8" rx="2" fill="#9a7840" />
+            <rect x="59" y="70" width="4.5" height="8" rx="2" fill="#9a7840" />
+            <path d="M31 39 L29 24 L40 32 Z" fill="#c0a060" />
+            <path d="M53 39 L55 24 L44 32 Z" fill="#c0a060" />
+            <path d="M33 36 L32 28 L38 32.5 Z" fill="#d4b87a" />
+            <circle cx="42" cy="45" r="13.5" fill="#c0a060" />
+            <path d="M35.5 45.5 q2.2 -2.6 4.4 0 M44.1 45.5 q2.2 -2.6 4.4 0" fill="none" stroke="#1a1005" stroke-width="1.6" stroke-linecap="round" />
+            <circle cx="42" cy="50" r="1.4" fill="#9a7840" />
+            <path d="M29 48 H23 M29.5 51 L24 53 M55 48 H61 M54.5 51 L60 53" stroke="#9a7840" stroke-width="1" stroke-linecap="round" />
+            <text x="60" y="32" font-size="10" font-style="italic" fill="#9a7840" font-family="Fraunces, serif">야옹!</text>
+          </svg>
+        </div>
         <span class="pol-lnum">cityzen</span>
         <span class="pol-ltag">yaong</span>
       </div>
       <h2 class="pol-ltitle">yaong</h2>
-      <p class="pol-ldesc">냥이를 키워라.</p>
-      <button class="pol-lbtn" id="start-btn">시작하기</button>
+      <p class="pol-ldesc">목소리로 점프하는 고양이 러너</p>
+      <div class="pol-lbtns">
+        <button class="pol-lbtn" id="start-btn">시작하기</button>
+        <button class="pol-lbtn" id="settings-btn">⚙️ 설정</button>
+      </div>
+      <p id="best-line" class="pol-lbest"></p>
       <span class="pol-llabel">cityzen &middot; Game - Cat</span>
     </div>
 
@@ -98,13 +117,8 @@
     </div>
   </div>
 
-  <a class="pol-back-btn" href="https://portfolio.cityzen.kr">&#8592; cityzen</a>
+  <a class="pol-back-btn" href="https://games.cityzen.kr">&#8592; 게임 허브</a>
 
   <script type="module" src="js/main.js"></script>
-  <script type="module">
-    import { czHeader, czFx } from '../cityzen-ui.js';
-    czFx();
-    czHeader({ title: 'Yaong' });
-  </script>
 </body>
 </html>

@@ -1,27 +1,22 @@
 <!DOCTYPE html>
-<html lang="ko" data-theme="dark">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>온맨틀 - 단어 유사도 추측 게임</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2306060b'/%3E%3Ccircle cx='32' cy='32' r='15' fill='none' stroke='%23a98bff' stroke-width='5'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%235ef2ff'/%3E%3C/svg%3E">
-    <meta name="theme-color" content="#06060b">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ece7dc'/%3E%3Ccircle cx='32' cy='32' r='15' fill='none' stroke='%23c0a060' stroke-width='5'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%239a7840'/%3E%3C/svg%3E">
+    <meta name="theme-color" content="#ece7dc">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=JetBrains+Mono:wght@400;700&family=Fraunces:ital,opsz,wght@1,9..144,100..900&family=Space+Mono:wght@400;700&display=swap">
-    <link rel="stylesheet" href="cityzen-ui.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Noto+Sans+KR:wght@300;400;700&family=Space+Mono:wght@400;700&display=swap">
+    <link rel="stylesheet" href="css/design-tokens.css">
     <link rel="stylesheet" href="css/style.css">
-    <style>
-      body { background: #ece7dc !important; }
-      header h1 { font-family: 'Fraunces', serif; font-style: italic; font-weight: 300; }
-    </style>
 </head>
 <body>
     <div class="layout">
         <div class="main-panel">
             <header>
                 <div class="header-actions">
-                    <button id="dark-toggle" class="dark-toggle" type="button" title="테마 전환" aria-label="테마 전환" aria-pressed="true">🌙</button>
                     <button id="reset-btn" class="reset-btn" type="button" title="게임 초기화">단어 목록 초기화하기</button>
                 </div>
                 <h1>온맨틀 <span class="subtitle">- 단어 유사도 추측 게임</span></h1>
@@ -38,6 +33,37 @@
                     <input type="text" id="guess-input" placeholder="단어를 입력하세요"
                            aria-label="추측할 단어" autocomplete="off" autofocus>
                     <button id="guess-btn" type="button">추측</button>
+                </div>
+
+                <div class="howto">
+                    <button id="howto-btn" class="howto-toggle" type="button" aria-expanded="false" aria-controls="howto-panel">? 게임 방법</button>
+                    <div id="howto-panel" class="howto-panel hidden">
+                        <div class="about-content">
+                            <div class="about-block">
+                                <h3>온맨틀은 무엇인가요?</h3>
+                                <p>온맨틀은 오늘의 단어를 맞히는 게임입니다. 정답 단어를 추측하면, 추측한 단어가 정답 단어와 얼마나 유사한지 유사도 점수로 알려줍니다. 가장 유사한 단어의 유사도와 가까운 단어를 추측하면서, 정답 단어를 맞혀보세요.</p>
+                            </div>
+
+                            <div class="about-block">
+                                <h3>정답 단어에는 어떤 단어가 포함되어 있나요?</h3>
+                                <p>정답 단어는 명사만 해당하며, 2~3글자 단어입니다.</p>
+                                <p class="about-example">예시) 행복, 사랑, 까치, 도형, 한글</p>
+                                <p>정답 단어는 Hunspell 한국어 사전과 FastText 어휘의 교집합에서 명사를 추출하여 임의 선택합니다. 정답 단어는 모두 두 글자 이상이지만, 전략적인 이유로 한 글자 단어나 자모(ㅋㅋ, ㅎㅎ 등)를 추측해볼 수 있습니다.</p>
+                            </div>
+
+                            <div class="about-block">
+                                <h3>유사도는 무엇인가요?</h3>
+                                <p>온맨틀에서 추측한 단어와 정답 단어가 의미·맥락적으로 얼마나 비슷한지에 대한 정도를 -100에서 +100까지의 숫자로 계산한 점수입니다. +이면서, 숫자가 클수록 유사한 정도가 크다고 이해할 수 있습니다.</p>
+                                <p>유사도 추정을 위해 온맨틀에서는 Common Crawl 및 Wikipedia 데이터로 사전 훈련된 FastText를 사용하였습니다. 훈련된 데이터에 따라 편향이 있을 수 있습니다.</p>
+                                <p>온맨틀에서는 정답 단어와 가장 비슷한 1,000개의 단어 안에 추측한 단어가 있을 때, 단어의 유사도 순위를 함께 제공합니다.</p>
+                            </div>
+
+                            <div class="about-block">
+                                <h3>꼬맨틀과 다른 점은 무엇인가요?</h3>
+                                <p>온맨틀은 하루 3번(08시, 16시, 24시) 퍼즐이 교체되며, 5단계 힌트 시스템(추측 횟수에 따라 해금)과 순위표, 점메추 기능을 제공합니다.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="puzzle-retry-wrap" class="puzzle-retry-wrap hidden">
@@ -131,36 +157,8 @@
         </div>
     </div>
 
-    <div class="about-section">
-        <h2>온맨틀은 무엇인가요?</h2>
-        <div class="about-content">
-            <div class="about-block">
-                <p>온맨틀은 오늘의 단어를 맞히는 게임입니다. 정답 단어를 추측하면, 추측한 단어가 정답 단어와 얼마나 유사한지 유사도 점수로 알려줍니다. 가장 유사한 단어의 유사도와 가까운 단어를 추측하면서, 정답 단어를 맞혀보세요.</p>
-            </div>
-
-            <div class="about-block">
-                <h3>정답 단어에는 어떤 단어가 포함되어 있나요?</h3>
-                <p>정답 단어는 명사만 해당하며, 2~3글자 단어입니다.</p>
-                <p class="about-example">예시) 행복, 사랑, 까치, 도형, 한글</p>
-                <p>정답 단어는 Hunspell 한국어 사전과 FastText 어휘의 교집합에서 명사를 추출하여 임의 선택합니다. 정답 단어는 모두 두 글자 이상이지만, 전략적인 이유로 한 글자 단어나 자모(ㅋㅋ, ㅎㅎ 등)를 추측해볼 수 있습니다.</p>
-            </div>
-
-            <div class="about-block">
-                <h3>유사도는 무엇인가요?</h3>
-                <p>온맨틀에서 추측한 단어와 정답 단어가 의미·맥락적으로 얼마나 비슷한지에 대한 정도를 -100에서 +100까지의 숫자로 계산한 점수입니다. +이면서, 숫자가 클수록 유사한 정도가 크다고 이해할 수 있습니다.</p>
-                <p>유사도 추정을 위해 온맨틀에서는 Common Crawl 및 Wikipedia 데이터로 사전 훈련된 FastText를 사용하였습니다. 훈련된 데이터에 따라 편향이 있을 수 있습니다.</p>
-                <p>온맨틀에서는 정답 단어와 가장 비슷한 1,000개의 단어 안에 추측한 단어가 있을 때, 단어의 유사도 순위를 함께 제공합니다.</p>
-            </div>
-
-            <div class="about-block">
-                <h3>꼬맨틀과 다른 점은 무엇인가요?</h3>
-                <p>온맨틀은 하루 3번(08시, 16시, 24시) 퍼즐이 교체되며, 5단계 힌트 시스템(추측 횟수에 따라 해금)과 순위표, 점메추 기능을 제공합니다.</p>
-            </div>
-        </div>
-    </div>
-
     <div class="credit-section">
-        <p>이 사이트는 고려대학교 성우동아리 온보이싱 회원들을 위해 제작되었습니다. (<a href="https://www.youtube.com/@OnVoicing" target="_blank">온보이싱 유튜브</a>)</p>
+        <p>이 사이트는 고려대학교 성우동아리 온보이싱 회원들을 위해 제작되었습니다. (<a href="https://www.youtube.com/@OnVoicing" target="_blank">온보이싱 유튜브</a>) — 직접 만들어 운영 · 광고 없음</p>
     </div>
 
     <div class="feedback-section">
@@ -170,18 +168,23 @@
             <label for="fb-nick" class="sr-only">닉네임</label>
             <input type="text" id="fb-nick" placeholder="닉네임" aria-label="닉네임" maxlength="20">
             <label for="fb-text" class="sr-only">피드백 내용</label>
-            <textarea id="fb-text" aria-label="피드백 내용" placeholder="(개발자의 귀차니즘으로 인한)익명 게시판입니다.&#10;따듯한 말과 건설적인 피드백을 적어주세요."></textarea>
+            <textarea id="fb-text" aria-label="피드백 내용" maxlength="500" placeholder="익명 게시판입니다.&#10;따듯한 말과 건설적인 피드백을 적어주세요."></textarea>
             <button id="feedback-submit-btn" type="button">전송</button>
         </div>
         <div id="feedback-list" class="feedback-list"></div>
     </div>
 
     <script src="js/script.js"></script>
-    <script type="module">
-      import { czFx, czHeader } from './cityzen-ui.js';
-      czFx();
-      czHeader({ title: '온맨틀' });
+    <script>
+      // 뒤로가기 → onvoicing 허브
+      (function () {
+        if (history.state && history.state.czHub) return;
+        history.pushState({ czHub: 1 }, '');
+        window.addEventListener('popstate', function (e) {
+          if (!e.state || !e.state.czHub) location.replace('https://onvoicing.cityzen.kr/');
+        });
+      }());
     </script>
-    <a class="pol-back-btn" href="https://portfolio.cityzen.kr">&#8592; cityzen</a>
+    <a class="pol-back-btn" href="https://onvoicing.cityzen.kr">&#8592; onvoicing</a>
 </body>
 </html>

@@ -29,7 +29,6 @@ const leaderboardContent = document.getElementById("leaderboard-content");
 
 // --- Init ---
 async function init() {
-    loadTheme();
     await loadPuzzle();
     loadState();
     renderGuesses();
@@ -88,16 +87,20 @@ function hidePuzzleError() {
 
 function loadState() {
     if (puzzleNumber === null) return;
-    const saved = localStorage.getItem(`onmantle_guesses_${puzzleNumber}`);
-    if (saved) {
-        guesses = JSON.parse(saved);
-        solved = guesses.some(g => g.is_correct);
-    }
-    const savedHints = localStorage.getItem(`onmantle_hints_${puzzleNumber}`);
-    if (savedHints) {
-        hintsUsed = JSON.parse(savedHints);
-        renderHintResults();
-    }
+    try {
+        const saved = localStorage.getItem(`onmantle_guesses_${puzzleNumber}`);
+        if (saved) {
+            guesses = JSON.parse(saved) || [];
+            solved = guesses.some(g => g.is_correct);
+        }
+    } catch (e) { guesses = []; solved = false; }
+    try {
+        const savedHints = localStorage.getItem(`onmantle_hints_${puzzleNumber}`);
+        if (savedHints) {
+            hintsUsed = JSON.parse(savedHints) || {};
+            renderHintResults();
+        }
+    } catch (e) { hintsUsed = {}; }
     if (solved) showSuccess();
 }
 
@@ -478,7 +481,15 @@ function bindEvents() {
     document.getElementById("lunch-submit-btn").addEventListener("click", submitLunch);
     document.getElementById("lunch-menu").addEventListener("keydown", (e) => { if (e.key === "Enter") submitLunch(); });
     document.getElementById("feedback-submit-btn").addEventListener("click", submitFeedback);
-    document.getElementById("dark-toggle").addEventListener("click", toggleDark);
+    // '? 게임 방법' 접이식 토글
+    const howtoBtn = document.getElementById("howto-btn");
+    if (howtoBtn) {
+        howtoBtn.addEventListener("click", () => {
+            const panel = document.getElementById("howto-panel");
+            const nowHidden = panel.classList.toggle("hidden");
+            howtoBtn.setAttribute("aria-expanded", String(!nowHidden));
+        });
+    }
     // 점메추 좋아요: 인라인 onclick 대신 이벤트 위임 (CSP 안전)
     lunchContent.addEventListener("click", (e) => {
         const btn = e.target.closest(".like-btn");
@@ -501,33 +512,6 @@ async function retryLoad() {
     }
 }
 
-// --- 다크 모드 ---
-function applyTheme(isDark) {
-    const el = document.documentElement;
-    const btn = document.getElementById("dark-toggle");
-    if (isDark) {
-        el.setAttribute("data-theme", "dark");
-        btn.textContent = "☀️";
-        btn.setAttribute("aria-pressed", "true");
-    } else {
-        el.removeAttribute("data-theme");
-        btn.textContent = "🌙";
-        btn.setAttribute("aria-pressed", "false");
-    }
-}
-
-function toggleDark() {
-    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-    applyTheme(!isDark);
-    localStorage.setItem("onmantle_theme", isDark ? "light" : "dark");
-}
-
-function loadTheme() {
-    const saved = localStorage.getItem("onmantle_theme");
-    // 기본은 다크. 저장값이 'light'면 라이트로 복원.
-    applyTheme(saved !== "light");
-}
-
 // --- 점메추 ---
 const lunchContent = document.getElementById("lunch-content");
 const todayStr = new Date().toISOString().slice(0, 10);
@@ -536,7 +520,10 @@ const likedKey = `onmantle_liked_lunches_${todayStr}`;
 Object.keys(localStorage).forEach(k => {
     if (k.startsWith("onmantle_liked_lunches_") && k !== likedKey) localStorage.removeItem(k);
 });
-const likedSet = new Set(JSON.parse(localStorage.getItem(likedKey) || "[]"));
+let likedSet;
+try {
+    likedSet = new Set(JSON.parse(localStorage.getItem(likedKey) || "[]"));
+} catch (e) { likedSet = new Set(); }
 
 async function loadLunch() {
     try {
@@ -549,23 +536,43 @@ async function loadLunch() {
 }
 
 function renderLunch(picks) {
+    // 사용자 입력(메뉴·닉네임)은 속성 보간 XSS 방지를 위해 DOM API로만 구성
+    lunchContent.textContent = "";
     if (!picks || picks.length === 0) {
-        lunchContent.innerHTML = '<p class="leaderboard-empty">오늘의 점심을 추천해주세요!</p>';
+        const empty = document.createElement("p");
+        empty.className = "leaderboard-empty";
+        empty.textContent = "오늘의 점심을 추천해주세요!";
+        lunchContent.appendChild(empty);
         return;
     }
-    lunchContent.innerHTML = picks.map((p, i) => {
-        const liked = likedSet.has(p.id) ? " liked" : "";
-        return `<div class="lunch-row">
-            <span class="lunch-rank">${i + 1}</span>
-            <div class="lunch-info">
-                <div class="lunch-menu">${escapeHtml(p.menu)}</div>
-                <div class="lunch-nick">${escapeHtml(p.nickname)}</div>
-            </div>
-            <button class="like-btn${liked}" type="button" data-id="${p.id}" aria-label="${escapeHtml(p.menu)} 추천 좋아요 (현재 ${p.likes})">
-                ♥ ${p.likes}
-            </button>
-        </div>`;
-    }).join("");
+    picks.forEach((p, i) => {
+        const row = document.createElement("div");
+        row.className = "lunch-row";
+
+        const rank = document.createElement("span");
+        rank.className = "lunch-rank";
+        rank.textContent = String(i + 1);
+
+        const info = document.createElement("div");
+        info.className = "lunch-info";
+        const menu = document.createElement("div");
+        menu.className = "lunch-menu";
+        menu.textContent = p.menu;
+        const nick = document.createElement("div");
+        nick.className = "lunch-nick";
+        nick.textContent = p.nickname;
+        info.append(menu, nick);
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "like-btn" + (likedSet.has(p.id) ? " liked" : "");
+        btn.dataset.id = String(p.id);
+        btn.setAttribute("aria-label", `${p.menu} 추천 좋아요 (현재 ${p.likes})`);
+        btn.textContent = `♥ ${p.likes}`;
+
+        row.append(rank, info, btn);
+        lunchContent.appendChild(row);
+    });
 }
 
 async function submitLunch() {
@@ -597,45 +604,67 @@ async function likeLunch(id, btn) {
             likedSet.add(id);
             localStorage.setItem(likedKey, JSON.stringify([...likedSet]));
             btn.classList.add("liked");
-            btn.innerHTML = `♥ ${data.likes}`;
+            btn.textContent = `♥ ${data.likes}`;
             loadLunch();
         }
     } catch (e) { /* 무시 */ }
 }
 
-// --- 피드백 (로컬스토리지) ---
+// --- 피드백 (서버 저장: /api/feedback) ---
 const feedbackList = document.getElementById("feedback-list");
 
-function loadFeedback() {
-    const items = JSON.parse(localStorage.getItem("onmantle_feedback") || "[]");
-    renderFeedback(items);
+async function loadFeedback() {
+    try {
+        const resp = await fetch(`${API_URL}/api/feedback`);
+        const data = await resp.json();
+        renderFeedback(data.items);
+    } catch (e) {
+        feedbackList.textContent = "";
+    }
 }
 
 function renderFeedback(items) {
-    if (!items.length) {
-        feedbackList.innerHTML = "";
-        return;
-    }
-    feedbackList.innerHTML = items.slice().reverse().map(f => {
-        const d = new Date(f.time);
+    // 사용자 입력은 DOM API + textContent로만 삽입 (XSS 방지)
+    feedbackList.textContent = "";
+    if (!items || !items.length) return;
+    items.forEach(f => {
+        const d = new Date(f.created_at);
         const timeStr = `${d.getMonth()+1}/${d.getDate()} ${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`;
-        return `<div class="feedback-item">
-            <span class="fb-nick">${escapeHtml(f.nick)}</span>
-            <span class="fb-text">${escapeHtml(f.text)}</span>
-            <span class="fb-time">${timeStr}</span>
-        </div>`;
-    }).join("");
+        const item = document.createElement("div");
+        item.className = "feedback-item";
+        const nick = document.createElement("span");
+        nick.className = "fb-nick";
+        nick.textContent = f.nickname;
+        const text = document.createElement("span");
+        text.className = "fb-text";
+        text.textContent = f.content;
+        const time = document.createElement("span");
+        time.className = "fb-time";
+        time.textContent = timeStr;
+        item.append(nick, text, time);
+        feedbackList.appendChild(item);
+    });
 }
 
-function submitFeedback() {
+async function submitFeedback() {
     const nick = document.getElementById("fb-nick").value.trim() || "익명";
     const text = document.getElementById("fb-text").value.trim();
     if (!text) { showError("피드백 내용을 입력해주세요"); return; }
-    const items = JSON.parse(localStorage.getItem("onmantle_feedback") || "[]");
-    items.push({ nick, text, time: new Date().toISOString() });
-    localStorage.setItem("onmantle_feedback", JSON.stringify(items));
-    document.getElementById("fb-text").value = "";
-    renderFeedback(items);
+    try {
+        const resp = await fetch(`${API_URL}/api/feedback`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nickname: nick, content: text }),
+        });
+        if (resp.ok) {
+            document.getElementById("fb-text").value = "";
+            showInfo("피드백이 등록되었습니다. 감사합니다!");
+            loadFeedback();
+        } else {
+            const data = await resp.json();
+            showError(data.error || "등록 실패");
+        }
+    } catch (e) { showError("서버 연결 오류"); }
 }
 
 // --- Start ---

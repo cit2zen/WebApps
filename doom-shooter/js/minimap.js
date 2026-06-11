@@ -24,7 +24,8 @@ export class MiniMap {
     canvas.id = 'minimap';
     canvas.width = CANVAS_SIZE;
     canvas.height = CANVAS_SIZE;
-    document.body.appendChild(canvas);
+    // #hud 안에 넣어 메뉴/일시정지/사망 화면에서 HUD와 함께 숨겨지게 한다
+    (document.getElementById('hud') ?? document.body).appendChild(canvas);
     this._canvas = canvas;
     this._ctx = canvas.getContext('2d');
   }

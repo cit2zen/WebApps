@@ -5,7 +5,8 @@ const SIZE = 512;
 function makeCanvas(size = SIZE) {
   const c = document.createElement('canvas');
   c.width = c.height = size;
-  return [c, c.getContext('2d')];
+  // 노멀/러프니스 생성 시 getImageData를 반복 호출하므로 readback 최적화 컨텍스트 사용
+  return [c, c.getContext('2d', { willReadFrequently: true })];
 }
 
 function repeatTex(canvas, aniso = 4) {

@@ -49,3 +49,11 @@ class LunchPick(db.Model):
     menu = db.Column(db.Text, nullable=False)
     likes = db.Column(db.Integer, nullable=False, default=0)
     created_at = db.Column(db.Text, nullable=False)  # ISO 8601 (KST)
+
+
+class Feedback(db.Model):
+    __tablename__ = "feedbacks"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nickname = db.Column(db.Text, nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.Text, nullable=False)  # ISO 8601 (KST)

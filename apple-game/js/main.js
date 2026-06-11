@@ -19,6 +19,7 @@ const overlayKicker = $("overlayKicker");
 const overlaySub = $("overlaySub");
 const confetti = $("confetti");
 const replayBtn = $("replay");
+const startOverlay = $("startOverlay");
 
 const BEST_KEY = "apple-game-best";
 let best = Number(localStorage.getItem(BEST_KEY) || 0);
@@ -97,7 +98,7 @@ function endGame(win) {
 }
 
 function spawnConfetti() {
-  const colors = ["#e8b54a", "#ff6a5a", "#6bc46e", "#f4ecd8", "#ff4d4d"];
+  const colors = ["#e8b54a", "#ff6a5a", "#6bc46e", "#ff4d4d"];
   let html = "";
   for (let i = 0; i < 44; i++) {
     const left = (Math.random() * 100).toFixed(1);
@@ -111,6 +112,11 @@ function spawnConfetti() {
 
 $("reset").addEventListener("click", startGame);
 $("replay").addEventListener("click", startGame);
+// 시작 게이트: 로드 시 자동 시작하지 않고, '시작하기'가 '다시 하기'와 같은 경로(startGame)를 탄다.
+$("start").addEventListener("click", () => {
+  startOverlay.hidden = true;
+  startGame();
+});
 
 initSettings();
-startGame();
+board.setEnabled(false); // 시작 전 입력 잠금(타이머도 startGame에서만 시작)

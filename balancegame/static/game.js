@@ -1,15 +1,9 @@
+/* esc / imageUrl 은 /static/utils.js (먼저 로드) */
 let bracket = [];
 let roundWinners = [];
 let currentMatch = 0;
-let roundNum = 0;
 let currentSetId = null;
-
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
-function imageUrl(path) { return path ? '/uploads/' + esc(path) : null; }
+let choosing = false; // 더블클릭/더블탭 레이스 가드
 
 // 항상 2의거듭제곱: prevPow2(6)=4, prevPow2(8)=8, prevPow2(10)=8
 function prevPow2(n) {
@@ -74,6 +68,9 @@ function showMatch() {
 }
 
 async function onChoose(winner) {
+  if (choosing) return;
+  choosing = true;
+
   const winEl = winner.id === parseInt(document.getElementById('card-a').dataset.id)
     ? document.getElementById('card-a')
     : document.getElementById('card-b');
@@ -88,14 +85,15 @@ async function onChoose(winner) {
     if (roundWinners.length === 1) {
       await recordWin(roundWinners[0].id);
       goToResult(roundWinners[0]);
+      choosing = false;
       return;
     }
     // 다음 라운드도 2의거듭제곱이 보장됨
     buildBracket(roundWinners);
     currentMatch = 0;
-    roundNum++;
   }
   showMatch();
+  choosing = false;
 }
 
 async function recordWin(id) {

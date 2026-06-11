@@ -58,7 +58,7 @@ async function ensureMic() {
 }
 
 // --- 음량 미터 루프 (준비/설정 화면 공용) ---
-function startMeter(fillEl, thresholdEl, statusEl) {
+function startMeter(fillEl, thresholdEl, statusEl, failMsg = "⚠️ 마이크 권한을 허용해 주세요") {
   stopMeter();
   if (thresholdEl) thresholdEl.style.left = `${settings.threshold * 100}%`;
   const meterEl = fillEl.closest(".meter"); // role=meter 래퍼
@@ -71,7 +71,7 @@ function startMeter(fillEl, thresholdEl, statusEl) {
   };
   tick();
   ensureMic().then((ok) => {
-    if (statusEl) statusEl.textContent = ok ? "" : "⚠️ 마이크 권한을 허용해 주세요";
+    if (statusEl) statusEl.textContent = ok ? "" : failMsg;
   });
 }
 function stopMeter() {
@@ -92,7 +92,8 @@ async function goReady() {
   returnFrom = "ready";
   show("ready");
   await ensureMic();
-  startMeter($("ready-meter-fill"), $("ready-meter-threshold"), $("ready-mic-status"));
+  startMeter($("ready-meter-fill"), $("ready-meter-threshold"), $("ready-mic-status"),
+    "마이크 없이는 탭/스페이스로 점프!");
 }
 
 function beginGame() {
@@ -113,8 +114,23 @@ function openSettings(from) {
 function closeSettings() {
   sfx.click();
   if (returnFrom === "ready") goReady();
+  else if (returnFrom === "gameover") show("gameover");
   else goHome();
 }
+
+// --- 마이크 폴백: 탭/스페이스 보조 점프(고정 세기) ---
+const TAP_JUMP_POWER = 0.6;
+function manualJump() {
+  if (game.state !== "playing" || !game.cat.onGround) return;
+  game.cat.jump(TAP_JUMP_POWER);
+  sfx.jump();
+}
+window.addEventListener("keydown", (e) => {
+  if (e.code !== "Space" || game.state !== "playing") return;
+  e.preventDefault(); // 스크롤·포커스 버튼 재클릭 방지
+  manualJump();
+});
+canvas.addEventListener("pointerdown", manualJump);
 
 // --- 버튼 연결 ---
 $("start-btn").addEventListener("click", goReady);

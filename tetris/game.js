@@ -8,7 +8,7 @@ const MAX_LOCK_TIME = 1000; // 바닥에 처음 닿은 뒤 강제로 고정되�
 const gravityMs = (level) =>
   Math.max(Math.pow(0.8 - (level - 1) * 0.007, level - 1) * 1000, 1);
 
-export function createGame() {
+export function createGame(state = 'playing') {
   const g = {
     grid: createGrid(),
     current: null,
@@ -17,7 +17,7 @@ export function createGame() {
     score: 0,
     lines: 0,
     level: 1,
-    state: 'playing', // playing | paused | over
+    state, // ready | playing | paused | over
     gravityTimer: 0,
     lockTimer: 0,
     lockStarted: false,

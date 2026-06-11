@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DOOMBLAST — 3D Shooter</title>
+  <link rel="stylesheet" href="../design-tokens.css" />
   <link rel="stylesheet" href="./style.css" />
   <script type="importmap">
   {
@@ -33,34 +34,36 @@
       <div id="banner"></div>
     </div>
 
-    <!-- viewmodel -->
-    <div id="muzzle"></div>
-    <img id="gun" alt="" />
     <div id="damage"></div>
 
-    <!-- overlays -->
-    <div id="overlay">
-      <div class="panel">
-        <h1 id="o-title">DOOMBLAST</h1>
-        <p id="o-text">적을 전멸시키고 빛나는 출구로 탈출하라.<br/>3개 스테이지를 클리어하면 승리.</p>
-        <ul id="o-controls">
-          <li><b>WASD</b> 이동 · <b>Shift</b> 달리기 · <b>Space</b> 점프</li>
-          <li><b>마우스</b> 시점 · <b>좌클릭</b> 발사 · <b>R</b> 재장전</li>
-          <li><b>Esc</b> 일시정지</li>
-        </ul>
-        <button id="o-btn">클릭하여 시작</button>
+    <!-- overlays: index.html과 동일 마크업 유지(정합) — e2e가 실제 프로덕션 DOM을 검증하도록 -->
+    <div id="overlay" class="pol-lobby">
+      <div class="pol-lcard">
+        <div class="pol-lphoto" style="background:linear-gradient(145deg,#8a4a3a,#3a1a18)"></div>
+        <span class="pol-lnum">cityzen</span>
+        <span class="pol-ltag">doom</span>
+      </div>
+      <h2 id="o-title" class="pol-ltitle">doom</h2>
+      <p id="o-text" class="pol-ldesc">살아남아라.</p>
+      <ul id="o-controls">
+        <li><b>WASD</b> 이동 · <b>Shift</b> 달리기 · <b>Space</b> 점프</li>
+        <li><b>마우스</b> 시점 · <b>좌클릭</b> 발사 · <b>R</b> 재장전 · <b>1·2·3</b> 무기</li>
+        <li><b>Esc</b> 일시정지</li>
+      </ul>
+      <p id="touch-notice">터치 기기에서는 시점 조작이 지원되지 않습니다.<br />데스크톱 + 마우스 환경에서 플레이를 권장합니다.</p>
+      <button id="o-btn" class="pol-lbtn">시작하기</button>
+      <span class="pol-llabel">cityzen &middot; Game - FPS</span>
 
-        <div id="settings">
-          <h3>설정 · 사운드</h3>
-          <label>전체 음량 <input id="vol-master" type="range" min="0" max="1" step="0.01" /></label>
-          <label>효과음 <input id="vol-sfx" type="range" min="0" max="1" step="0.01" /></label>
-          <label>배경음 <input id="vol-music" type="range" min="0" max="1" step="0.01" /></label>
-        </div>
+      <div id="settings" style="display:none">
+        <h3>설정 · 사운드</h3>
+        <label>전체 음량 <input id="vol-master" type="range" min="0" max="1" step="0.01" /></label>
+        <label>효과음 <input id="vol-sfx" type="range" min="0" max="1" step="0.01" /></label>
+        <label>배경음 <input id="vol-music" type="range" min="0" max="1" step="0.01" /></label>
       </div>
     </div>
   </div>
 
   <script type="module" src="./js/game.js"></script>
-  <script type="module" src="./js/test/e2e.js?v=3"></script>
+  <script type="module" src="./js/test/e2e.js?v=4"></script>
 </body>
 </html>

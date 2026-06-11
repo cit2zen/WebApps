@@ -1,45 +1,24 @@
 /* 폰트는 index.html에서 preconnect+link로 비동기 로드 (렌더 블로킹 회피) */
 
 /* --- Theme Variables ---
-   다크가 정본(생태계 Neon Arcade 팔레트, html[data-theme="dark"] 기본 탑재).
-   라이트는 보조 테마(:root, JS가 data-theme 제거 시 적용).
-   생태계와 정합되게 라이트 accent도 violet 계열로 통일. */
+   Polaroid Editorial 라이트 단일 테마.
+   토큰 정본: css/design-tokens.css (develop_web/design-system/ 사본). */
 :root {
-    --bg: #f0ecf7;
-    --bg-solid: #f0ecf7;
-    --card: #ffffff;
-    --card-border: #e4dff0;
-    --card-shadow: 0 2px 16px rgba(124,92,255,0.08);
-    --text: #1e1e2f;
-    --text-sub: #4a4a6a;
-    --text-muted: #6f6f8a;
-    --input-bg: #f8f6fc;
-    --input-border: #d8d2e8;
-    --accent: #7c5cff;
-    --accent-light: #a98bff;
-    --accent-bg: rgba(124,92,255,0.07);
-    --green: #00b894;
-    --pink: #e84db0;
-    --red: #e17055;
-}
-
-[data-theme="dark"] {
-    --bg: transparent;            /* cz-fx 네온 배경이 비치도록 투명 */
-    --bg-solid: #06060b;
-    --card: #0c0c14;
-    --card-border: rgba(255,255,255,0.08);
-    --card-shadow: 0 2px 20px rgba(0,0,0,0.35);
-    --text: #eef0ff;
-    --text-sub: #b8b8d4;
-    --text-muted: #9a9ac0;
-    --input-bg: rgba(255,255,255,0.03);
-    --input-border: rgba(255,255,255,0.10);
-    --accent: #5ef2ff;
-    --accent-light: #a98bff;
-    --accent-bg: rgba(94,242,255,0.07);
-    --green: #39ff96;
-    --pink: #ff4fc8;
-    --red: #ff6b6b;
+    --bg: var(--bg-base);
+    --card: var(--bg-card);
+    --card-border: var(--rule-color);
+    --card-shadow: var(--shadow-card);
+    --text: var(--ink-warm);
+    --text-sub: var(--ink-mid);
+    --text-muted: var(--ink-light);
+    --input-bg: var(--cream-100);
+    --input-border: var(--cream-400);
+    --accent: var(--gold-mid);
+    --accent-light: var(--gold-light);
+    --accent-dark: var(--gold-dark);
+    --accent-bg: rgba(192, 160, 96, 0.08);
+    --green: #3a7a4e;
+    --red: #b0563c;
 }
 
 /* --- Reset & Base --- */
@@ -47,18 +26,12 @@
 
 body {
     font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--bg-solid);   /* 밑바탕(투명 --bg일 때 cz-fx가 이 위에 깔림) */
+    background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    transition: background 0.3s, color 0.3s;
+    word-break: keep-all; /* 한국어 본문 중간 줄바꿈 방지 */
     -webkit-font-smoothing: antialiased;
 }
-
-/* 본문 컨텐츠는 cz-fx(z-index:0) 위에 배치 */
-.layout,
-.about-section,
-.credit-section,
-.feedback-section { position: relative; z-index: 1; }
 
 /* 접근성: 시각적 숨김 라벨 */
 .sr-only {
@@ -72,21 +45,12 @@ body {
     display: flex;
     max-width: 980px;
     margin: 0 auto;
-    padding: 28px 20px;
+    padding: 52px 20px 28px; /* 상단 여백: 고정 back 버튼과 겹침 방지 */
     gap: 24px;
 }
 
 .main-panel { flex: 1; max-width: 600px; }
 .side-panel { width: 290px; flex-shrink: 0; }
-
-/* --- Card base --- */
-.card-style {
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 14px;
-    box-shadow: var(--card-shadow);
-    transition: background 0.3s, border-color 0.3s;
-}
 
 /* --- Header --- */
 header {
@@ -97,19 +61,19 @@ header {
 }
 
 header h1 {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 300;
     font-size: 2.6rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--accent), var(--accent-light));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--text);
     letter-spacing: -1px;
     margin-bottom: 6px;
 }
 
 header h1 .subtitle {
     font-size: 1rem;
-    font-weight: 400;
+    font-weight: 300;
+    color: var(--text-muted);
     letter-spacing: 0;
 }
 
@@ -122,7 +86,7 @@ header h1 .subtitle {
     font-weight: 400;
 }
 
-#puzzle-number { font-weight: 700; color: var(--accent); }
+#puzzle-number { font-weight: 700; color: var(--accent-dark); }
 
 .rank-info {
     display: flex;
@@ -135,27 +99,13 @@ header h1 .subtitle {
 }
 
 .rank-info .sim-value {
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--accent);
+    font-family: var(--font-mono);
+    color: var(--accent-dark);
     font-weight: 700;
     font-size: 1rem;
 }
 
-/* --- Toggle Buttons (top) --- */
-.dark-toggle {
-    position: absolute;
-    top: 0; left: 0;
-    width: 36px; height: 36px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem;
-    border: 1px solid var(--card-border);
-    border-radius: 10px;
-    background: var(--card);
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.dark-toggle:hover { transform: scale(1.08); box-shadow: var(--card-shadow); }
-
+/* --- Reset Button (top) --- */
 .reset-btn {
     position: absolute;
     top: 0; right: 0;
@@ -176,11 +126,12 @@ header h1 .subtitle {
 .input-area {
     display: flex;
     gap: 10px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 #guess-input {
     flex: 1;
+    min-width: 0;
     padding: 14px 18px;
     font-size: 1.05rem;
     border: 2px solid var(--input-border);
@@ -202,18 +153,59 @@ header h1 .subtitle {
     font-size: 1.05rem;
     border: none;
     border-radius: 12px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    background: linear-gradient(135deg, var(--gold-mid), var(--gold-light));
     color: #fff;
     cursor: pointer;
     font-weight: 700;
     font-family: inherit;
     letter-spacing: 0.5px;
     transition: all 0.15s;
-    box-shadow: 0 3px 14px rgba(108,92,231,0.2);
+    box-shadow: 0 3px 14px rgba(154, 120, 64, 0.25);
 }
-#guess-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 20px rgba(108,92,231,0.3); }
+#guess-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 20px rgba(154, 120, 64, 0.35); }
 #guess-btn:active { transform: translateY(0); }
 #guess-btn:disabled { background: var(--input-border); box-shadow: none; cursor: not-allowed; transform: none; }
+
+/* --- 게임 방법 토글 --- */
+.howto { margin-bottom: 14px; }
+
+.howto-toggle {
+    width: 100%;
+    text-align: left;
+    padding: 10px 16px;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 0.92rem;
+    color: var(--accent-dark);
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    cursor: pointer;
+    box-shadow: var(--card-shadow);
+    transition: box-shadow 0.2s, color 0.2s;
+}
+.howto-toggle:hover { color: var(--text); box-shadow: var(--shadow-card-open); }
+.howto-toggle[aria-expanded="true"] { border-bottom-color: transparent; }
+
+.howto-panel {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-top: none;
+    padding: 16px 18px;
+    box-shadow: var(--card-shadow);
+}
+
+.about-content { display: flex; flex-direction: column; gap: 14px; }
+.about-block h3 {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--accent-dark);
+    margin-bottom: 5px;
+}
+.about-block p { font-size: 0.85rem; color: var(--text-sub); line-height: 1.7; margin-bottom: 3px; }
+.about-example { font-size: 0.82rem; color: var(--text-muted); font-style: italic; padding-left: 8px; border-left: 3px solid var(--card-border); }
 
 /* --- Messages --- */
 .error {
@@ -222,8 +214,8 @@ header h1 .subtitle {
     font-size: 0.88rem;
     font-weight: 500;
     color: var(--red);
-    background: rgba(225,112,85,0.07);
-    border: 1px solid rgba(225,112,85,0.12);
+    background: rgba(176, 86, 60, 0.07);
+    border: 1px solid rgba(176, 86, 60, 0.16);
     border-radius: 10px;
     margin-bottom: 12px;
     animation: slideIn 0.2s ease;
@@ -232,8 +224,8 @@ header h1 .subtitle {
 /* 성공/중립 안내(복사·중복 단어 등): error 빨강 대신 초록 톤 */
 .error.info {
     color: var(--green);
-    background: rgba(57,255,150,0.07);
-    border-color: rgba(57,255,150,0.18);
+    background: rgba(58, 122, 78, 0.07);
+    border-color: rgba(58, 122, 78, 0.18);
 }
 
 .puzzle-retry-wrap {
@@ -247,8 +239,8 @@ header h1 .subtitle {
     font-size: 1.15rem;
     font-weight: 700;
     color: var(--green);
-    background: rgba(0,184,148,0.07);
-    border: 1px solid rgba(0,184,148,0.12);
+    background: rgba(58, 122, 78, 0.07);
+    border: 1px solid rgba(58, 122, 78, 0.14);
     border-radius: 14px;
     margin-bottom: 12px;
     animation: popIn 0.35s cubic-bezier(0.175,0.885,0.32,1.275);
@@ -263,14 +255,14 @@ header h1 .subtitle {
 .register {
     background: var(--card);
     border: 1px solid var(--card-border);
-    border-radius: 14px;
+    border-radius: 3px;
     padding: 18px;
     margin-bottom: 12px;
     text-align: center;
     box-shadow: var(--card-shadow);
     animation: slideIn 0.3s ease;
 }
-.register p { font-size: 0.95rem; color: var(--accent); font-weight: 600; margin-bottom: 10px; }
+.register p { font-size: 0.95rem; color: var(--accent-dark); font-weight: 600; margin-bottom: 10px; }
 .register-form { display: flex; gap: 8px; justify-content: center; }
 
 #name-input {
@@ -284,9 +276,9 @@ header h1 .subtitle {
 
 #register-btn {
     padding: 10px 20px; font-size: 0.92rem; border: none; border-radius: 9px;
-    background: linear-gradient(135deg, var(--green), #55efc4);
+    background: var(--green);
     color: #fff; cursor: pointer; font-weight: 600; font-family: inherit;
-    transition: all 0.15s; box-shadow: 0 2px 10px rgba(0,184,148,0.18);
+    transition: all 0.15s; box-shadow: 0 2px 10px rgba(58, 122, 78, 0.18);
 }
 #register-btn:hover { transform: translateY(-1px); }
 
@@ -300,16 +292,16 @@ header h1 .subtitle {
     cursor: pointer; font-family: inherit;
     transition: all 0.15s;
 }
-.small-btn:hover { border-color: var(--accent); color: var(--accent); }
+.small-btn:hover { border-color: var(--accent); color: var(--accent-dark); }
 
 .guess-count {
-    font-size: 0.82rem; color: var(--accent); font-weight: 600;
+    font-size: 0.82rem; color: var(--accent-dark); font-weight: 600;
     padding: 7px 0;
 }
 
 .latest-guess-block {
     background: var(--accent-bg); border: 1px solid var(--card-border);
-    border-radius: 14px; padding: 2px 14px;
+    border-radius: 3px; padding: 2px 14px;
     margin-bottom: 10px;
 }
 .latest-guess-block .guess-row.latest {
@@ -320,7 +312,7 @@ header h1 .subtitle {
 /* --- Hints --- */
 .hints {
     background: var(--card); border: 1px solid var(--card-border);
-    border-radius: 14px; padding: 14px; margin-bottom: 14px;
+    border-radius: 3px; padding: 14px; margin-bottom: 14px;
     box-shadow: var(--card-shadow);
 }
 .hint-buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
@@ -331,13 +323,13 @@ header h1 .subtitle {
     background: var(--input-bg); color: var(--text-muted);
     cursor: pointer; font-family: inherit; transition: all 0.15s;
 }
-.hint-level:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.hint-level:hover:not(:disabled) { border-color: var(--accent); color: var(--accent-dark); }
 .hint-level.used {
     border-color: var(--accent); color: #fff;
-    background: linear-gradient(135deg, var(--accent), var(--accent-light));
-    font-weight: 500; box-shadow: 0 2px 8px rgba(108,92,231,0.15);
+    background: linear-gradient(135deg, var(--gold-mid), var(--gold-light));
+    font-weight: 500; box-shadow: 0 2px 8px rgba(154, 120, 64, 0.2);
 }
-.hint-level.locked { opacity: 0.3; cursor: not-allowed; }
+.hint-level.locked { opacity: 0.35; cursor: not-allowed; }
 .hint-level.unlocked { border-color: var(--green); color: var(--green); opacity: 1; cursor: pointer; }
 
 #hint-results { font-size: 0.85rem; color: var(--text-sub); }
@@ -347,7 +339,7 @@ header h1 .subtitle {
 /* --- Guess List --- */
 .guess-list {
     background: var(--card); border: 1px solid var(--card-border);
-    border-radius: 14px; padding: 2px 14px;
+    border-radius: 3px; padding: 2px 14px;
     box-shadow: var(--card-shadow);
 }
 
@@ -368,13 +360,13 @@ header h1 .subtitle {
 
 .guess-row {
     padding: 9px 0;
-    border-bottom: 1px solid var(--card-border);
+    border-bottom: 1px solid var(--cream-200);
     transition: background 0.15s, padding 0.15s;
 }
 .guess-row:last-child { border-bottom: none; }
 .guess-row:hover { background: var(--accent-bg); border-radius: 6px; }
 .guess-row.correct {
-    background: rgba(57,255,150,0.06);
+    background: rgba(58, 122, 78, 0.06);
     box-shadow: inset 3px 0 0 var(--green);
     border-radius: 0 6px 6px 0;
 }
@@ -390,21 +382,21 @@ header h1 .subtitle {
 .col-word { font-weight: 600; color: var(--text); font-size: 0.92rem; overflow-wrap: anywhere; }
 .col-sim {
     text-align: right;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.88rem; font-weight: 700;
     color: var(--text-muted);
 }
-.col-sim.ranked { color: var(--green); }
+.col-sim.ranked { color: var(--accent-dark); }
 .col-sim.negative { color: var(--red); }
 
 .col-rank {
     text-align: center; font-size: 0.8rem;
-    font-family: 'JetBrains Mono', monospace; font-weight: 700;
+    font-family: var(--font-mono); font-weight: 700;
 }
-.col-rank.rank-gold { color: #f1c40f; text-shadow: 0 0 6px rgba(241,196,15,0.3); }
-.col-rank.rank-deep { color: var(--green); }
-.col-rank.rank-mid { color: #55efc4; }
-.col-rank.rank-light { color: #b2dfdb; }
+.col-rank.rank-gold { color: var(--gold-dark); }
+.col-rank.rank-deep { color: var(--gold-mid); }
+.col-rank.rank-mid { color: var(--gold-light); }
+.col-rank.rank-light { color: var(--ink-light); }
 .col-rank.rank-out { color: var(--text-muted); font-weight: 400; font-size: 0.72rem; }
 
 .col-bar { min-width: 0; }
@@ -414,14 +406,14 @@ header h1 .subtitle {
     transition: width 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
     overflow: hidden; position: relative;
 }
-.sim-bar.positive { background: linear-gradient(90deg, var(--accent-light), var(--accent)); }
+.sim-bar.positive { background: linear-gradient(90deg, var(--gold-light), var(--gold-mid)); }
 .sim-bar.positive::after {
     content: ""; position: absolute; inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
     animation: shimmer 2.5s ease-in-out infinite;
 }
 @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-.sim-bar.negative { background: linear-gradient(90deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04)); }
+.sim-bar.negative { background: var(--cream-400); }
 
 /* --- Scroll Buttons --- */
 .scroll-btn-wrap {
@@ -435,19 +427,20 @@ header h1 .subtitle {
     cursor: pointer; font-family: inherit;
     transition: all 0.15s;
 }
-.scroll-btn:hover { border-color: var(--accent); color: var(--accent); }
+.scroll-btn:hover { border-color: var(--accent); color: var(--accent-dark); }
 
 /* --- Leaderboard --- */
 .leaderboard {
     background: var(--card); border: 1px solid var(--card-border);
-    border-radius: 14px; padding: 18px;
+    border-radius: 3px; padding: 18px;
     box-shadow: var(--card-shadow);
 }
 
 .leaderboard h2, .lunch-board h2 {
-    font-size: 1rem; font-weight: 800;
-    background: linear-gradient(135deg, var(--accent), var(--accent-light));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.05rem; font-weight: 500;
+    color: var(--accent-dark);
     margin-bottom: 14px; text-align: center;
 }
 
@@ -464,113 +457,97 @@ header h1 .subtitle {
 .lb-row:hover { background: var(--accent-bg); }
 .lb-row:last-child { border-bottom: none; }
 
-.lb-rank { width: 26px; font-weight: 800; font-size: 0.95rem; color: var(--accent); text-align: center; }
-.lb-rank.gold { color: #f1c40f; text-shadow: 0 0 6px rgba(241,196,15,0.3); }
-.lb-rank.silver { color: #aaa; }
-.lb-rank.bronze { color: #cd7f32; }
+.lb-rank { width: 26px; font-weight: 800; font-size: 0.95rem; color: var(--accent-dark); text-align: center; }
+.lb-rank.gold { color: var(--gold-mid); }
+.lb-rank.silver { color: #8a8a8a; }
+.lb-rank.bronze { color: #b07c4f; }
 
 .lb-name { flex: 1; font-weight: 500; color: var(--text); padding: 0 8px; }
-.lb-detail { text-align: right; font-size: 0.76rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+.lb-detail { text-align: right; font-size: 0.76rem; color: var(--text-muted); font-family: var(--font-mono); }
 .lb-time { display: block; font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; opacity: 0.7; }
 
 /* --- 점메추 --- */
 .lunch-section {
     margin-top: 24px;
     background: var(--card); border: 1px solid var(--card-border);
-    border-radius: 14px; padding: 18px;
+    border-radius: 3px; padding: 18px;
     box-shadow: var(--card-shadow);
 }
-.lunch-section h3 { font-size: 0.95rem; font-weight: 700; color: var(--pink); text-align: center; margin-bottom: 10px; }
+.lunch-section h3 {
+    font-family: var(--font-display); font-style: italic;
+    font-size: 0.98rem; font-weight: 500; color: var(--accent-dark);
+    text-align: center; margin-bottom: 10px;
+}
 
 .lunch-form { display: flex; gap: 8px; }
 .lunch-form input {
-    flex: 1; padding: 10px 12px; font-size: 0.88rem;
-    border: 2px solid rgba(253,121,168,0.12); border-radius: 9px;
+    flex: 1; min-width: 0; padding: 10px 12px; font-size: 0.88rem;
+    border: 2px solid var(--input-border); border-radius: 9px;
     background: var(--input-bg); color: var(--text);
     outline: none; font-family: inherit; transition: border-color 0.2s;
 }
-.lunch-form input:focus { border-color: var(--pink); }
+.lunch-form input:focus { border-color: var(--accent); }
 
 #lunch-submit-btn {
     padding: 10px 16px; font-size: 0.88rem; border: none; border-radius: 9px;
-    background: linear-gradient(135deg, var(--pink), #fab1d0);
+    background: linear-gradient(135deg, var(--gold-mid), var(--gold-light));
     color: #fff; cursor: pointer; font-weight: 600; font-family: inherit;
-    transition: all 0.15s; box-shadow: 0 2px 10px rgba(253,121,168,0.15); white-space: nowrap;
+    transition: all 0.15s; box-shadow: 0 2px 10px rgba(154, 120, 64, 0.2); white-space: nowrap;
 }
 #lunch-submit-btn:hover { transform: translateY(-1px); }
 
 .lunch-board {
     background: var(--card); border: 1px solid var(--card-border);
-    border-radius: 14px; padding: 18px; margin-top: 14px;
+    border-radius: 3px; padding: 18px; margin-top: 14px;
     box-shadow: var(--card-shadow);
-}
-.lunch-board h2 {
-    background: linear-gradient(135deg, var(--pink), #fab1d0);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 
 .lunch-row {
     display: flex; align-items: center;
-    padding: 8px 4px; border-bottom: 1px solid rgba(253,121,168,0.05);
+    padding: 8px 4px; border-bottom: 1px solid var(--accent-bg);
     font-size: 0.83rem; border-radius: 6px; transition: background 0.12s;
 }
-.lunch-row:hover { background: rgba(253,121,168,0.03); }
+.lunch-row:hover { background: var(--accent-bg); }
 .lunch-row:last-child { border-bottom: none; }
 
-.lunch-rank { width: 22px; font-weight: 800; font-size: 0.88rem; color: var(--pink); text-align: center; }
+.lunch-rank { width: 22px; font-weight: 800; font-size: 0.88rem; color: var(--accent-dark); text-align: center; }
 .lunch-info { flex: 1; padding: 0 8px; }
 .lunch-menu { font-weight: 600; color: var(--text); font-size: 0.88rem; }
 .lunch-nick { font-size: 0.7rem; color: var(--text-muted); margin-top: 1px; }
 
 .like-btn {
     display: flex; align-items: center; gap: 3px;
-    padding: 4px 10px; border: 1px solid rgba(253,121,168,0.15);
+    padding: 4px 10px; border: 1px solid var(--card-border);
     border-radius: 7px; background: var(--card);
-    color: var(--pink); cursor: pointer;
-    font-size: 0.76rem; font-family: 'JetBrains Mono', monospace; font-weight: 600;
+    color: var(--accent-dark); cursor: pointer;
+    font-size: 0.76rem; font-family: var(--font-mono); font-weight: 600;
     transition: all 0.15s;
 }
-.like-btn:hover { background: rgba(253,121,168,0.06); transform: scale(1.05); }
-.like-btn.liked { background: linear-gradient(135deg, var(--pink), #fab1d0); color: #fff; border-color: transparent; }
-
-/* --- About --- */
-.about-section {
-    max-width: 980px; margin: 8px auto;
-    background: var(--card); border: 1px solid var(--card-border);
-    border-radius: 14px; padding: 24px 28px;
-    box-shadow: var(--card-shadow);
-}
-.about-section h2 {
-    font-size: 1.1rem; font-weight: 800;
-    background: linear-gradient(135deg, var(--accent), var(--accent-light));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    margin-bottom: 14px; text-align: center;
-}
-.about-content { display: flex; flex-direction: column; gap: 14px; }
-.about-block h3 { font-size: 0.92rem; font-weight: 700; color: var(--accent); margin-bottom: 5px; }
-.about-block p { font-size: 0.85rem; color: var(--text-sub); line-height: 1.7; margin-bottom: 3px; }
-.about-example { font-size: 0.82rem; color: var(--text-muted); font-style: italic; padding-left: 8px; border-left: 3px solid var(--card-border); }
+.like-btn:hover { background: var(--accent-bg); transform: scale(1.05); }
+.like-btn.liked { background: linear-gradient(135deg, var(--gold-mid), var(--gold-light)); color: #fff; border-color: transparent; }
 
 /* --- Credit --- */
 .credit-section {
     max-width: 980px; margin: 10px auto;
+    padding: 0 20px;
     text-align: center; font-size: 0.85rem; color: var(--text-muted);
 }
-.credit-section a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.credit-section a { color: var(--accent-dark); font-weight: 600; text-decoration: none; }
 .credit-section a:hover { text-decoration: underline; }
 
 /* --- 피드백 --- */
 .feedback-section {
     max-width: 980px; margin: 0 auto;
     background: var(--card); border: 1px solid var(--card-border);
-    border-radius: 14px; padding: 22px 24px;
+    border-radius: 3px; padding: 22px 24px;
     margin-top: 8px; margin-bottom: 28px;
     box-shadow: var(--card-shadow);
 }
 .feedback-section h2 {
-    font-size: 1rem; font-weight: 800;
-    background: linear-gradient(135deg, var(--green), #55efc4);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.05rem; font-weight: 500;
+    color: var(--accent-dark);
     margin-bottom: 3px; text-align: center;
 }
 .feedback-subtitle { text-align: center; font-size: 0.76rem; color: var(--text-muted); font-weight: 300; margin-bottom: 12px; }
@@ -579,32 +556,32 @@ header h1 .subtitle {
 .feedback-form input {
     width: 110px; flex-shrink: 0;
     padding: 10px 12px; font-size: 0.88rem;
-    border: 2px solid rgba(0,184,148,0.12); border-radius: 9px;
+    border: 2px solid var(--input-border); border-radius: 9px;
     background: var(--input-bg); color: var(--text);
     outline: none; font-family: inherit; transition: border-color 0.2s;
 }
-.feedback-form input:focus { border-color: var(--green); }
+.feedback-form input:focus { border-color: var(--accent); }
 
 .feedback-form textarea {
     flex: 1; padding: 10px 12px;
-    font-size: 0.85rem; border: 2px solid rgba(0,184,148,0.12);
+    font-size: 0.85rem; border: 2px solid var(--input-border);
     border-radius: 9px; background: var(--input-bg); color: var(--text);
     outline: none; font-family: inherit;
     resize: vertical; min-height: 76px; line-height: 1.5;
     transition: border-color 0.2s;
 }
-.feedback-form textarea:focus { border-color: var(--green); }
+.feedback-form textarea:focus { border-color: var(--accent); }
 
 #feedback-submit-btn {
     padding: 10px 16px; font-size: 0.85rem; border: none; border-radius: 9px;
-    background: linear-gradient(135deg, var(--green), #55efc4);
+    background: var(--green);
     color: #fff; cursor: pointer; font-weight: 600; font-family: inherit;
-    transition: all 0.15s; box-shadow: 0 2px 10px rgba(0,184,148,0.15); white-space: nowrap;
+    transition: all 0.15s; box-shadow: 0 2px 10px rgba(58, 122, 78, 0.15); white-space: nowrap;
 }
 #feedback-submit-btn:hover { transform: translateY(-1px); }
 
 .feedback-list { margin-top: 12px; }
-.feedback-item { padding: 7px 0; border-bottom: 1px solid rgba(0,184,148,0.05); font-size: 0.82rem; }
+.feedback-item { padding: 7px 0; border-bottom: 1px solid var(--accent-bg); font-size: 0.82rem; }
 .feedback-item:last-child { border-bottom: none; }
 .feedback-item .fb-nick { font-weight: 600; color: var(--green); }
 .feedback-item .fb-text { color: var(--text-sub); margin-left: 4px; }
@@ -615,7 +592,7 @@ footer {
     text-align: center; margin-top: 32px; padding-bottom: 16px;
     font-size: 0.78rem; color: var(--text-muted); font-weight: 300;
 }
-footer a { color: var(--accent); text-decoration: none; font-weight: 500; }
+footer a { color: var(--accent-dark); text-decoration: none; font-weight: 500; }
 footer a:hover { text-decoration: underline; }
 
 /* --- Responsive --- */
@@ -625,56 +602,30 @@ footer a:hover { text-decoration: underline; }
 }
 
 @media (max-width: 480px) {
-    .layout { padding: 16px 12px; }
+    .layout { padding: 50px 12px 16px; }
     /* 헤더 버튼을 절대배치에서 flow로 전환 — 제목과 겹침 방지 */
     header { padding-top: 0; }
     .header-actions {
-        display: flex; justify-content: space-between; align-items: center;
+        display: flex; justify-content: flex-end; align-items: center;
         gap: 8px; margin-bottom: 10px;
     }
-    .dark-toggle, .reset-btn { position: static; top: auto; left: auto; right: auto; }
-    .reset-btn { max-width: none; }
+    .reset-btn { position: static; top: auto; right: auto; max-width: none; }
     header h1 { font-size: 2rem; }
     #guess-input { font-size: 1rem; padding: 12px 14px; }
     #guess-btn { padding: 12px 20px; font-size: 1rem; }
     .guess-header, .guess-row { grid-template-columns: 30px 1fr 56px 46px minmax(48px, 1.4fr); gap: 4px; }
     .guess-list { padding: 2px 10px; }
     .rank-info { font-size: 0.8rem; }
+    /* 점메추 입력 2개 세로 스택 — 390px 가로 스크롤 방지 */
+    .lunch-form { flex-direction: column; }
+    .lunch-form input { width: 100%; }
+    #lunch-submit-btn { width: 100%; }
     .feedback-form { flex-direction: column; }
     .feedback-form input { width: 100%; }
+    .feedback-form textarea { width: 100%; }
+    #feedback-submit-btn { width: 100%; }
 }
-
-/* 공통 헤더가 게임 레이아웃 위에 자연스럽게 얹히도록 */
-body:has(> .cz-gamehead) { padding-top: 0; }
-.cz-gamehead { margin-bottom: 4px; }
-
-/* 카드 컨테이너가 cz-fx 위에 또렷이 — 다크에서 배경 반투명 합성 */
-[data-theme="dark"] .card-style,
-[data-theme="dark"] .register,
-[data-theme="dark"] .hints,
-[data-theme="dark"] .guess-list,
-[data-theme="dark"] .leaderboard,
-[data-theme="dark"] .lunch-section,
-[data-theme="dark"] .lunch-board,
-[data-theme="dark"] .about-section,
-[data-theme="dark"] .feedback-section {
-    background: rgba(12,12,20,0.72);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-}
-
-/* Polaroid Lobby 2026-06-07 */
-.pol-lobby{position:fixed;inset:0;background:#ece7dc;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:500}
-.pol-lcard{background:#fff;padding:5px 5px 22px;width:140px;box-shadow:0 3px 12px rgba(0,0,0,.18);transform:rotate(-3deg);flex-shrink:0}
-.pol-lphoto{width:100%;aspect-ratio:1 / 1}
-.pol-lnum{font-family:'Fraunces',serif;font-style:italic;font-weight:100;font-size:.6rem;color:#c0a060;display:block;margin-top:5px}
-.pol-ltag{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.66rem;color:#a09060;text-align:center;margin-top:2px;display:block}
-.pol-ltitle{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:clamp(1.9rem,5vw,3rem);color:#1a1005;line-height:1;text-align:center}
-.pol-ldesc{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.86rem;color:#4a3820;text-align:center;max-width:260px;line-height:1.55}
-.pol-lbtn{font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.88rem;letter-spacing:.16em;color:#c0a060;background:#fff;border:1px solid rgba(192,160,96,.45);padding:11px 46px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:box-shadow .3s,transform .3s;margin-top:6px}
-.pol-lbtn:hover{box-shadow:0 8px 22px rgba(0,0,0,.15);transform:translateY(-2px)}
 
 /* pol-back-btn */
-.pol-back-btn{position:fixed;top:14px;left:14px;font-family:'Fraunces',serif;font-style:italic;font-weight:200;font-size:.78rem;color:#c0a060;text-decoration:none;letter-spacing:.06em;z-index:9999;background:rgba(236,231,220,.88);padding:6px 14px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1px solid rgba(192,160,96,.25);transition:color .2s,background .2s}
-.pol-back-btn:hover{color:#1a1005;background:rgba(236,231,220,.98)}
-.pol-llabel{font-family:'Space Mono',monospace;font-size:.57rem;color:#a09060;letter-spacing:.09em;text-transform:uppercase}
+.pol-back-btn{position:fixed;top:14px;left:14px;font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.78rem;color:var(--gold-mid);text-decoration:none;letter-spacing:.06em;z-index:9999;background:rgba(236,231,220,.88);padding:6px 14px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1px solid rgba(192,160,96,.25);transition:color .2s,background .2s}
+.pol-back-btn:hover{color:var(--ink-warm);background:rgba(236,231,220,.98)}

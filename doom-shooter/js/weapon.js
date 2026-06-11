@@ -83,6 +83,19 @@ export class Weapon {
     bank.reserve = Math.min(wep.reserveMax, bank.reserve + add);
   }
 
+  /** Full restart: restore every ammo bank to its initial loadout and re-equip the pistol */
+  reset() {
+    for (const type of WEAPON_TYPES) {
+      this._banks[type] = { ...INITIAL_AMMO[type] };
+    }
+    this.reloading     = 0;
+    this.kick          = 0;
+    this.flash         = 0;
+    this.fovKick       = 0;
+    this._fireCooldown = 0;
+    if (this.weaponType !== 'pistol') this._attachModel('pistol');
+  }
+
   // ── model swap ────────────────────────────────────────────────────────────
   _attachModel(type) {
     if (this.group) {

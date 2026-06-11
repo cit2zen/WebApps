@@ -49,9 +49,21 @@
   width: 100%;
   aspect-ratio: 1/1;
   background: var(--cream-400);
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.lset-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lset-group:focus-visible {
+  outline: 2px solid var(--gold-mid);
+  outline-offset: 4px;
 }
 
 .lset-initial {
@@ -220,13 +232,9 @@
   </div>
 </div>
 
+<script src="/static/utils.js?v=1"></script>
 <script>
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
-const SIZES = [4, 8, 16, 32];
+const SIZES = [2, 4, 8, 16, 32];
 let selectedSet = null;
 
 function openSizePicker(s) {
@@ -238,7 +246,7 @@ function openSizePicker(s) {
   container.innerHTML = '';
 
   if (!available.length) {
-    container.innerHTML = `<p class="size-unavail">항목을 4개 이상 추가해야 플레이할 수 있어요.</p>`;
+    container.innerHTML = `<p class="size-unavail">항목을 2개 이상 추가해야 플레이할 수 있어요.</p>`;
   } else {
     available.forEach(size => {
       const btn = document.createElement('button');
@@ -279,10 +287,14 @@ async function loadSets() {
     document.getElementById('no-sets').style.display = 'block';
     return;
   }
+  // 커버 변별력: 첫 항목 이미지가 있으면 썸네일, 없으면 첫 2글자 + 셋별 배경색 변주
+  const COVER_BGS = ['#e0d8cc', '#dde3d1', '#d8dde6', '#e6dad1', '#e6dfc6', '#ded3e2'];
   sets.forEach(s => {
-    const initial = esc(s.question.charAt(0).toUpperCase());
     const group = document.createElement('div');
     group.className = 'lset-group';
+    group.setAttribute('role', 'button');
+    group.tabIndex = 0;
+    group.setAttribute('aria-label', s.question);
 
     for (let i = 0; i < 2; i++) {
       const card = document.createElement('div');
@@ -293,13 +305,21 @@ async function loadSets() {
 
     const front = document.createElement('div');
     front.className = 'lset-card';
+    const photo = s.cover_image
+      ? `<div class="lset-photo"><img src="/uploads/${esc(s.cover_image)}" alt=""></div>`
+      : `<div class="lset-photo" style="background:${COVER_BGS[s.id % COVER_BGS.length]}">
+           <span class="lset-initial">${esc(s.question.trim().slice(0, 2))}</span>
+         </div>`;
     front.innerHTML = `
-      <div class="lset-photo"><span class="lset-initial">${initial}</span></div>
+      ${photo}
       <div class="lset-q">"${esc(s.question)}"</div>
       <div class="lset-meta">${s.item_count}개 항목</div>
     `;
     group.appendChild(front);
     group.addEventListener('click', () => openSizePicker(s));
+    group.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); openSizePicker(s); }
+    });
     grid.appendChild(group);
   });
 }

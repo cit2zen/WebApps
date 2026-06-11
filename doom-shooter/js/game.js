@@ -73,7 +73,7 @@ const weapon = new Weapon(scene, camera, audio, fx);
 const minimap = new MiniMap();
 const score = new Score();
 
-// ---- HUD: inject #weaponname element (never touch index.html) ----
+// ---- HUD: inject #weaponname element (#hud 안에 넣어 메뉴/일시정지에서 함께 숨김) ----
 let weaponNameEl = document.getElementById('weaponname');
 if (!weaponNameEl) {
   weaponNameEl = document.createElement('div');
@@ -85,10 +85,10 @@ if (!weaponNameEl) {
     'text-shadow:0 0 6px #ff8800,0 1px 2px #000',
     'pointer-events:none', 'user-select:none',
   ].join(';');
-  document.body.appendChild(weaponNameEl);
+  (document.getElementById('hud') ?? document.body).appendChild(weaponNameEl);
 }
 
-// ---- boss HP bar (injected; do NOT edit index.html) ----
+// ---- boss HP bar (injected into #hud — 메뉴/일시정지에서 함께 숨김) ----
 let bossHpEl = document.getElementById('bosshp');
 if (!bossHpEl) {
   bossHpEl = document.createElement('div');
@@ -116,7 +116,7 @@ if (!bossHpEl) {
   bossHpLabel.textContent = 'WARLORD';
   bossHpEl.appendChild(bossHpFill);
   bossHpEl.appendChild(bossHpLabel);
-  document.body.appendChild(bossHpEl);
+  (document.getElementById('hud') ?? document.body).appendChild(bossHpEl);
 }
 
 // ---- state ----
@@ -277,8 +277,7 @@ function loadStage(i) {
 
 function startGame() {
   hp = 100;
-  weapon.ammo = weapon.mag;
-  weapon.reserve = weapon.reserveMax ?? 48;
+  weapon.reset(); // 전 무기 탄약 초기 로드아웃 복원 + 피스톨 복귀
   score.reset();
   audio.init();
   loadStage(0);
@@ -303,6 +302,7 @@ function gameOver() {
   state = State.OVER;
   hud.classList.add('hidden');
   audio.stopMusic();
+  audio.stopAmbient();
   audio.dead();
   const finalScore = score.getScore();
   const totalKills = score.getKills?.() ?? countedDeadIds.size;
@@ -318,12 +318,13 @@ function winGame() {
   state = State.WIN;
   hud.classList.add('hidden');
   audio.stopMusic();
+  audio.stopAmbient();
   audio.win();
   const finalScore = score.getScore();
   const totalKills = score.getKills?.() ?? countedDeadIds.size;
   showOverlay(
     'VICTORY',
-    `세 스테이지를 모두 정복했다. 지옥은 잠잠해졌다.<br>SCORE: ${finalScore} &nbsp;|&nbsp; KILLS: ${totalKills}`,
+    `${MAPS.length}개 스테이지를 모두 정복했다. 지옥은 잠잠해졌다.<br>SCORE: ${finalScore} &nbsp;|&nbsp; KILLS: ${totalKills}`,
     '다시 플레이'
   );
   try { controls.unlock(); } catch (e) {}
@@ -649,6 +650,7 @@ controls.addEventListener('unlock', () => {
     mouseHeld = false;
     hud.classList.add('hidden');
     audio.stopMusic();
+    audio.stopAmbient();
     showOverlay('PAUSED', '잠시 멈췄다.', '계속하기');
   }
 });
@@ -658,6 +660,7 @@ controls.addEventListener('lock', () => {
     overlay.classList.add('hidden');
     hud.classList.remove('hidden');
     audio.startMusic();
+    audio.ambient?.(level?.theme?.kind ?? 'stone');
   }
 });
 

@@ -48,6 +48,7 @@ class Game {
     this.level = 1;
     this.frame = 0;
     this.startRequested = false;
+    this.invincibleTimer = 0;
 
     this._resize();
     window.addEventListener("resize", () => this._resize());
@@ -55,9 +56,15 @@ class Game {
     this.hud.setHigh(this.high);
     this.hud.setLives(this.lives);
     this.hud.setLevel(this.level);
-    this.hud.showOverlay("NEON<br>PAC-MAN", "엔터 · 탭으로 시작");
+    this.hud.showLobby("pac-man", "먹어라, 도망쳐라.");
 
-    // 모바일: 일시정지 중 오버레이 탭으로 재개 (키보드 P 대체)
+    // 로비: 시작 버튼 클릭 또는 아무 곳이나 탭으로 시작
+    this.hud.startBtn.addEventListener("click", () => this._onStart());
+    this.hud.lobby.addEventListener("pointerdown", () => {
+      if (this.state === "TITLE" || this.state === "GAMEOVER") this._onStart();
+    });
+
+    // 모바일: 일시정지 중 인게임 오버레이 탭으로 재개 (키보드 P 대체)
     this.hud.overlay.addEventListener("pointerdown", () => {
       if (this.userPaused) this._togglePause();
     });
@@ -86,7 +93,7 @@ class Game {
 
   _onStart() {
     this.audio._ensure();
-    if (this.state === "TITLE" || this.state === "GAMEOVER" || this.state === "WIN") {
+    if (this.state === "TITLE" || this.state === "GAMEOVER") {
       this.startRequested = true;
     }
   }
@@ -96,11 +103,12 @@ class Game {
     if (this.state !== "PLAYING" && !this.userPaused) return;
     this.userPaused = !this.userPaused;
     this.paused = this.userPaused;
-    if (this.userPaused) this.hud.showOverlay("PAUSED", "일시정지 · P · 탭");
+    if (this.userPaused) this.hud.showOverlay("PAUSED · P · 탭으로 재개");
     else this.hud.hideOverlay();
   }
 
   _newGame() {
+    this.hud.hideLobby();
     this.score = 0;
     this.lives = 3;
     this.level = 1;
@@ -121,7 +129,7 @@ class Game {
     for (const g of this.ghosts) g.setMode("scatter");
     this.state = "READY";
     this.readyTimer = 1600;
-    this.hud.showOverlay(null, "READY!");
+    this.hud.showOverlay("READY!");
   }
 
   _resetActors() {
@@ -145,7 +153,7 @@ class Game {
     const dt = Math.min(dtMs / 16.6667, 3);
     this.frame += dt;
 
-    if (this.state === "TITLE" || this.state === "GAMEOVER" || this.state === "WIN") {
+    if (this.state === "TITLE" || this.state === "GAMEOVER") {
       if (this.startRequested) { this.startRequested = false; this._newGame(); }
       return;
     }
@@ -162,7 +170,7 @@ class Game {
         if (this.lives <= 0) {
           this.state = "GAMEOVER";
           this.audio.stopBgm();
-          this.hud.showOverlay("GAME<br>OVER", "엔터 · 탭으로 다시 시작");
+          this.hud.showLobby("game over", "엔터 · 탭으로 다시 시작");
         } else {
           // 목숨이 남으면 시작 위치로 돌아가지 않고 그 자리에서 재개.
           // 즉사 방지를 위해 유령만 집으로 되돌린다.
@@ -174,6 +182,8 @@ class Game {
           this.pac.y = this.pac.row;
           this.pac.dir = DIR.NONE;
           this.input.requested = DIR.NONE;
+          // 부활 직후 짧은 무적 — 주변 유령과의 즉시 재충돌 방지
+          this.invincibleTimer = 1500;
           this.hud.hideOverlay();
           this.state = "PLAYING";
         }
@@ -183,6 +193,7 @@ class Game {
 
     // PLAYING
     this.levelClock += dtMs;
+    if (this.invincibleTimer > 0) this.invincibleTimer -= dtMs;
     for (const g of this.ghosts) if (this.levelClock >= g.releaseDelay) g.release();
 
     // 모드 스케줄 (frightened 동안 정지)
@@ -235,6 +246,7 @@ class Game {
         g.getEaten();
         this.audio.eatGhost();
       } else if (g.state === "out" && !g.scared) {
+        if (this.invincibleTimer > 0) continue;
         this._die();
         return;
       }
@@ -262,7 +274,7 @@ class Game {
     this.frightTimer = 0;
     this.levelClock = 0;
     for (const g of this.ghosts) g.setMode("scatter");
-    this.hud.showOverlay(null, "LEVEL " + this.level);
+    this.hud.showOverlay("LEVEL " + this.level);
   }
 
   _draw() {
@@ -273,13 +285,16 @@ class Game {
       // 사망 중: 유령 숨기고 팩맨만 깜빡임
       if (Math.floor(this.frame * 0.2) % 2 === 0) this.pac.draw(ctx, tile);
     } else if (this.state !== "TITLE" && this.state !== "GAMEOVER") {
-      this.pac.draw(ctx, tile);
+      // 부활 무적 중에는 팩맨을 깜빡여 표시
+      if (this.invincibleTimer <= 0 || Math.floor(this.frame * 0.25) % 2 === 0) this.pac.draw(ctx, tile);
       for (const g of this.ghosts) g.draw(ctx, tile, this.frame);
     }
   }
 
   _loop(t) {
-    const dtMs = this.last ? t - this.last : 16.6;
+    // 탭 전환 복귀 등 큰 프레임 간격은 50ms로 클램프
+    // (readyTimer·levelClock·frightTimer·modeTimer 일괄 폭주 방지)
+    const dtMs = Math.min(this.last ? t - this.last : 16.6, 50);
     this.last = t;
     this.audio.update();           // BGM 스케줄링 (rAF 기반)
     if (!this.paused) this._update(dtMs);
