@@ -19,5 +19,5 @@
 
 ## Git / 배포
 - 원격 https://github.com/cit2zen/WebApps (`main`), 각 앱 = 자기 하위 폴더.
-- **푸시는 `develop_web/_wa_deploy` 클론 경유** — 배포·도메인·호스팅 현황은 루트 CLAUDE.md 「배포」가 단일 출처.
+- 이 폴더가 cit2zen/WebApps **직접 클론**(단일 소스) — 여기서 수정·커밋·푸시. 배포·도메인·호스팅 현황은 루트 CLAUDE.md 「배포」가 단일 출처.
 - `.gitignore` 화이트리스트 — 새 앱이면 `!/<폴더명>` 한 줄 추가. 스크린샷 등 산출물 커밋 금지.

@@ -1,5 +1,5 @@
 {
-  "$comment": "cityzen 서비스 레지스트리 — 단일 진실 소스. status: live(배포·업타임 감시), pending(이전 대기·현재 다운), local(미배포). 갱신 후 _wa_deploy로 동기·푸시(.github/scripts/uptime.py가 사용).",
+  "$comment": "cityzen 서비스 레지스트리 — 단일 진실 소스. status: live(배포·업타임 감시), pending(이전 대기·현재 다운), local(미배포). 갱신 후 커밋·푸시(.github/scripts/uptime.py가 사용).",
   "updated": "2026-06-11",
   "railway": {
     "projectId": "55a3acbd-18cd-40ea-ad8b-50d7bef0cc93",
