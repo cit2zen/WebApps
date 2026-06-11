@@ -9,7 +9,7 @@ from flask import (
 )
 import psycopg2
 import psycopg2.extras
-from PIL import Image
+from PIL import Image, ImageOps
 
 app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]
@@ -174,7 +174,8 @@ def api_add_item():
             return jsonify({"error": "지원하지 않는 파일 형식"}), 400
         filename = uuid.uuid4().hex + "." + ("jpg" if ext in ("jpg", "jpeg") else ext)
         save_path = UPLOAD_FOLDER / filename
-        img = Image.open(file.stream).convert("RGB")
+        # exif_transpose: 폰 사진의 EXIF 방향을 픽셀에 반영 (저장 시 EXIF가 제거되므로 필수)
+        img = ImageOps.exif_transpose(Image.open(file.stream)).convert("RGB")
         img.thumbnail((MAX_IMAGE_SIZE, MAX_IMAGE_SIZE))
         img.save(save_path, optimize=True, quality=85)
         image_path = filename
@@ -188,6 +189,57 @@ def api_add_item():
             new_id = cur.fetchone()[0]
 
     return jsonify({"id": new_id, "title": title, "image_path": image_path, "win_count": 0}), 201
+
+
+@app.route("/api/items/<int:item_id>", methods=["PATCH"])
+@login_required
+def api_update_item(item_id):
+    if not is_settings_host():
+        return jsonify({"error": "forbidden"}), 403
+    data = request.get_json(silent=True) or {}
+    title = (data.get("title") or "").strip()
+    if not title:
+        return jsonify({"error": "이름을 입력해주세요."}), 400
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("UPDATE bg_items SET title = %s WHERE id = %s RETURNING id", (title, item_id))
+            if not cur.fetchone():
+                return jsonify({"error": "not found"}), 404
+    return jsonify({"ok": True, "title": title})
+
+
+@app.route("/api/items/<int:item_id>/rotate", methods=["POST"])
+@login_required
+def api_rotate_item(item_id):
+    if not is_settings_host():
+        return jsonify({"error": "forbidden"}), 403
+    data = request.get_json(silent=True) or {}
+    direction = data.get("dir", "cw")
+
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT image_path FROM bg_items WHERE id = %s", (item_id,))
+            row = cur.fetchone()
+    if not row:
+        return jsonify({"error": "not found"}), 404
+    if not row[0]:
+        return jsonify({"error": "사진이 없는 항목이에요."}), 400
+    src = UPLOAD_FOLDER / row[0]
+    if not src.exists():
+        return jsonify({"error": "원본 파일이 없어요."}), 404
+
+    angle = -90 if direction == "cw" else 90  # PIL rotate는 반시계가 양수
+    img = Image.open(src).rotate(angle, expand=True)
+    # 새 파일명으로 저장 — 게임·브라우저 캐시 무효화를 파일명 교체로 보장
+    new_name = uuid.uuid4().hex + src.suffix
+    img.save(UPLOAD_FOLDER / new_name, optimize=True, quality=85)
+
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("UPDATE bg_items SET image_path = %s WHERE id = %s", (new_name, item_id))
+    src.unlink()
+
+    return jsonify({"ok": True, "image_path": new_name})
 
 
 @app.route("/api/items/<int:item_id>", methods=["DELETE"])

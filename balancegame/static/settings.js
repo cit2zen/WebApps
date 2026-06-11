@@ -46,13 +46,69 @@ function renderItem(item) {
   const img = imageUrl(item.image_path);
   card.innerHTML = `
     <button class="btn-delete" data-id="${item.id}" title="삭제">×</button>
+    ${img ? `
+    <button class="btn-rotate" data-id="${item.id}" data-dir="ccw" title="왼쪽으로 90° 회전">↺</button>
+    <button class="btn-rotate" data-id="${item.id}" data-dir="cw" title="오른쪽으로 90° 회전">↻</button>` : ''}
     <div class="pol-photo">
       ${img ? `<img src="${img}" alt="${esc(item.title)}">` : `<div class="pol-placeholder">${initial(item.title)}</div>`}
     </div>
-    <div class="item-title">${esc(item.title)}</div>
+    <div class="item-title"></div>
     <div class="win-badge">🏆 ${item.win_count}회</div>
   `;
+  renderTitle(card.querySelector('.item-title'), item.title);
   return card;
+}
+
+function renderTitle(el, title) {
+  el.dataset.title = title;
+  el.textContent = title;
+  const pen = document.createElement('span');
+  pen.className = 'edit-pen';
+  pen.textContent = ' ✎';
+  el.appendChild(pen);
+}
+
+function startTitleEdit(titleEl) {
+  const card = titleEl.closest('.item-card');
+  const id = card.dataset.id;
+  const old = titleEl.dataset.title;
+
+  titleEl.textContent = '';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'title-input';
+  input.value = old;
+  titleEl.appendChild(input);
+  input.focus();
+  input.select();
+
+  let done = false;
+  const finish = async (save) => {
+    if (done) return;
+    done = true;
+    const val = input.value.trim();
+    if (!save || !val || val === old) { renderTitle(titleEl, old); return; }
+    const res = await fetch(`/api/items/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: val })
+    });
+    if (res.ok) {
+      renderTitle(titleEl, val);
+      const ph = card.querySelector('.pol-placeholder');
+      if (ph) ph.textContent = val.charAt(0).toUpperCase();
+      window.refreshSetsUI?.();
+    } else {
+      renderTitle(titleEl, old);
+      const err = await res.json().catch(() => ({}));
+      showMsg(status, err.error || '이름 수정에 실패했어요.');
+    }
+  };
+  input.addEventListener('keydown', ev => {
+    if (ev.key === 'Enter') finish(true);
+    if (ev.key === 'Escape') finish(false);
+  });
+  input.addEventListener('blur', () => finish(true));
 }
 
 function showEmptyIfNeeded() {
@@ -107,6 +163,32 @@ btnAdd.addEventListener('click', async () => {
 });
 
 grid.addEventListener('click', async e => {
+  const rot = e.target.closest('.btn-rotate');
+  if (rot) {
+    rot.disabled = true;
+    const res = await fetch(`/api/items/${rot.dataset.id}/rotate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dir: rot.dataset.dir })
+    });
+    rot.disabled = false;
+    if (res.ok) {
+      const data = await res.json();
+      const im = document.querySelector(`.item-card[data-id="${rot.dataset.id}"] .pol-photo img`);
+      if (im) im.src = imageUrl(data.image_path);
+    } else {
+      const err = await res.json().catch(() => ({}));
+      showMsg(status, err.error || '회전에 실패했어요.');
+    }
+    return;
+  }
+
+  const titleEl = e.target.closest('.item-title');
+  if (titleEl && !titleEl.querySelector('input')) {
+    startTitleEdit(titleEl);
+    return;
+  }
+
   const btn = e.target.closest('.btn-delete');
   if (!btn) return;
   const id = btn.dataset.id;

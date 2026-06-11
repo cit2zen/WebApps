@@ -346,6 +346,26 @@ body {
   font-size: 0.85rem;
   color: var(--ink-mid);
   text-align: center;
+  cursor: pointer;
+}
+
+.item-card .item-title .edit-pen {
+  color: var(--ink-light);
+  font-size: 0.7rem;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.item-card:hover .item-title .edit-pen { opacity: 1; }
+
+.item-card .title-input {
+  width: 100%;
+  font: inherit;
+  font-style: italic;
+  text-align: center;
+  border: 1px solid var(--gold-mid);
+  background: var(--bg-warm);
+  padding: 2px 4px;
+  outline: none;
 }
 
 .item-card .win-badge {
@@ -371,6 +391,26 @@ body {
   justify-content: center;
   border-radius: 50%;
 }
+
+.item-card .btn-rotate {
+  position: absolute;
+  top: 4px;
+  background: rgba(26, 16, 5, 0.55);
+  color: #fff;
+  border: none;
+  width: 22px;
+  height: 22px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  z-index: 2;
+}
+.item-card .btn-rotate:hover { background: var(--gold-dark); }
+.item-card .btn-rotate[data-dir="ccw"] { left: 4px; }
+.item-card .btn-rotate[data-dir="cw"] { left: 30px; }
 
 .status-msg {
   font-style: italic;
