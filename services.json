@@ -9,18 +9,19 @@
     { "name": "onvoicing", "type": "static", "dir": "onvoicing", "url": "https://onvoicing.cityzen.kr", "railwayServiceId": "72ff7999-e523-4607-bdd3-4e120d35551a", "db": null, "status": "live" },
     { "name": "balancegame", "type": "flask", "dir": "balancegame", "url": "https://balancegame.cityzen.kr", "extraDomains": ["balancegame-settings.cityzen.kr"], "railwayServiceId": "b6cd1c70-368e-4550-8c85-3b18841fe84c", "db": "balancegame-db", "status": "live" },
     { "name": "onmantle", "type": "flask", "dir": "onmantle", "url": "https://onmantle.cityzen.kr", "railwayServiceId": "c76bb404-c94b-4319-9752-37f3c236273d", "db": "onmantle-db", "status": "live" },
-    { "name": "portfolio", "type": "static", "dir": "portfolio", "url": "https://portfolio.cityzen.kr", "railwayServiceId": null, "db": null, "status": "pending" },
-    { "name": "pacman", "type": "static", "dir": "pacman", "url": null, "railwayServiceId": null, "db": null, "status": "pending" },
-    { "name": "tetris", "type": "static", "dir": "tetris", "url": null, "railwayServiceId": null, "db": null, "status": "pending" },
-    { "name": "apple-game", "type": "static", "dir": "apple-game", "url": null, "railwayServiceId": null, "db": null, "status": "pending" },
-    { "name": "yaong", "type": "static", "dir": "yaong", "url": null, "railwayServiceId": null, "db": null, "status": "pending" },
-    { "name": "doom-shooter", "type": "static", "dir": "doom-shooter", "url": null, "railwayServiceId": null, "db": null, "status": "pending" },
-    { "name": "aurora-hands", "type": "static", "dir": "aurora-hands", "url": null, "railwayServiceId": null, "db": null, "status": "pending" },
-    { "name": "deeplearning", "type": "static", "dir": "deeplearning", "url": null, "railwayServiceId": null, "db": null, "status": "pending" },
+    { "name": "games", "type": "static", "dir": null, "url": "https://games.cityzen.kr", "railwayServiceId": "add6492b-8482-43d6-a479-2695093d2e2c", "db": null, "status": "live", "$note": "정적 게임 통합 서비스 — 리포 루트 nginx, .dockerignore 화이트리스트" },
+    { "name": "portfolio", "type": "static", "dir": "portfolio", "url": "https://portfolio.cityzen.kr", "railwayServiceId": "16707178-c6b6-48ab-bb93-8353a881f9f2", "db": null, "status": "live" },
+    { "name": "pacman", "type": "static", "dir": "pacman", "url": "https://games.cityzen.kr/pacman/", "via": "games", "railwayServiceId": null, "db": null, "status": "live" },
+    { "name": "tetris", "type": "static", "dir": "tetris", "url": "https://games.cityzen.kr/tetris/", "via": "games", "railwayServiceId": null, "db": null, "status": "live" },
+    { "name": "apple-game", "type": "static", "dir": "apple-game", "url": "https://games.cityzen.kr/apple-game/", "via": "games", "railwayServiceId": null, "db": null, "status": "live" },
+    { "name": "yaong", "type": "static", "dir": "yaong", "url": "https://games.cityzen.kr/yaong/", "via": "games", "railwayServiceId": null, "db": null, "status": "live" },
+    { "name": "doom-shooter", "type": "static", "dir": "doom-shooter", "url": "https://games.cityzen.kr/doom-shooter/", "via": "games", "railwayServiceId": null, "db": null, "status": "live" },
+    { "name": "aurora-hands", "type": "static", "dir": "aurora-hands", "url": "https://games.cityzen.kr/aurora-hands/", "via": "games", "railwayServiceId": null, "db": null, "status": "live" },
+    { "name": "deeplearning", "type": "static", "dir": "deeplearning", "url": "https://games.cityzen.kr/deeplearning/", "via": "games", "railwayServiceId": null, "db": null, "status": "live" },
     { "name": "aura", "type": "node", "dir": "aura", "url": null, "railwayServiceId": null, "db": null, "status": "local" },
     { "name": "jarvis", "type": "next", "dir": "jarvis", "url": null, "railwayServiceId": null, "db": null, "status": "local" },
     { "name": "shopscout", "type": "next", "dir": "shopscout", "url": null, "railwayServiceId": null, "db": null, "status": "local" },
     { "name": "studyai", "type": "next", "dir": "studyai", "url": null, "railwayServiceId": null, "db": null, "status": "local" },
-    { "name": "cityzen-web", "type": "next", "dir": null, "repo": "cit2zen/cityzen-web", "url": "https://cityzen.kr", "railwayServiceId": null, "db": null, "status": "pending" }
+    { "name": "cityzen-web", "type": "next", "dir": null, "repo": "cit2zen/cityzen-web", "url": "https://cityzen.kr", "railwayServiceId": "483cf0bc-fa77-4952-a266-3bcaa33515d6", "db": "cityzen-web-db", "status": "live" }
   ]
 }
