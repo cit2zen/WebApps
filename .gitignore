@@ -32,3 +32,9 @@ dist/
 # CI·서비스 레지스트리
 !/.github/
 !/services.json
+
+# 로컬 전용
+onmantle/_data/
+next-env.d.ts
+.env.local
+__pycache__/
