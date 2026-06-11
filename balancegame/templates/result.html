@@ -1,6 +1,21 @@
 {% extends "base.html" %}
 {% block title %}결과{% endblock %}
 {% block body %}
+<style>
+  /* 메인 이동 버튼 — style.css 개편 완료 전까지 페이지 내장 */
+  .home-link {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--bg-warm);
+    background: var(--ink-warm);
+    padding: 0.8rem 2.2rem;
+    text-decoration: none;
+    transition: background var(--pol-ease);
+  }
+  .home-link:hover { background: var(--gold-dark); }
+</style>
 <div class="result-wrap">
   <h1 class="game-title">🏆 최종 우승</h1>
   <div id="winner-card" class="pol-card winner-card"></div>
@@ -15,18 +30,13 @@
     </thead>
     <tbody id="ranking-body"></tbody>
   </table>
-  <div style="display:flex;gap:1.5rem;margin-top:1rem">
-    <a href="/" class="nav-link">다시 선택</a>
+  <div style="display:flex;gap:1.5rem;margin-top:1rem;align-items:center">
+    <a href="/" class="home-link">메인 화면으로</a>
     <a href="/logout" class="nav-link">로그아웃</a>
   </div>
 </div>
+<script src="/static/utils.js?v=1"></script>
 <script>
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-function imageUrl(path) { return path ? '/uploads/' + path : null; }
-
 const winner = JSON.parse(sessionStorage.getItem('winner') || 'null');
 if (winner) {
   const card = document.getElementById('winner-card');
