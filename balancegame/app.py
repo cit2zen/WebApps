@@ -176,6 +176,19 @@ def result_page():
 
 # ── API: items ────────────────────────────────────────────────────────
 
+def process_and_save_image(file):
+    """업로드 이미지 검증·EXIF 보정·축소 후 저장 — 파일명 반환, 미지원 형식이면 None."""
+    ext = Path(file.filename).suffix.lstrip(".").lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        return None
+    filename = uuid.uuid4().hex + "." + ("jpg" if ext in ("jpg", "jpeg") else ext)
+    # exif_transpose: 폰 사진의 EXIF 방향을 픽셀에 반영 (저장 시 EXIF가 제거되므로 필수)
+    img = ImageOps.exif_transpose(Image.open(file.stream)).convert("RGB")
+    img.thumbnail((MAX_IMAGE_SIZE, MAX_IMAGE_SIZE))
+    img.save(UPLOAD_FOLDER / filename, optimize=True, quality=85)
+    return filename
+
+
 @app.route("/api/items", methods=["GET"])
 @login_required
 def api_items():
@@ -198,16 +211,9 @@ def api_add_item():
     image_path = None
     file = request.files.get("image")
     if file and file.filename:
-        ext = Path(file.filename).suffix.lstrip(".").lower()
-        if ext not in ALLOWED_EXTENSIONS:
+        image_path = process_and_save_image(file)
+        if not image_path:
             return jsonify({"error": "지원하지 않는 파일 형식"}), 400
-        filename = uuid.uuid4().hex + "." + ("jpg" if ext in ("jpg", "jpeg") else ext)
-        save_path = UPLOAD_FOLDER / filename
-        # exif_transpose: 폰 사진의 EXIF 방향을 픽셀에 반영 (저장 시 EXIF가 제거되므로 필수)
-        img = ImageOps.exif_transpose(Image.open(file.stream)).convert("RGB")
-        img.thumbnail((MAX_IMAGE_SIZE, MAX_IMAGE_SIZE))
-        img.save(save_path, optimize=True, quality=85)
-        image_path = filename
 
     with get_db() as conn:
         with conn.cursor() as cur:
@@ -267,6 +273,47 @@ def api_rotate_item(item_id):
         with conn.cursor() as cur:
             cur.execute("UPDATE bg_items SET image_path = %s WHERE id = %s", (new_name, item_id))
     src.unlink()
+
+    return jsonify({"ok": True, "image_path": new_name})
+
+
+@app.route("/api/items/<int:item_id>/image", methods=["POST"])
+@login_required
+def api_update_item_image(item_id):
+    if not is_settings_host():
+        return jsonify({"error": "forbidden"}), 403
+    file = request.files.get("image")
+    if not file or not file.filename:
+        return jsonify({"error": "이미지 파일을 올려주세요."}), 400
+
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT image_path FROM bg_items WHERE id = %s", (item_id,))
+            row = cur.fetchone()
+    if not row:
+        return jsonify({"error": "not found"}), 404
+
+    new_name = process_and_save_image(file)
+    if not new_name:
+        return jsonify({"error": "지원하지 않는 파일 형식"}), 400
+
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE bg_items SET image_path = %s WHERE id = %s RETURNING id",
+                (new_name, item_id)
+            )
+            if not cur.fetchone():
+                # 업로드 처리 중 항목이 삭제된 경우 — 방금 저장한 파일을 고아로 남기지 않음
+                (UPLOAD_FOLDER / new_name).unlink(missing_ok=True)
+                return jsonify({"error": "not found"}), 404
+
+    # 새 파일명으로 교체 — 브라우저 캐시 무효화 보장, 구 파일은 DB 갱신 후 정리
+    old_path = row[0]
+    if old_path:
+        target = UPLOAD_FOLDER / old_path
+        if target.exists():
+            target.unlink()
 
     return jsonify({"ok": True, "image_path": new_name})
 

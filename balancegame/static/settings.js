@@ -49,6 +49,7 @@ function renderItem(item) {
     ${img ? `
     <button class="btn-rotate" data-id="${item.id}" data-dir="ccw" title="왼쪽으로 90° 회전">↺</button>
     <button class="btn-rotate" data-id="${item.id}" data-dir="cw" title="오른쪽으로 90° 회전">↻</button>` : ''}
+    <button class="btn-photo${img ? ' has-img' : ''}" data-id="${item.id}" title="${img ? '사진 변경' : '사진 추가'}">📷</button>
     <div class="pol-photo">
       ${img ? `<img src="${img}" alt="${esc(item.title)}">` : `<div class="pol-placeholder">${initial(item.title)}</div>`}
     </div>
@@ -111,6 +112,45 @@ function startTitleEdit(titleEl) {
   input.addEventListener('blur', () => finish(true));
 }
 
+/* 카드별 사진 변경 — 공유 숨김 input 하나로 처리 */
+const photoInput = document.createElement('input');
+photoInput.type = 'file';
+photoInput.accept = 'image/jpeg,image/png,image/webp';
+photoInput.style.display = 'none';
+document.body.appendChild(photoInput);
+let photoTargetId = null;
+
+photoInput.addEventListener('change', async () => {
+  const file = photoInput.files[0];
+  const id = photoTargetId;
+  photoTargetId = null;
+  if (!file || !id) return;
+  if (file.size > 5 * 1024 * 1024) {
+    showMsg(status, '이미지가 5MB를 초과합니다.');
+    return;
+  }
+  const btn = grid.querySelector(`.btn-photo[data-id="${id}"]`);
+  if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+  const fd = new FormData();
+  fd.append('image', file);
+  try {
+    const res = await fetch(`/api/items/${id}/image`, { method: 'POST', body: fd });
+    if (res.ok) {
+      await loadItems();
+      showMsg(status, '사진이 변경됐어요!');
+      window.refreshSetsUI?.();
+    } else {
+      const err = await res.json().catch(() => ({}));
+      showMsg(status, err.error || '사진 변경에 실패했어요.');
+    }
+  } catch {
+    showMsg(status, '네트워크 오류로 사진 업로드에 실패했어요.');
+  } finally {
+    // 성공 시 loadItems()가 그리드를 재생성하므로 실패 경로에서만 복원됨
+    if (btn?.isConnected) { btn.disabled = false; btn.textContent = '📷'; }
+  }
+});
+
 function showEmptyIfNeeded() {
   if (grid.querySelector('.item-card')) return;
   grid.innerHTML = `<p class="empty-msg">아직 항목이 없어요. 위 폼에서 이름과 사진으로 첫 항목을 추가해보세요.</p>`;
@@ -163,6 +203,14 @@ btnAdd.addEventListener('click', async () => {
 });
 
 grid.addEventListener('click', async e => {
+  const pbtn = e.target.closest('.btn-photo');
+  if (pbtn) {
+    photoTargetId = pbtn.dataset.id;
+    photoInput.value = '';
+    photoInput.click();
+    return;
+  }
+
   const rot = e.target.closest('.btn-rotate');
   if (rot) {
     rot.disabled = true;
