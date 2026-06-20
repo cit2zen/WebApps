@@ -6,7 +6,13 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join, normalize } from "node:path";
 import { spawn } from "node:child_process";
-import { query } from "@anthropic-ai/claude-agent-sdk";
+// agent-sdk는 정적(top-level) import 시 컨테이너 기동에서 모듈 평가가 멈춰
+// server.listen에 도달하지 못하는 문제가 있어, 첫 요청 때 지연 로드한다(jarvis/shopscout와 동일하게).
+let _agentQuery;
+async function getQuery() {
+  if (!_agentQuery) ({ query: _agentQuery } = await import("@anthropic-ai/claude-agent-sdk"));
+  return _agentQuery;
+}
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3000;
@@ -112,6 +118,7 @@ async function runAura(message, sessionId) {
   const abort = new AbortController();
   const timer = setTimeout(() => abort.abort(), 60_000);
 
+  const query = await getQuery();
   const q = query({
     prompt: message,
     options: {
