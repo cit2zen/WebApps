@@ -1,32 +1,41 @@
-# React + TypeScript + Vite
+# todo — 체크리스트 할 일 관리
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+개인용 체크리스트 기반 할 일 관리 웹앱. 일별이 아닌 **전체 할 일**을 세 가지로 관리합니다.
 
-Currently, two official plugins are available:
+- **프로젝트**: 세부 할 일 체크리스트 + 진행률 바 (100% 달성 시 완료 표시)
+- **할 일**: 한 줄 입력으로 빠르게 추가, 마감일·태그·메모 옵션
+- **일정**: 월간 미니 캘린더 (일정 있는 날 dot 표시)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+모든 데이터는 브라우저 localStorage에 자동 저장됩니다 (서버 없음).
 
-## React Compiler
+## 실행
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev        # 개발 서버 (http://localhost:5173)
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## 빌드·검사
+
+```bash
+npm run build      # 프로덕션 빌드 (dist/)
+npx tsc --noEmit   # 타입 검사
+npm run lint       # 린트 (oxlint)
+npx vitest run     # 유닛 테스트
+```
+
+## 사용법
+
+- **상단 요약 바**: 전체 미완료 개수 · 오늘 마감 개수 · 프로젝트 평균 달성률
+- **태그 필터**: 태그 칩 클릭 → 프로젝트/할 일 탭에서 해당 태그만 표시, 다시 클릭하면 해제
+- **마감일 배지**: 지남(빨강) · 오늘~3일 이내(주황) · 그 외(회색), "D-3" / "오늘" / "n일 지남"
+- **백업**: 헤더의 내보내기 → `todo-backup-YYYY-MM-DD.json` 다운로드 / 가져오기 → 파일 선택으로 복원
+- 세부 할 일 이름은 **더블클릭**으로 수정, 할 일은 제목 클릭으로 펼쳐서 편집
+
+## 스택
+
+Vite · React · TypeScript · Tailwind CSS v4 · Zustand(persist) · Motion · day.js
+
+## 배포
+
+Railway — nginx 정적 서빙 (`Dockerfile` 멀티스테이지 빌드), https://todo.cityzen.kr

@@ -1,4 +1,7 @@
 import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+
+dayjs.locale('ko');
 
 export type DdayTone = 'overdue' | 'soon' | 'normal';
 
