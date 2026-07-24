@@ -11,7 +11,7 @@ interface ProjectFormModalProps {
 }
 
 const inputClass =
-  'w-full rounded-xl bg-cream px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-lavender-200';
+  'w-full rounded-xl bg-cream px-3 py-2 text-base outline-none focus:ring-2 focus:ring-lavender-200 sm:text-sm';
 
 export function ProjectFormModal({ open, project, onClose }: ProjectFormModalProps) {
   const addProject = useAppStore((s) => s.addProject);
@@ -46,7 +46,13 @@ export function ProjectFormModal({ open, project, onClose }: ProjectFormModalPro
 
   return (
     <Modal open={open} title={project ? '프로젝트 수정' : '새 프로젝트'} onClose={onClose}>
-      <div className="flex flex-col gap-3">
+      <form
+        className="flex flex-col gap-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          submit();
+        }}
+      >
         <input
           autoFocus
           value={title}
@@ -85,15 +91,14 @@ export function ProjectFormModal({ open, project, onClose }: ProjectFormModalPro
             취소
           </button>
           <button
-            type="button"
-            onClick={submit}
+            type="submit"
             disabled={!title.trim()}
             className="rounded-xl bg-lavender-400 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-lavender-500 disabled:opacity-40"
           >
             저장
           </button>
         </div>
-      </div>
+      </form>
     </Modal>
   );
 }

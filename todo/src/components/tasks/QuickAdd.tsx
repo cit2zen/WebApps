@@ -7,6 +7,10 @@ export function QuickAdd() {
 
   return (
     <input
+      id="quick-add"
+      autoFocus
+      autoComplete="off"
+      enterKeyHint="done"
       value={draft}
       onChange={(e) => setDraft(e.target.value)}
       onKeyDown={(e) => {
@@ -19,7 +23,7 @@ export function QuickAdd() {
         }
       }}
       placeholder="할 일을 입력하고 Enter"
-      className="w-full rounded-2xl bg-white px-4 py-3 text-sm shadow-sm outline-none placeholder:text-muted focus:ring-2 focus:ring-mint-200"
+      className="w-full rounded-2xl bg-white px-4 py-3 text-base shadow-sm outline-none placeholder:text-muted focus:ring-2 focus:ring-mint-200 sm:text-sm"
     />
   );
 }

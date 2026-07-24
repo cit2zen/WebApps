@@ -19,7 +19,7 @@ export function Checkbox({ checked, onChange, accent = 'lavender' }: CheckboxPro
       role="checkbox"
       aria-checked={checked}
       onClick={onChange}
-      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${
+      className={`relative flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors after:absolute after:-inset-2.5 after:content-[''] ${
         checked ? checkedClass : idleClass
       }`}
     >

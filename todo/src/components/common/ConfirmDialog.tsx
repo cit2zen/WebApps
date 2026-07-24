@@ -1,13 +1,30 @@
 import { AnimatePresence, motion } from 'motion/react';
+import { useEffect } from 'react';
 
 interface ConfirmDialogProps {
   open: boolean;
   message: string;
+  confirmLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }
 
-export function ConfirmDialog({ open, message, onConfirm, onCancel }: ConfirmDialogProps) {
+export function ConfirmDialog({
+  open,
+  message,
+  confirmLabel = '삭제',
+  onConfirm,
+  onCancel,
+}: ConfirmDialogProps) {
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [open, onCancel]);
+
   return (
     <AnimatePresence>
       {open && (
@@ -25,7 +42,7 @@ export function ConfirmDialog({ open, message, onConfirm, onCancel }: ConfirmDia
             exit={{ scale: 0.92, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="text-sm">{message}</p>
+            <p className="text-sm break-words [overflow-wrap:anywhere]">{message}</p>
             <div className="mt-5 flex justify-end gap-2">
               <button
                 type="button"
@@ -36,10 +53,11 @@ export function ConfirmDialog({ open, message, onConfirm, onCancel }: ConfirmDia
               </button>
               <button
                 type="button"
+                autoFocus
                 onClick={onConfirm}
                 className="rounded-xl bg-rose-pastel-500 px-4 py-2 text-sm font-medium text-white hover:opacity-90"
               >
-                삭제
+                {confirmLabel}
               </button>
             </div>
           </motion.div>

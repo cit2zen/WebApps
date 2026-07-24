@@ -16,6 +16,11 @@ export function SubtaskItem({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(subtask.title);
 
+  const startEditing = () => {
+    setDraft(subtask.title);
+    setEditing(true);
+  };
+
   const commit = () => {
     const title = draft.trim();
     if (title) renameSubtask(projectId, subtask.id, title);
@@ -24,7 +29,7 @@ export function SubtaskItem({
   };
 
   return (
-    <li className="flex items-center gap-2">
+    <li className="group flex items-center gap-2">
       <Checkbox
         checked={subtask.done}
         onChange={() => toggleSubtask(projectId, subtask.id)}
@@ -44,24 +49,34 @@ export function SubtaskItem({
               setEditing(false);
             }
           }}
-          className="flex-1 rounded-lg border border-lavender-200 px-2 py-0.5 text-sm outline-none"
+          className="min-w-0 flex-1 rounded-lg border border-lavender-200 px-2 py-0.5 text-base outline-none sm:text-sm"
         />
       ) : (
         <span
-          onDoubleClick={() => {
-            setDraft(subtask.title);
-            setEditing(true);
-          }}
-          className={`flex-1 text-sm ${subtask.done ? 'text-muted line-through' : ''}`}
+          onDoubleClick={startEditing}
+          title="더블클릭 또는 ✎ 버튼으로 수정"
+          className={`min-w-0 flex-1 text-sm break-words [overflow-wrap:anywhere] ${
+            subtask.done ? 'text-muted line-through' : ''
+          }`}
         >
           {subtask.title}
         </span>
+      )}
+      {!editing && (
+        <button
+          type="button"
+          aria-label="세부 할 일 이름 수정"
+          onClick={startEditing}
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs text-muted/60 transition-colors hover:text-ink sm:opacity-0 sm:group-hover:opacity-100"
+        >
+          ✎
+        </button>
       )}
       <button
         type="button"
         aria-label="세부 할 일 삭제"
         onClick={() => deleteSubtask(projectId, subtask.id)}
-        className="px-1 text-sm text-muted/60 transition-colors hover:text-rose-pastel-500"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm text-muted/60 transition-colors hover:bg-rose-pastel-100/50 hover:text-rose-pastel-500"
       >
         ×
       </button>

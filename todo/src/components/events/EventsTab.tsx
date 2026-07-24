@@ -9,7 +9,7 @@ export function EventsTab() {
   return (
     <section className="flex flex-col gap-3">
       <MiniCalendar selected={selected} onSelect={setSelected} />
-      <EventList date={selected} />
+      <EventList date={selected} onSelectDate={setSelected} />
     </section>
   );
 }

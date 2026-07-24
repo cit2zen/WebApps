@@ -7,7 +7,12 @@ import { ConfirmDialog } from '../common/ConfirmDialog';
 import { EmptyState } from '../common/EmptyState';
 import { EventFormModal } from './EventFormModal';
 
-export function EventList({ date }: { date: string }) {
+interface EventListProps {
+  date: string;
+  onSelectDate?: (date: string) => void;
+}
+
+export function EventList({ date, onSelectDate }: EventListProps) {
   const events = useAppStore((s) => s.events);
   const deleteEvent = useAppStore((s) => s.deleteEvent);
   const [modalOpen, setModalOpen] = useState(false);
@@ -44,24 +49,30 @@ export function EventList({ date }: { date: string }) {
                 {event.time ?? '종일'}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium">{event.title}</p>
-                {event.memo && <p className="mt-0.5 text-xs text-muted">{event.memo}</p>}
+                <p className="text-sm font-medium break-words [overflow-wrap:anywhere]">
+                  {event.title}
+                </p>
+                {event.memo && (
+                  <p className="mt-0.5 text-xs break-words whitespace-pre-wrap text-muted [overflow-wrap:anywhere]">
+                    {event.memo}
+                  </p>
+                )}
               </div>
-              <div className="flex shrink-0 gap-2 text-xs">
+              <div className="flex shrink-0 gap-1 text-xs">
                 <button
                   type="button"
                   onClick={() => {
                     setEditing(event);
                     setModalOpen(true);
                   }}
-                  className="text-muted hover:text-ink"
+                  className="-my-1 px-1.5 py-1.5 text-muted hover:text-ink"
                 >
                   수정
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmId(event.id)}
-                  className="text-muted hover:text-rose-pastel-500"
+                  className="-my-1 px-1.5 py-1.5 text-muted hover:text-rose-pastel-500"
                 >
                   삭제
                 </button>
@@ -75,6 +86,7 @@ export function EventList({ date }: { date: string }) {
         event={editing}
         defaultDate={date}
         onClose={() => setModalOpen(false)}
+        onSaved={onSelectDate}
       />
       <ConfirmDialog
         open={confirmId !== null}

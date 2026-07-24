@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { EventsTab } from './components/events/EventsTab';
 import { Header } from './components/layout/Header';
+import { IntroCard } from './components/layout/IntroCard';
 import { SummaryBar } from './components/layout/SummaryBar';
 import { TabBar } from './components/layout/TabBar';
 import { TagFilter } from './components/layout/TagFilter';
@@ -21,6 +22,7 @@ export default function App() {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col gap-4 px-4 pb-16">
       <Header />
+      <IntroCard />
       <SummaryBar />
       <TagFilter />
       <TabBar />

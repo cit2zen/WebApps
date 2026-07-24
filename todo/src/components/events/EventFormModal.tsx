@@ -8,12 +8,19 @@ interface EventFormModalProps {
   event?: Event;
   defaultDate: string;
   onClose: () => void;
+  onSaved?: (date: string) => void;
 }
 
 const inputClass =
-  'w-full rounded-xl bg-cream px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-peach-200';
+  'w-full rounded-xl bg-cream px-3 py-2 text-base outline-none focus:ring-2 focus:ring-peach-200 sm:text-sm';
 
-export function EventFormModal({ open, event, defaultDate, onClose }: EventFormModalProps) {
+export function EventFormModal({
+  open,
+  event,
+  defaultDate,
+  onClose,
+  onSaved,
+}: EventFormModalProps) {
   const addEvent = useAppStore((s) => s.addEvent);
   const updateEvent = useAppStore((s) => s.updateEvent);
   const [title, setTitle] = useState('');
@@ -41,12 +48,19 @@ export function EventFormModal({ open, event, defaultDate, onClose }: EventFormM
     };
     if (event) updateEvent(event.id, input);
     else addEvent(input);
+    onSaved?.(date);
     onClose();
   };
 
   return (
     <Modal open={open} title={event ? '일정 수정' : '새 일정'} onClose={onClose}>
-      <div className="flex flex-col gap-3">
+      <form
+        className="flex flex-col gap-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          submit();
+        }}
+      >
         <input
           autoFocus
           value={title}
@@ -90,15 +104,14 @@ export function EventFormModal({ open, event, defaultDate, onClose }: EventFormM
             취소
           </button>
           <button
-            type="button"
-            onClick={submit}
+            type="submit"
             disabled={!title.trim() || !date}
             className="rounded-xl bg-peach-400 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-peach-500 disabled:opacity-40"
           >
             저장
           </button>
         </div>
-      </div>
+      </form>
     </Modal>
   );
 }

@@ -111,14 +111,36 @@ describe('importData', () => {
   });
 });
 
+describe('완료됨 정리·인트로', () => {
+  it('clearDoneTasks는 완료 항목만 제거', () => {
+    useAppStore.getState().addTask('남을 것');
+    useAppStore.getState().addTask('지울 것');
+    const doneId = useAppStore.getState().tasks[1].id;
+    useAppStore.getState().toggleTask(doneId);
+    useAppStore.getState().clearDoneTasks();
+    expect(useAppStore.getState().tasks.map((t) => t.title)).toEqual(['남을 것']);
+  });
+
+  it('dismissIntro 플래그 설정', () => {
+    expect(useAppStore.getState().introDismissed).toBe(false);
+    useAppStore.getState().dismissIntro();
+    expect(useAppStore.getState().introDismissed).toBe(true);
+  });
+});
+
 describe('persist', () => {
-  it('도메인 데이터만 저장(activeTab·selectedTag 제외)', async () => {
+  it('도메인 데이터+introDismissed만 저장(activeTab·selectedTag 제외)', async () => {
     useAppStore.getState().addTask('저장 확인');
     useAppStore.getState().setActiveTab('events');
     await useAppStore.persist.rehydrate();
     const raw = localStorage.getItem('todo-app-storage');
     expect(raw).toBeTruthy();
     const saved = JSON.parse(raw as string) as { state: Record<string, unknown> };
-    expect(Object.keys(saved.state).sort()).toEqual(['events', 'projects', 'tasks']);
+    expect(Object.keys(saved.state).sort()).toEqual([
+      'events',
+      'introDismissed',
+      'projects',
+      'tasks',
+    ]);
   });
 });

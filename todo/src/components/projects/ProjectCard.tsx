@@ -35,18 +35,22 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
       }`}
     >
       <div className="flex items-start justify-between gap-2">
-        <h3 className="font-bold">
+        <h3 className="min-w-0 font-bold break-words [overflow-wrap:anywhere]">
           {done && <span className="mr-1 text-lavender-500">✓</span>}
           {project.title}
         </h3>
-        <div className="flex shrink-0 gap-2 text-xs">
-          <button type="button" onClick={onEdit} className="text-muted hover:text-ink">
+        <div className="flex shrink-0 gap-1 text-xs">
+          <button
+            type="button"
+            onClick={onEdit}
+            className="-my-1 px-1.5 py-1.5 text-muted hover:text-ink"
+          >
             수정
           </button>
           <button
             type="button"
             onClick={() => setConfirmOpen(true)}
-            className="text-muted hover:text-rose-pastel-500"
+            className="-my-1 px-1.5 py-1.5 text-muted hover:text-rose-pastel-500"
           >
             삭제
           </button>
@@ -70,7 +74,11 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
         </div>
       )}
 
-      {project.memo && <p className="text-xs text-muted">{project.memo}</p>}
+      {project.memo && (
+        <p className="text-xs break-words whitespace-pre-wrap text-muted [overflow-wrap:anywhere]">
+          {project.memo}
+        </p>
+      )}
 
       <ProgressBar percent={percent} />
 
@@ -90,7 +98,9 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
           if (e.key === 'Enter') submitSubtask();
         }}
         placeholder="+ 세부 할 일 추가 (Enter)"
-        className="rounded-xl bg-cream px-3 py-1.5 text-sm outline-none placeholder:text-muted focus:ring-2 focus:ring-lavender-200"
+        autoComplete="off"
+        enterKeyHint="done"
+        className="rounded-xl bg-cream px-3 py-1.5 text-base outline-none placeholder:text-muted focus:ring-2 focus:ring-lavender-200 sm:text-sm"
       />
 
       <ConfirmDialog

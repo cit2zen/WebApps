@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useAppStore } from '../../store/useAppStore';
-import { todayStr } from '../../utils/date';
+import { useToday } from '../../utils/useToday';
 import { eventDateSet } from '../../utils/selectors';
 
 interface MiniCalendarProps {
@@ -17,9 +17,17 @@ const navButtonClass =
 export function MiniCalendar({ selected, onSelect }: MiniCalendarProps) {
   const events = useAppStore((s) => s.events);
   const [month, setMonth] = useState(() => dayjs(selected).startOf('month'));
+  const today = useToday();
+
+  const [lastSelected, setLastSelected] = useState(selected);
+  if (selected !== lastSelected) {
+    setLastSelected(selected);
+    if (!dayjs(selected).isSame(month, 'month')) {
+      setMonth(dayjs(selected).startOf('month'));
+    }
+  }
 
   const dots = eventDateSet(events);
-  const today = todayStr();
   const cells: (string | null)[] = [
     ...Array.from({ length: month.day() }, () => null),
     ...Array.from({ length: month.daysInMonth() }, (_, i) =>
@@ -44,7 +52,21 @@ export function MiniCalendar({ selected, onSelect }: MiniCalendarProps) {
         >
           ‹
         </button>
-        <p className="text-sm font-bold">{month.format('YYYY년 M월')}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-sm font-bold">{month.format('YYYY년 M월')}</p>
+          {(selected !== today || !month.isSame(dayjs(today), 'month')) && (
+            <button
+              type="button"
+              onClick={() => {
+                onSelect(today);
+                setMonth(dayjs(today).startOf('month'));
+              }}
+              className="rounded-full bg-peach-50 px-2 py-0.5 text-xs font-medium text-peach-500 transition-colors hover:bg-peach-100"
+            >
+              오늘
+            </button>
+          )}
+        </div>
         <button
           type="button"
           aria-label="다음 달"

@@ -1,20 +1,25 @@
 import { useAppStore } from '../../store/useAppStore';
-import { todayStr } from '../../utils/date';
+import { useToday } from '../../utils/useToday';
 import { summarize } from '../../utils/selectors';
 
 export function SummaryBar() {
   const projects = useAppStore((s) => s.projects);
   const tasks = useAppStore((s) => s.tasks);
+  const today = useToday();
   const { incompleteCount, dueTodayCount, avgProgress } = summarize(
     projects,
     tasks,
-    todayStr(),
+    today,
   );
 
   const items = [
-    { label: '미완료 할 일', value: `${incompleteCount}개` },
-    { label: '오늘 마감', value: `${dueTodayCount}개` },
-    { label: '평균 달성률', value: `${avgProgress}%` },
+    { label: '미완료 할 일', value: `${incompleteCount}개`, valueClass: 'text-mint-500' },
+    {
+      label: '오늘 마감',
+      value: `${dueTodayCount}개`,
+      valueClass: dueTodayCount > 0 ? 'text-amber-pastel-600' : 'text-ink',
+    },
+    { label: '평균 달성률', value: `${avgProgress}%`, valueClass: 'text-lavender-500' },
   ];
 
   return (
@@ -24,7 +29,7 @@ export function SummaryBar() {
           key={item.label}
           className="rounded-2xl bg-white px-3 py-3 text-center shadow-sm"
         >
-          <p className="text-lg font-bold">{item.value}</p>
+          <p className={`text-lg font-bold ${item.valueClass}`}>{item.value}</p>
           <p className="text-xs text-muted">{item.label}</p>
         </div>
       ))}
