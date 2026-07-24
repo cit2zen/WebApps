@@ -22,6 +22,7 @@
     { "name": "jarvis", "type": "next", "dir": "jarvis", "url": "https://jarvis.cityzen.kr", "railwayServiceId": "8e5b28b7-38c5-4ff4-95de-6af738aa4748", "db": null, "status": "live" },
     { "name": "shopscout", "type": "next", "dir": "shopscout", "url": "https://shopscout.cityzen.kr", "railwayServiceId": "819223c8-5d90-4f77-97f4-1822cf7d7db1", "db": null, "status": "live", "$note": "real 모드 — FIRECRAWL_API_KEY/EXA_API_KEY 미설정으로 상품 검색 결과 빈칸(키 추가 시 자동 활성). LLM=agent-sdk(OAuth)" },
     { "name": "studyai", "type": "next", "dir": "studyai", "url": "https://studyai.cityzen.kr", "railwayServiceId": "eaa6566c-19e9-4842-bdca-f51d233afaa7", "db": "studyai-db", "status": "live" },
-    { "name": "cityzen-web", "type": "next", "dir": null, "repo": "cit2zen/cityzen-web", "url": "https://cityzen.kr", "railwayServiceId": "483cf0bc-fa77-4952-a266-3bcaa33515d6", "db": "cityzen-web-db", "status": "live" }
+    { "name": "cityzen-web", "type": "next", "dir": null, "repo": "cit2zen/cityzen-web", "url": "https://cityzen.kr", "railwayServiceId": "483cf0bc-fa77-4952-a266-3bcaa33515d6", "db": "cityzen-web-db", "status": "live" },
+    { "name": "todo", "type": "static", "dir": "todo", "url": "https://todo.cityzen.kr", "railwayServiceId": null, "db": null, "status": "pending", "$note": "Vite+React 빌드형 정적 앱 — Dockerfile 멀티스테이지(node build→nginx)" }
   ]
 }
