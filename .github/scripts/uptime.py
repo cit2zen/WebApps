@@ -1,8 +1,8 @@
-"""services.json의 status=live 서비스를 핑하고, 실패 시 Discord(ClaudeBot 채널)로 알림.
+"""services.json의 status=live 서비스를 핑해 실패 시 Actions 로그로 남긴다.
 
 GitHub Actions(uptime.yml, 10분 주기)에서 실행. 로컬 수동 실행도 가능:
-  DISCORD_BOT_TOKEN=... DISCORD_CHANNEL_ID=... python .github/scripts/uptime.py
-다운이 지속되는 동안 매 주기 알림이 반복됨(의도 — 복구 전까지 상기).
+  python .github/scripts/uptime.py
+Discord 알림은 2026-09-11 사용자 요청으로 비활성화(제거)됨 — 실패는 Actions 실행 결과(exit 1)로만 확인.
 """
 import json
 import os
@@ -28,17 +28,7 @@ if not fails:
     print("all live services OK")
     sys.exit(0)
 
-token = os.environ.get("DISCORD_BOT_TOKEN")
-channel = os.environ.get("DISCORD_CHANNEL_ID")
-msg = "🚨 **cityzen 서비스 다운 감지**\n" + "\n".join(
-    f"- **{n}** {u} — {err}" for n, u, err in fails)
+msg = "cityzen 서비스 다운 감지\n" + "\n".join(
+    f"- {n} {u} — {err}" for n, u, err in fails)
 print(msg)
-if token and channel:
-    data = json.dumps({"content": msg}).encode()
-    req = urllib.request.Request(
-        f"https://discord.com/api/v10/channels/{channel}/messages", data=data,
-        headers={"Authorization": f"Bot {token}", "Content-Type": "application/json",
-                 "User-Agent": "cityzen-uptime/1.0"})
-    urllib.request.urlopen(req, timeout=15)
-    print("Discord alert sent")
 sys.exit(1)

@@ -11,7 +11,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check live services
-        env:
-          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
         run: python3 .github/scripts/uptime.py
