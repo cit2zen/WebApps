@@ -7,8 +7,8 @@
   },
   "services": [
     { "name": "onvoicing", "type": "static", "dir": "onvoicing", "url": "https://onvoicing.cityzen.kr", "railwayServiceId": "72ff7999-e523-4607-bdd3-4e120d35551a", "db": null, "status": "live" },
-    { "name": "balancegame", "type": "flask", "dir": "balancegame", "url": "https://balancegame.cityzen.kr", "extraDomains": ["balancegame-settings.cityzen.kr"], "railwayServiceId": "b6cd1c70-368e-4550-8c85-3b18841fe84c", "db": "balancegame-db", "status": "live" },
-    { "name": "onmantle", "type": "flask", "dir": "onmantle", "url": "https://onmantle.cityzen.kr", "railwayServiceId": "c76bb404-c94b-4319-9752-37f3c236273d", "db": "onmantle-db", "status": "live" },
+    { "name": "balancegame", "type": "flask", "dir": "balancegame", "url": "https://balancegame.cityzen.kr", "extraDomains": ["balancegame-settings.cityzen.kr"], "coolifyUuid": "jw3av65bvuwypny9z99bokng", "host": "home-server", "db": "balancegame-db", "status": "live" },
+    { "name": "onmantle", "type": "flask", "dir": "onmantle", "url": "https://onmantle.cityzen.kr", "coolifyUuid": "jcp641v69weivvl8zr0ieofs", "host": "home-server", "db": "onmantle-db", "status": "live" },
     { "name": "games", "type": "static", "dir": null, "url": "https://games.cityzen.kr", "coolifyUuid": "k119hqjopwtd8pnptqktia3w", "host": "home-server", "db": null, "status": "live", "$note": "정적 게임 통합 서비스 — 리포 루트 nginx, .dockerignore 화이트리스트. build_pack=dockerfile(2026-09-12 static→dockerfile 수정: Coolify static은 자체 생성 nginx.conf가 루트 화이트리스트 .dockerignore에 걸려 빌드 실패)" },
     { "name": "portfolio", "type": "static", "dir": "portfolio", "url": "https://portfolio.cityzen.kr", "coolifyUuid": "aq6q0ssc43lslaaueljqdsz5", "host": "home-server", "db": null, "status": "live" },
     { "name": "pacman", "type": "static", "dir": "pacman", "url": "https://games.cityzen.kr/pacman/", "via": "games", "railwayServiceId": null, "db": null, "status": "live" },
