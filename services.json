@@ -6,23 +6,192 @@
     "environmentId": "937ec3a0-c873-40c5-9d42-42590ded3f3e"
   },
   "services": [
-    { "name": "onvoicing", "type": "static", "dir": "onvoicing", "url": "https://onvoicing.cityzen.kr", "railwayServiceId": "72ff7999-e523-4607-bdd3-4e120d35551a", "db": null, "status": "live" },
-    { "name": "balancegame", "type": "flask", "dir": "balancegame", "url": "https://balancegame.cityzen.kr", "extraDomains": ["balancegame-settings.cityzen.kr"], "coolifyUuid": "jw3av65bvuwypny9z99bokng", "host": "home-server", "db": "balancegame-db", "status": "live" },
-    { "name": "onmantle", "type": "flask", "dir": "onmantle", "url": "https://onmantle.cityzen.kr", "coolifyUuid": "jcp641v69weivvl8zr0ieofs", "host": "home-server", "db": "onmantle-db", "status": "live" },
-    { "name": "games", "type": "static", "dir": null, "url": "https://games.cityzen.kr", "coolifyUuid": "k119hqjopwtd8pnptqktia3w", "host": "home-server", "db": null, "status": "live", "$note": "정적 게임 통합 서비스 — 리포 루트 nginx, .dockerignore 화이트리스트. build_pack=dockerfile(2026-09-12 static→dockerfile 수정: Coolify static은 자체 생성 nginx.conf가 루트 화이트리스트 .dockerignore에 걸려 빌드 실패)" },
-    { "name": "portfolio", "type": "static", "dir": "portfolio", "url": "https://portfolio.cityzen.kr", "coolifyUuid": "aq6q0ssc43lslaaueljqdsz5", "host": "home-server", "db": null, "status": "live" },
-    { "name": "pacman", "type": "static", "dir": "pacman", "url": "https://games.cityzen.kr/pacman/", "via": "games", "railwayServiceId": null, "db": null, "status": "live" },
-    { "name": "tetris", "type": "static", "dir": "tetris", "url": "https://games.cityzen.kr/tetris/", "via": "games", "railwayServiceId": null, "db": null, "status": "live" },
-    { "name": "apple-game", "type": "static", "dir": "apple-game", "url": "https://games.cityzen.kr/apple-game/", "via": "games", "railwayServiceId": null, "db": null, "status": "live" },
-    { "name": "yaong", "type": "static", "dir": "yaong", "url": "https://games.cityzen.kr/yaong/", "via": "games", "railwayServiceId": null, "db": null, "status": "live" },
-    { "name": "doom-shooter", "type": "static", "dir": "doom-shooter", "url": "https://games.cityzen.kr/doom-shooter/", "via": "games", "railwayServiceId": null, "db": null, "status": "live" },
-    { "name": "aurora-hands", "type": "static", "dir": "aurora-hands", "url": "https://games.cityzen.kr/aurora-hands/", "via": "games", "railwayServiceId": null, "db": null, "status": "live" },
-    { "name": "deeplearning", "type": "static", "dir": "deeplearning", "url": "https://deeplearning.cityzen.kr", "coolifyUuid": "adscntao3psbl8qtfba1e2jw", "host": "home-server", "db": null, "status": "live", "$note": "독립 도메인(자체 Coolify 앱) + games 번들 양쪽 모두 서빙 — games.cityzen.kr/deeplearning/ 경로도 계속 응답" },
-    { "name": "aura", "type": "node", "dir": "aura", "url": "https://aura.cityzen.kr", "coolifyUuid": "xe0rvprbokou51doa1f4pff2", "host": "home-server", "db": null, "status": "live" },
-    { "name": "jarvis", "type": "next", "dir": "jarvis", "url": "https://jarvis.cityzen.kr", "coolifyUuid": "rgabswd8qxksh4bac5uj07il", "host": "home-server", "db": null, "status": "live" },
-    { "name": "shopscout", "type": "next", "dir": "shopscout", "url": "https://shopscout.cityzen.kr", "coolifyUuid": "lx2nl3mi90w20f2crt7nmgxb", "host": "home-server", "db": null, "status": "live", "$note": "real 모드 — FIRECRAWL_API_KEY/EXA_API_KEY 미설정으로 상품 검색 결과 빈칸(키 추가 시 자동 활성). LLM=agent-sdk(OAuth)" },
-    { "name": "studyai", "type": "next", "dir": "studyai", "url": "https://study.cityzen.kr", "coolifyUuid": "l13na2otgecew3af7ai0w739", "host": "home-server", "db": "studyai-db", "status": "live" },
-    { "name": "cityzen-web", "type": "next", "dir": null, "repo": "cit2zen/cityzen-web", "url": "https://cityzen.kr", "railwayServiceId": "483cf0bc-fa77-4952-a266-3bcaa33515d6", "db": "cityzen-web-db", "status": "live" },
-    { "name": "todo", "type": "static", "dir": "todo", "url": "https://todo.cityzen.kr", "railwayServiceId": null, "db": null, "status": "live", "host": "github-pages", "$note": "Vite+React 빌드형 정적 앱 — GitHub Pages(Actions deploy-todo-pages.yml, todo/** 푸시 시 자동배포). Railway 트라이얼 만료로 무료 대안 채택(2026-07-24). Dockerfile은 Railway 복귀 대비 보존" }
+    {
+      "name": "onvoicing",
+      "type": "static",
+      "dir": "onvoicing",
+      "url": "https://onvoicing.cityzen.kr",
+      "railwayServiceId": "72ff7999-e523-4607-bdd3-4e120d35551a",
+      "db": null,
+      "status": "live"
+    },
+    {
+      "name": "balancegame",
+      "type": "flask",
+      "dir": "balancegame",
+      "url": "https://balancegame.cityzen.kr",
+      "extraDomains": [
+        "balancegame-settings.cityzen.kr"
+      ],
+      "coolifyUuid": "jw3av65bvuwypny9z99bokng",
+      "host": "home-server",
+      "db": "balancegame-db",
+      "status": "live"
+    },
+    {
+      "name": "onmantle",
+      "type": "flask",
+      "dir": "onmantle",
+      "url": "https://onmantle.cityzen.kr",
+      "coolifyUuid": "jcp641v69weivvl8zr0ieofs",
+      "host": "home-server",
+      "db": "onmantle-db",
+      "status": "live"
+    },
+    {
+      "name": "games",
+      "type": "static",
+      "dir": null,
+      "url": "https://games.cityzen.kr",
+      "coolifyUuid": "k119hqjopwtd8pnptqktia3w",
+      "host": "home-server",
+      "db": null,
+      "status": "live",
+      "$note": "정적 게임 통합 서비스 — 리포 루트 nginx, .dockerignore 화이트리스트. build_pack=dockerfile(2026-09-12 static→dockerfile 수정: Coolify static은 자체 생성 nginx.conf가 루트 화이트리스트 .dockerignore에 걸려 빌드 실패)"
+    },
+    {
+      "name": "portfolio",
+      "type": "static",
+      "dir": "portfolio",
+      "url": "https://portfolio.cityzen.kr",
+      "coolifyUuid": "aq6q0ssc43lslaaueljqdsz5",
+      "host": "home-server",
+      "db": null,
+      "status": "live"
+    },
+    {
+      "name": "pacman",
+      "type": "static",
+      "dir": "pacman",
+      "url": "https://games.cityzen.kr/pacman/",
+      "via": "games",
+      "railwayServiceId": null,
+      "db": null,
+      "status": "live"
+    },
+    {
+      "name": "tetris",
+      "type": "static",
+      "dir": "tetris",
+      "url": "https://games.cityzen.kr/tetris/",
+      "via": "games",
+      "railwayServiceId": null,
+      "db": null,
+      "status": "live"
+    },
+    {
+      "name": "apple-game",
+      "type": "static",
+      "dir": "apple-game",
+      "url": "https://games.cityzen.kr/apple-game/",
+      "via": "games",
+      "railwayServiceId": null,
+      "db": null,
+      "status": "live"
+    },
+    {
+      "name": "yaong",
+      "type": "static",
+      "dir": "yaong",
+      "url": "https://games.cityzen.kr/yaong/",
+      "via": "games",
+      "railwayServiceId": null,
+      "db": null,
+      "status": "live"
+    },
+    {
+      "name": "doom-shooter",
+      "type": "static",
+      "dir": "doom-shooter",
+      "url": "https://games.cityzen.kr/doom-shooter/",
+      "via": "games",
+      "railwayServiceId": null,
+      "db": null,
+      "status": "live"
+    },
+    {
+      "name": "aurora-hands",
+      "type": "static",
+      "dir": "aurora-hands",
+      "url": "https://games.cityzen.kr/aurora-hands/",
+      "via": "games",
+      "railwayServiceId": null,
+      "db": null,
+      "status": "live"
+    },
+    {
+      "name": "deeplearning",
+      "type": "static",
+      "dir": "deeplearning",
+      "url": "https://deeplearning.cityzen.kr",
+      "coolifyUuid": "adscntao3psbl8qtfba1e2jw",
+      "host": "home-server",
+      "db": null,
+      "status": "live",
+      "$note": "독립 도메인(자체 Coolify 앱) + games 번들 양쪽 모두 서빙 — games.cityzen.kr/deeplearning/ 경로도 계속 응답"
+    },
+    {
+      "name": "aura",
+      "type": "node",
+      "dir": "aura",
+      "url": "https://aura.cityzen.kr",
+      "coolifyUuid": "xe0rvprbokou51doa1f4pff2",
+      "host": "home-server",
+      "db": null,
+      "status": "live"
+    },
+    {
+      "name": "jarvis",
+      "type": "next",
+      "dir": "jarvis",
+      "url": "https://jarvis.cityzen.kr",
+      "coolifyUuid": "rgabswd8qxksh4bac5uj07il",
+      "host": "home-server",
+      "db": null,
+      "status": "live"
+    },
+    {
+      "name": "shopscout",
+      "type": "next",
+      "dir": "shopscout",
+      "url": "https://shopscout.cityzen.kr",
+      "coolifyUuid": "lx2nl3mi90w20f2crt7nmgxb",
+      "host": "home-server",
+      "db": null,
+      "status": "live",
+      "$note": "real 모드 — FIRECRAWL_API_KEY/EXA_API_KEY 미설정으로 상품 검색 결과 빈칸(키 추가 시 자동 활성). LLM=agent-sdk(OAuth)"
+    },
+    {
+      "name": "studyai",
+      "type": "next",
+      "dir": "studyai",
+      "url": "https://study.cityzen.kr",
+      "coolifyUuid": "l13na2otgecew3af7ai0w739",
+      "host": "home-server",
+      "db": "studyai-db",
+      "status": "live"
+    },
+    {
+      "name": "cityzen-web",
+      "type": "next",
+      "dir": null,
+      "repo": "cit2zen/cityzen-web",
+      "url": "https://cityzen.kr",
+      "coolifyUuid": "ef1m5xfh0dtpnpk2fe072rl1",
+      "host": "home-server",
+      "db": "cityzen-web-db",
+      "status": "live"
+    },
+    {
+      "name": "todo",
+      "type": "static",
+      "dir": "todo",
+      "url": "https://todo.cityzen.kr",
+      "railwayServiceId": null,
+      "db": null,
+      "status": "live",
+      "host": "github-pages",
+      "$note": "Vite+React 빌드형 정적 앱 — GitHub Pages(Actions deploy-todo-pages.yml, todo/** 푸시 시 자동배포). Railway 트라이얼 만료로 무료 대안 채택(2026-07-24). Dockerfile은 Railway 복귀 대비 보존"
+    }
   ]
 }
