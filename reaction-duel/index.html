@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f04444" />
+    <title>Reaction Duel</title>
+    <link rel="stylesheet" href="./static/styles.css" />
+  </head>
+  <body>
+    <main id="game" data-state="ready" aria-live="polite">
+      <section class="player-zone" data-player="p1" aria-label="1P 구역">
+        <div class="zone-content">
+          <p class="player-label">1P · W</p>
+          <h1 class="state-word"></h1>
+          <p class="result-detail"></p>
+          <button class="round-action" type="button"></button>
+        </div>
+      </section>
+      <div class="center-seam" aria-label="대결 상태">
+        <span id="round-count">ROUND 0</span><span id="latest-time">READY</span>
+      </div>
+      <section class="player-zone" data-player="p2" aria-label="2P 구역">
+        <div class="zone-content">
+          <p class="player-label">2P · ↓</p>
+          <h1 class="state-word"></h1>
+          <p class="result-detail"></p>
+          <button class="round-action" type="button"></button>
+        </div>
+      </section>
+    </main>
+    <aside class="stats-panel" aria-label="대결 기록">
+      <p>최고 기록 <strong id="p1-best">1P —</strong> <strong id="p2-best">2P —</strong></p>
+      <ol id="recent-results"></ol>
+    </aside>
+    <p class="rotate-hint">세로로 돌리면 더 좋아요</p>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
