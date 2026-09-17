@@ -7,6 +7,7 @@ button { font: inherit; }
 .player-zone[data-player="p1"] { background: #f04444; }
 .player-zone[data-player="p2"] { background: #f6ab38; }
 .zone-content { width: min(100%, 34rem); text-align: center; }
+.player-zone[data-player="p1"] .zone-content { transform: rotate(180deg); }
 .player-label { margin: 0 0 .3rem; font: 700 clamp(.75rem, 2vw, 1rem)/1 system-ui, sans-serif; letter-spacing: .08em; }
 .state-word { margin: 0; font-size: clamp(3.75rem, 15vw, 8rem); letter-spacing: -.065em; line-height: .85; }
 .result-detail { min-height: 1.5rem; margin: .7rem 0 1.1rem; font: 600 clamp(1rem, 3vw, 1.4rem)/1.1 system-ui, sans-serif; }
