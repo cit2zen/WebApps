@@ -14,3 +14,6 @@
 !doom-shooter/
 !aurora-hands/
 !deeplearning/
+!reaction-duel/
+reaction-duel/Dockerfile
+reaction-duel/default.conf.template
