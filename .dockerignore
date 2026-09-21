@@ -15,5 +15,6 @@
 !aurora-hands/
 !deeplearning/
 !reaction-duel/
+!fps/
 reaction-duel/Dockerfile
 reaction-duel/default.conf.template

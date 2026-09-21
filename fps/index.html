@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+    <title>Overclock Arena</title>
+    <link rel="icon" href="data:,">
+    <style>
+      /* 폰트: TemplateData/fonts (OFL, 빌드 동봉 — 외부 요청 없음) */
+      @font-face { font-family: "Fraunces"; font-style: italic; font-weight: 600; src: url("TemplateData/fonts/Fraunces-SemiBoldItalic.ttf") format("truetype"); font-display: swap; }
+      @font-face { font-family: "Orbitron"; font-weight: 700; src: url("TemplateData/fonts/Orbitron-Bold.ttf") format("truetype"); font-display: swap; }
+      /* 토큰: Polaroid Editorial(develop_web/design-system) + 게임 네온 */
+      :root {
+        --bg-base: #ece7dc; --bg-card: #ffffff; --gold-mid: #c0a060; --gold-light: #d4b87a; --ink-warm: #1a1005; --ink-mid: #4a3820;
+        --void: #0b0d17; --neon-cyan: #27e0ff; --neon-magenta: #ff2e88; --track: rgba(26, 16, 5, 0.12);
+        --shadow-card: 0 12px 32px rgba(26, 16, 5, 0.18);
+      }
+      html, body { margin: 0; padding: 0; height: 100%; background: var(--void); overflow: hidden; }
+      #unity-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: var(--void); outline: none; }
+      .screen { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--bg-base); transition: opacity 0.5s ease; }
+      .screen.hide { opacity: 0; pointer-events: none; }
+      .card { width: min(420px, 86vw); background: var(--bg-card); padding: 16px 16px 20px; box-shadow: var(--shadow-card); }
+      .photo { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: linear-gradient(to bottom, #07080f 0%, #1a0f2e 52%, #3a1238 60%, var(--void) 60.5%); }
+      .photo::before { content: ""; position: absolute; left: -50%; right: -50%; top: 60%; bottom: -40%; transform: perspective(220px) rotateX(58deg); transform-origin: top;
+        background-image: linear-gradient(var(--neon-cyan) 1px, transparent 1px), linear-gradient(90deg, var(--neon-cyan) 1px, transparent 1px);
+        background-size: 32px 32px; opacity: 0.55; animation: scroll 1.6s linear infinite; }
+      .photo::after { content: ""; position: absolute; left: 50%; top: 42%; width: 38%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 46, 136, 0.9) 0%, rgba(255, 46, 136, 0.25) 45%, transparent 70%); filter: blur(2px); }
+      @keyframes scroll { from { background-position: 0 0; } to { background-position: 0 32px; } }
+      .caption { text-align: center; padding-top: 14px; color: var(--ink-warm); }
+      .title { font: italic 600 30px/1.1 "Fraunces", Georgia, serif; color: var(--gold-mid); letter-spacing: 0.01em; }
+      .sub { margin-top: 8px; font: 700 11px/1.4 "Orbitron", system-ui, sans-serif; letter-spacing: 0.16em; color: var(--ink-mid); text-transform: uppercase; }
+      .bar { margin: 16px auto 0; width: 70%; height: 3px; background: var(--track); }
+      .fill { width: 0; height: 100%; background: var(--gold-mid); transition: width 0.2s; }
+      .pct { margin-top: 8px; font: 700 12px "Orbitron", system-ui, sans-serif; color: var(--gold-mid); letter-spacing: 0.12em; }
+      .msg { margin-top: 10px; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink-mid); }
+      .btns { display: flex; gap: 10px; margin-top: 16px; }
+      .btn { flex: 1; min-height: 52px; border: 1px solid rgba(26, 16, 5, 0.25); background: transparent; color: var(--ink-warm); font: 700 12px "Orbitron", system-ui, sans-serif; letter-spacing: 0.1em; cursor: pointer; }
+      .btn.primary { background: var(--ink-warm); color: var(--bg-card); border-color: var(--ink-warm); }
+    </style>
+  </head>
+  <body>
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+
+    <div id="loader" class="screen">
+      <div class="card">
+        <div class="photo"></div>
+        <div class="caption">
+          <div class="title" id="loader-title"></div>
+          <div class="sub">Mouse &amp; keyboard · Headphones on</div>
+          <div class="bar"><div class="fill" id="fill"></div></div>
+          <div class="pct" id="pct">0%</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="desktop-only" class="screen hide">
+      <div class="card">
+        <div class="photo"></div>
+        <div class="caption">
+          <div class="title" id="mobile-title"></div>
+          <div class="msg" id="mobile-msg"></div>
+          <div class="btns">
+            <button class="btn" id="copy-link" type="button"></button>
+            <button class="btn primary" id="run-anyway" type="button"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="Build/WebGL.loader.js"></script>
+    <script>
+      var PRODUCT = "Overclock Arena";
+      var loader = document.getElementById("loader");
+      var mobile = document.getElementById("desktop-only");
+      document.getElementById("loader-title").textContent = PRODUCT;
+      document.getElementById("mobile-title").textContent = PRODUCT;
+      document.getElementById("mobile-msg").textContent = "데스크톱(마우스·키보드) 전용 게임이에요. PC에서 열어 주세요. — Desktop only: mouse & keyboard required.";
+      document.getElementById("copy-link").textContent = "링크 복사 · Copy link";
+      document.getElementById("run-anyway").textContent = "그래도 실행 · Run anyway";
+
+      function start() {
+        mobile.classList.add("hide");
+        loader.classList.remove("hide");
+        createUnityInstance(document.getElementById("unity-canvas"), {
+          arguments: [],
+          dataUrl: "Build/WebGL.data.unityweb",
+          frameworkUrl: "Build/WebGL.framework.js.unityweb",
+          codeUrl: "Build/WebGL.wasm.unityweb",
+          streamingAssetsUrl: "StreamingAssets",
+          companyName: "cityzen",
+          productName: PRODUCT,
+          productVersion: "1.0",
+          autoSyncPersistentDataPath: true,
+          // 포인터 락 거부(iframe 권한·헤드리스 등)는 치명 오류가 아니다 — 경고만 남기고 로더 alert를 막는다
+          errorHandler: function (message) {
+            if (/pointer ?lock/i.test(String(message))) { console.warn(message); return true; }
+            return false;
+          },
+        }, function (progress) {
+          document.getElementById("fill").style.width = (progress * 100) + "%";
+          document.getElementById("pct").textContent = Math.round(progress * 100) + "%";
+        }).then(function (unityInstance) {
+          window.unityInstance = unityInstance;
+          loader.classList.add("hide");
+          setTimeout(function () { loader.remove(); }, 600);
+          document.getElementById("unity-canvas").focus();
+        }).catch(function (message) {
+          document.getElementById("pct").textContent = String(message);
+        });
+      }
+
+      // 터치 전용 기기면 먼저 "데스크톱 전용" 안내(기획서 §4). 마우스가 있는 기기는 바로 로딩
+      var touchOnly = window.matchMedia && matchMedia("(pointer: coarse)").matches && !matchMedia("(pointer: fine)").matches;
+      document.getElementById("copy-link").addEventListener("click", function () {
+        var b = this;
+        if (navigator.clipboard) navigator.clipboard.writeText(location.href).then(function () { b.textContent = "복사됨 · Copied"; });
+      });
+      document.getElementById("run-anyway").addEventListener("click", start);
+      if (touchOnly) { loader.classList.add("hide"); mobile.classList.remove("hide"); }
+      else start();
+    </script>
+  </body>
+</html>
