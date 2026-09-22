@@ -25,6 +25,7 @@
 !/onvoicing
 !/todo
 !/fps
+!/fps-api
 
 # 의존성/빌드 산출물은 어느 앱이든 추적 제외
 node_modules/
@@ -49,3 +50,7 @@ __pycache__/
 !/design-tokens.css
 !/typography.css
 !/polaroid.css
+
+# fps-api 로컬 SQLite·캐시
+fps-api/*.db
+.pytest_cache/
