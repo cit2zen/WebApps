@@ -16,5 +16,6 @@
 !deeplearning/
 !reaction-duel/
 !fps/
+!subway/
 reaction-duel/Dockerfile
 reaction-duel/default.conf.template

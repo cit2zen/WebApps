@@ -9,4 +9,22 @@ server {
         add_header Cache-Control "no-cache";
         try_files $uri $uri/ =404;
     }
+
+    # subway (Unity WebGL) — Brotli 사전 압축 파일. decompressionFallback=false 라 Content-Encoding 헤더 필수.
+    # 빌드 파일명이 고정(nameFilesAsHashes=false)이라 immutable 장기 캐시 금지 → 재배포 후 옛 빌드 방지용 no-cache.
+    location ~ ^/subway/.+\.(data|symbols\.json)\.br$ {
+        add_header Content-Encoding br;
+        add_header Cache-Control "no-cache";
+        types { } default_type application/octet-stream;
+    }
+    location ~ ^/subway/.+\.js\.br$ {
+        add_header Content-Encoding br;
+        add_header Cache-Control "no-cache";
+        types { } default_type application/javascript;
+    }
+    location ~ ^/subway/.+\.wasm\.br$ {
+        add_header Content-Encoding br;
+        add_header Cache-Control "no-cache";
+        types { } default_type application/wasm;
+    }
 }

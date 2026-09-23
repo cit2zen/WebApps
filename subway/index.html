@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>subway</title>
+<link rel="stylesheet" href="TemplateData/overlay.css">
+<script src="TemplateData/overlay.js"></script>
+</head>
+<body>
+<canvas id="unity-canvas" tabindex="-1"></canvas>
+<div id="loading">
+  <div id="loading-bar"><div id="loading-fill"></div></div>
+  <div id="loading-text">노선도 불러오는 중…</div>
+</div>
+<div id="input-panel" hidden>
+  <div id="chips"></div>
+  <input id="answer" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" placeholder="역 이름을 입력하세요">
+</div>
+<script src="Build/subway.loader.js"></script>
+<script>
+  createUnityInstance(document.querySelector('#unity-canvas'), {
+    arguments: [],
+    dataUrl: "Build/subway.data.br",
+    frameworkUrl: "Build/subway.framework.js.br",
+    codeUrl: "Build/subway.wasm.br",
+    streamingAssetsUrl: "StreamingAssets",
+    companyName: "cityzen",
+    productName: "subway",
+    productVersion: "1.0",
+    devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2)
+  }, function (progress) {
+    document.getElementById('loading-fill').style.width = Math.round(progress * 100) + '%';
+  }).then(function (instance) {
+    window.unityInstance = instance;
+    document.getElementById('loading').hidden = true;
+  }).catch(function (err) {
+    document.getElementById('loading-text').textContent = '로딩 실패: ' + err;
+    console.error(err);
+  });
+</script>
+</body>
+</html>
