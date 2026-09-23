@@ -1,23 +1,23 @@
-# WebApps 모노레포 컨벤션
+# WebApps Monorepo Conventions
 
-## 스택
-- 기본: 빌드 스텝 없는 vanilla HTML/CSS/JS (ES modules, CDN import만 허용).
-- 서버 필요 앱은 **Flask** 허용(balancegame·onmantle·studyai 전례), Agent SDK 앱은 Next.js/Node(Dockerfile).
+## Stack
+- Default: vanilla HTML/CSS/JS with no build step (ES modules, CDN import only).
+- Apps that need a server may use **Flask** (precedent: balancegame·onmantle·studyai); Agent SDK apps use Next.js/Node (Dockerfile).
 
-## 코딩 규칙 (정적앱)
-- 함수 단일 책임, 파일당 200줄 이하 권장.
-- 게임 루프는 requestAnimationFrame, setInterval 금지.
+## Coding Rules (Static Apps)
+- Single responsibility per function; 200 lines or fewer per file recommended.
+- Game loops use requestAnimationFrame; setInterval is forbidden.
 
-## Flask 규칙
-- 진입점 `wsgi:app` + Procfile `web: gunicorn wsgi:app --bind 0.0.0.0:$PORT`.
-- 템플릿 autoescape 유지(`|safe` 남용 금지), 비밀번호·DB 접속은 환경변수로, DB는 Postgres(psycopg2/SQLAlchemy).
-- 업로드 파일은 영속 볼륨 경로(`uploads/`), Pillow로 처리.
+## Flask Rules
+- Entry point `wsgi:app` + Procfile `web: gunicorn wsgi:app --bind 0.0.0.0:$PORT`.
+- Keep template autoescape on (do not abuse `|safe`); passwords and DB credentials go through environment variables; the DB is Postgres (psycopg2/SQLAlchemy).
+- Uploaded files go to a persistent volume path (`uploads/`) and are processed with Pillow.
 
-## 실행 & 검증
-- 로컬: Live Server(정적) / `flask run`(Flask).
-- 검증 기준·배포 후 smoke는 **루트 `C:\factory\CLAUDE.md` 「검증 워크플로」가 단일 출처**(Playwright 스크린샷 + console.error 0개 등).
+## Running & Verification
+- Local: Live Server (static) / `flask run` (Flask).
+- For verification criteria and post-deploy smoke tests, **the "Verification workflow" section of the root `C:\factory\CLAUDE.md` is the single source of truth** (Playwright screenshot + 0 console.error, etc.).
 
-## Git / 배포
-- 원격 https://github.com/cit2zen/WebApps (`main`), 각 앱 = 자기 하위 폴더.
-- 이 폴더가 cit2zen/WebApps **직접 클론**(단일 소스) — 여기서 수정·커밋·푸시. 배포·도메인·호스팅 현황은 루트 CLAUDE.md 「배포」가 단일 출처.
-- `.gitignore` 화이트리스트 — 새 앱이면 `!/<폴더명>` 한 줄 추가. 스크린샷 등 산출물 커밋 금지.
+## Git / Deployment
+- Remote https://github.com/cit2zen/WebApps (`main`); each app = its own subfolder.
+- This folder is a **direct clone** of cit2zen/WebApps (single source) — edit, commit, and push here. For deployment, domain, and hosting status, the "Deployment" section of the root CLAUDE.md is the single source of truth.
+- `.gitignore` is a whitelist — for a new app, add one line `!/<폴더명>` (`<폴더명>` = folder name). Do not commit artifacts such as screenshots.
