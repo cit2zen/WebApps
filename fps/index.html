@@ -46,7 +46,10 @@
       // SDK는 await init() 전엔 쓸 수 없어 그 전 호출(loadingStart 등)은 큐에 쌓았다가 순서대로 보낸다
       window.FpsPortal = (function () {
         var host = location.hostname;
-        var want = /(^|\.)crazygames\.[a-z.]+$/.test(host) || /(^|\.)1001juegos\.com$/.test(host) || /[?&]useLocalSdk=true(&|$)/.test(location.search);
+        // iframe 안(포털·QA 미리보기·파트너 도메인)이면 SDK를 불러 environment로 판정 — crazygames|local이 아니면 off
+        var framed = false;
+        try { framed = window.self !== window.top; } catch (e) { framed = true; }
+        var want = framed || /(^|\.)crazygames\.[a-z.]+$/.test(host) || /(^|\.)1001juegos\.com$/.test(host) || /[?&]useLocalSdk=true(&|$)/.test(location.search);
         var p = { state: want ? 1 : 3, portal: want, sdk: null, queue: [] };
         function ready() { return p.state === 2; }
         p.call = function (fn) {
