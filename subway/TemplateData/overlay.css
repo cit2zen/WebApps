@@ -1,7 +1,7 @@
 :root { --bg-base: #ece7dc; --bg-card: #ffffff; --gold-mid: #c0a060; --ink-warm: #1a1005; --ink-light: #a09060; }
 [hidden] { display: none !important; }   /* #loading의 display:flex가 hidden 속성을 덮지 않게 */
-html, body { margin: 0; height: 100%; background: var(--bg-base); overflow: hidden; font-family: 'Pretendard', system-ui, sans-serif; }
-#unity-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+html, body { margin: 0; height: 100%; background: var(--bg-base); overflow: hidden; overscroll-behavior: none; font-family: 'Pretendard', system-ui, sans-serif; }
+#unity-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; overscroll-behavior: none; }   /* iOS: 핀치·당겨서 새로고침을 페이지가 가로채지 않게 (maximum-scale=1은 무시됨) */
 #loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: var(--bg-base); color: var(--ink-warm); }
 #loading-bar { width: 60%; max-width: 320px; height: 6px; background: var(--bg-card); border-radius: 999px; overflow: hidden; }
 #loading-fill { width: 0; height: 100%; background: var(--gold-mid); transition: width .2s; }
