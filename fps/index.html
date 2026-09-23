@@ -67,7 +67,19 @@
         };
         p.muted = function () { try { return ready() && !!p.sdk.game.settings.muteAudio; } catch (e) { return false; } };
         p.locale = function () { try { return ready() ? String(p.sdk.user.systemInfo.locale || "") : ""; } catch (e) { return ""; } };
-        function off(e) { if (e) console.warn("[portal] SDK off", e); p.state = 3; p.queue = []; }
+        // Data 모듈(진행 저장, localStorage와 같은 동기 API · 문자열) — 준비 전·포털 밖은 null/no-op → C# Prefs가 PlayerPrefs로 폴백
+        p.dataGet = function (k) { try { return ready() ? p.sdk.data.getItem(k) : null; } catch (e) { return null; } };
+        p.dataSet = function (k, v) { try { if (ready()) p.sdk.data.setItem(k, v); } catch (e) { console.warn("[portal] data", e); } };
+        p.dataDel = function (k) { try { if (ready()) p.sdk.data.removeItem(k); } catch (e) {} };
+        // SDK init이 끝나거나(성공·실패) 8초가 지나면 cb — Unity 시작 전에 Data 모듈이 준비되도록 로더가 기다린다
+        var waiters = [];
+        function settle() { var w = waiters; waiters = []; w.forEach(function (f) { f(); }); }
+        p.settled = function (cb) {
+          if (p.state !== 1) return cb();
+          waiters.push(cb);
+          setTimeout(function () { if (p.state === 1) off("init timeout"); settle(); }, 8000);
+        };
+        function off(e) { if (e) console.warn("[portal] SDK off", e); p.state = 3; p.queue = []; settle(); }
         if (want) {
           var s = document.createElement("script");
           s.src = "https://sdk.crazygames.com/crazygames-sdk-v3.js";
@@ -81,6 +93,7 @@
               p.state = 2;
               var q = p.queue; p.queue = [];
               q.forEach(p.call);
+              settle();
             }).catch(off);
           };
           document.head.appendChild(s);
@@ -139,6 +152,10 @@
         mobile.classList.add("hide");
         loader.classList.remove("hide");
         window.FpsPortal.call("loadingStart"); // 포털: 로딩 구간 표시(포털 밖 no-op)
+        window.FpsPortal.settled(boot);
+      }
+
+      function boot() {
         createUnityInstance(document.getElementById("unity-canvas"), {
           arguments: [],
           dataUrl: "Build/WebGL.data.unityweb",
