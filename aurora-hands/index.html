@@ -5,120 +5,109 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>오로라 핸드 — 손동작 인터랙티브 시뮬레이션</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🖐️</text></svg>" />
-<link rel="stylesheet" href="../design-tokens.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,100;1,200;1,300&family=Space+Mono&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,100..400&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500&family=Space+Mono&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../design-tokens.css">
+<link rel="stylesheet" href="../typography.css">
+<link rel="stylesheet" href="../polaroid.css">
+<link rel="stylesheet" href="../pol-ui.css">
 <style>
-  :root { color-scheme: dark; }
-  html, body {
-    margin: 0; padding: 0; height: 100%; width: 100%;
-    background: #05060a; overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    color: #e6e9f5;
-  }
+  /* 오로라 핸드 — Polaroid Editorial v2. 색은 var() 토큰만.
+     WebGL 오로라(가산 합성 입자)는 어두운 배경에서만 보이므로 씬 색은 원래대로 두고,
+     그 위 DOM 크롬(패널·힌트·로비)만 인화지 톤으로. */
+  html, body { width: 100%; height: 100%; overflow: hidden; }
   #stage { position: fixed; inset: 0; }
   canvas, video { position: absolute; inset: 0; width: 100%; height: 100%; }
   #video { opacity: 0; pointer-events: none; }
   #fx { display: block; }
+
+  /* 인화지 결: 로비(z 500) 위로 올리고, 체험 중(WebGL 화면)에는 끈다 */
+  .pol-body:has(#overlay:not(.hidden))::after { z-index: 600; }
+  .pol-body:has(#overlay.hidden)::after { display: none; }
+
+  /* 허브로 돌아가기 — 일시정지 화면이 없는 체험이라 로비가 닫혀도 계속 보이게 + 터치 40px */
+  .pol-back-btn { display: inline-flex; align-items: center; box-sizing: border-box; min-height: 40px; }
+  body:has(.pol-lobby.hidden) .pol-back-btn { opacity: 1; pointer-events: auto; background: var(--paper); box-shadow: var(--shadow-soft); }
+
+  /* 체험 중 컨트롤 패널 — 흰 인화지 한 장 (.pol-back-btn 아래) */
   #ui {
-    position: fixed; left: 16px; top: 14px; z-index: 10;
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-    background: rgba(10,14,24,0.45);
-    border: 1px solid rgba(255,255,255,0.08);
-    padding: 10px 14px; border-radius: 12px;
-    font-size: 12.5px; line-height: 1.45; max-width: 360px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+    position: fixed; left: 14px; top: 64px; z-index: 10;
+    width: max-content; max-width: min(360px, calc(100vw - 28px));
+    padding: var(--space-3) var(--space-4) var(--space-4);
     word-break: keep-all;
   }
   #ui h1 {
-    margin: 0 0 6px 0; font-size: 13.5px; font-weight: 600;
-    letter-spacing: 0.4px;
-    background: linear-gradient(90deg,#7df9ff,#b388ff,#ff6ec7);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin: 0 0 var(--space-1);
+    font-family: var(--font-display); font-style: italic; font-synthesis: none; font-weight: 400;
+    font-size: var(--fs-title); line-height: 1.2; color: var(--ink-warm);
   }
-  #ui small { color: #95a0bd; }
-  #ui .row { display:flex; align-items:center; gap: 8px; margin-top: 6px; flex-wrap: wrap;}
-  #ui button {
-    appearance: none; border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.06); color: #e6e9f5;
-    padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 12px;
-    transition: background .15s ease, transform .15s ease;
-  }
-  #ui button:hover { background: rgba(255,255,255,0.12); }
-  #ui button:active { transform: translateY(1px); }
-  #status { color:#8fb4ff; font-variant-numeric: tabular-nums; font-size:11.5px; }
+  #ui small { display: block; font-family: var(--font-body); font-size: var(--fs-sm); line-height: 1.55; color: var(--ink-muted); }
+  #ui .row { display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-3); flex-wrap: wrap; }
+  #ui .pol-btn-ghost { min-height: 40px; }
+  #camSelect { width: auto; max-width: 100%; min-height: 40px; padding: 6px 10px; font-size: var(--fs-sm); }
+  #status { font-family: var(--font-label); font-size: var(--fs-xs); color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+  .gtag { font-size: var(--fs-xs); padding: 3px 10px; transition: opacity var(--dur-fast) ease; }
+
+  /* 제스처 힌트 — 하단 종이 알약 */
   #hint {
-    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
-    z-index: 10; color: #9aa6c7; font-size: 12px; letter-spacing:.3px;
-    background: rgba(10,14,24,0.35); padding: 6px 12px; border-radius: 999px;
-    border:1px solid rgba(255,255,255,0.06);
-    max-width: 90vw; text-align: center; word-break: keep-all;
+    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 10;
+    width: max-content; max-width: calc(100vw - 32px);
+    padding: 8px 16px;
+    font-family: var(--font-label); font-size: var(--fs-xs); line-height: 1.6; color: var(--ink-mid);
+    text-align: center; word-break: keep-all;
+    background: var(--paper); border: 1px solid var(--rule-color); border-radius: var(--r-pill);
+    box-shadow: var(--shadow-soft);
   }
-  #overlay {
-    position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
-    background: var(--bg-base);
-    transition: opacity .4s ease; opacity: 1; pointer-events: auto;
-  }
-  #overlay.hidden { opacity: 0; pointer-events: none; }
-  #err { color:#a03020; font-size:12px; margin-top:10px; min-height: 16px; max-width: 320px; text-align: center; word-break: keep-all; }
-  #loader { margin-top: 14px; display: flex; justify-content: center; }
+
+  /* 로비(.pol-lobby kit) — 권한 요청·로딩·오류 상태 포함 */
+  #overlay { overflow-y: auto; justify-content: safe center; }
+  .pol-lhelp { margin: 0; }
+  #err { max-width: 320px; text-align: center; word-break: keep-all; }
+  #err:empty { display: none; }
+  #loader { display: flex; justify-content: center; }
   #loader.hidden { display: none; }
-  #loader .spin {
-    width: 26px; height: 26px; border-radius: 50%;
-    border: 3px solid rgba(255,255,255,0.15);
-    border-top-color: #7df9ff;
-    animation: ah-spin .8s linear infinite;
+  #loader .pol-spinner { display: block; }
+  #startBtn:disabled { opacity: 0.6; cursor: progress; transform: none; }
+
+  /* 로비 폴라로이드 사진 아트 — 인화지 위 오로라 띠 + 손 */
+  .lp-sky { fill: var(--cream-200); }
+  .lp-band { fill: none; stroke-linecap: round; }
+  .lp-band-1 { stroke: var(--gold-light); stroke-width: 7; opacity: 0.8; }
+  .lp-band-2 { stroke: var(--gold-mid); stroke-width: 2.5; }
+  .lp-band-3 { stroke: var(--ink-light); stroke-width: 1.2; stroke-dasharray: 2 3; }
+  .lp-dot { fill: var(--gold-mid); }
+  .lp-hand { fill: var(--ink-mid); stroke: var(--ink-mid); stroke-width: 7; stroke-linecap: round; }
+
+  @media (max-width: 640px) {
+    #ui { padding: var(--space-3); }
+    #ui small { display: none; }
+    #hint { bottom: 12px; border-radius: var(--r-md); }
   }
-  @keyframes ah-spin { to { transform: rotate(360deg); } }
-  .gtag {
-    display:inline-block; padding: 2px 7px; border-radius: 6px;
-    font-size: 11px; letter-spacing: .4px; text-transform: uppercase;
-    border:1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04);
-    color:#cfd6ec;
-  }
-  /* keep the in-game UI panel clear of the fixed .pol-back-btn (top-left) */
-  #ui { top: 60px; }
   @media (prefers-reduced-motion: reduce) {
-    #loader .spin { animation: none; border-top-color: rgba(255,255,255,0.3); }
-    #overlay { transition: none; }
+    #loader .pol-spinner { animation: none; }
+    .gtag { transition: none; }
   }
-
-/* Polaroid Lobby 2026-06-07 */
-#overlay.pol-lobby{position:fixed;inset:0;background:var(--bg-base);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:500}
-.pol-lcard{background:var(--bg-card);padding:5px 5px 22px;width:140px;box-shadow:var(--shadow-card);transform:rotate(-3deg);flex-shrink:0}
-.pol-lphoto{width:100%;aspect-ratio:1 / 1}
-.pol-lnum{font-family:var(--font-display);font-style:italic;font-weight:100;font-size:.6rem;color:var(--gold-mid);display:block;margin-top:5px}
-.pol-ltag{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.66rem;color:var(--ink-light);text-align:center;margin-top:2px;display:block}
-.pol-ltitle{font-family:var(--font-display);font-style:italic;font-weight:300;font-size:clamp(1.9rem,5vw,3rem);color:var(--ink-warm);line-height:1;text-align:center}
-.pol-ldesc{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.86rem;color:var(--ink-mid);text-align:center;max-width:260px;line-height:1.55;word-break:keep-all}
-.pol-lbtn{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.88rem;letter-spacing:.16em;color:var(--gold-mid);background:var(--bg-card);border:1px solid rgba(192,160,96,.45);padding:11px 46px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:box-shadow .3s,transform .3s;margin-top:6px}
-.pol-lbtn:hover{box-shadow:0 8px 22px rgba(0,0,0,.15);transform:translateY(-2px)}
-.pol-llabel{font-family:var(--font-mono);font-size:.57rem;color:var(--ink-light);letter-spacing:.09em;text-transform:uppercase}
-
-/* pol-back-btn */
-.pol-back-btn{position:fixed;top:14px;left:14px;font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.78rem;color:var(--gold-mid);text-decoration:none;letter-spacing:.06em;z-index:9999;background:rgba(236,231,220,.88);padding:6px 14px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1px solid rgba(192,160,96,.25);transition:color .2s,background .2s}
-.pol-back-btn:hover{color:var(--ink-warm);background:rgba(236,231,220,.98)}
 </style>
 </head>
-<body>
+<body class="pol-body">
 <div id="stage">
   <video id="video" autoplay playsinline muted></video>
   <canvas id="fx"></canvas>
 </div>
 
-<div id="ui">
+<div id="ui" class="pol-panel">
   <h1>오로라 핸드</h1>
   <small>카메라 앞에서 손을 움직여 보세요. 손동작마다 다른 효과가 나타납니다.</small>
   <div class="row">
-    <button id="modeBtn">팔레트: 네뷸라</button>
-    <button id="mirrorBtn">좌우반전: 끔</button>
-    <select id="camSelect" aria-label="카메라 선택" style="display:none; background:rgba(255,255,255,0.06); color:#e6e9f5; border:1px solid rgba(255,255,255,0.12); padding:5px 8px; border-radius:8px; font-size:12px;"></select>
+    <button id="modeBtn" class="pol-btn-ghost pol-btn-sm">팔레트: 네뷸라</button>
+    <button id="mirrorBtn" class="pol-btn-ghost pol-btn-sm">좌우반전: 끔</button>
+    <select id="camSelect" class="pol-select" aria-label="카메라 선택" style="display:none"></select>
     <span id="status">—</span>
   </div>
   <div class="row" id="gestureRow">
-    <span class="gtag" id="g0">—</span>
-    <span class="gtag" id="g1">—</span>
+    <span class="gtag pol-badge" id="g0">—</span>
+    <span class="gtag pol-badge" id="g1">—</span>
   </div>
 </div>
 
@@ -126,16 +115,32 @@
 
 <div id="overlay" class="pol-lobby">
 <div class="pol-lcard">
-  <div class="pol-lphoto" style="background:linear-gradient(145deg,#9ab0be,#5a7080)"></div>
+  <div class="pol-lphoto">
+    <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+      <rect class="lp-sky" width="100" height="100" />
+      <path class="lp-band lp-band-1" d="M-4 34C14 16 30 44 50 28S84 14 104 30" />
+      <path class="lp-band lp-band-2" d="M-4 42C16 28 32 52 52 38S86 26 104 40" />
+      <path class="lp-band lp-band-3" d="M-4 22C18 10 34 30 54 18S88 8 104 18" />
+      <circle class="lp-dot" cx="22" cy="54" r="1.4" />
+      <circle class="lp-dot" cx="74" cy="50" r="1.8" />
+      <circle class="lp-dot" cx="84" cy="62" r="1.1" />
+      <circle class="lp-dot" cx="14" cy="68" r="1" />
+      <g class="lp-hand">
+        <path d="M42 70L40 54M48 68V50M54 68L56 52M60 71L64 58M40 80L31 72" fill="none" />
+        <rect x="39" y="68" width="24" height="22" rx="9" stroke-width="2" />
+      </g>
+    </svg>
+  </div>
   <span class="pol-lnum">cityzen</span>
-  <span class="pol-ltag">aurora</span>
+  <span class="pol-ltag">aurora hands</span>
 </div>
-<h2 class="pol-ltitle">aurora</h2>
+<h2 class="pol-ltitle">오로라 핸드</h2>
 <p class="pol-ldesc">손으로 빛을 그려라.</p>
+<p class="pol-lhelp">시작하면 카메라 권한을 요청합니다.</p>
 <button class="pol-lbtn" id="startBtn">시작하기</button>
 <span class="pol-llabel">cityzen &middot; AI - Vision</span>
-<div id="loader" class="hidden" aria-hidden="true"><span class="spin"></span></div>
-<div id="err"></div>
+<div id="loader" class="hidden" aria-hidden="true"><span class="pol-spinner"></span></div>
+<div id="err" class="pol-alert" role="alert"></div>
 </div>
 
 <!-- MediaPipe Hands (global) -->
@@ -868,6 +873,6 @@ function animate() {
 animate();
 </script>
 
-<a class="pol-back-btn" href="https://games.cityzen.kr">&#8592; 게임 허브</a>
+<a class="pol-back-btn" href="../">&#8592; 게임 허브</a>
 </body>
 </html>
