@@ -42,6 +42,7 @@ window.SubwayInput = (function () {
     });
   }
   function clear() { input.value = ''; chips.textContent = ''; }
+  // hidden 패널도 CSS상 display:block(출처 줄만 표시) — 표시 여부 판정은 panel.hidden / #answer 가시성으로
   function setVisible(v) { panel.hidden = !v; if (v) input.focus(); }
   function bind(name) { target = name; }
 
