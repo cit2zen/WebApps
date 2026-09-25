@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import ProductCard from './ProductCard';
 import ComparisonTable from './ComparisonTable';
+import { AlertMark } from './Marks';
 import { readNdjson } from '@/lib/util/ndjson';
 import type { Recommendation } from '@/lib/types';
 
@@ -14,6 +15,8 @@ const STAGE_LABEL: Record<string, string> = {
   evaluating: '매물 신뢰도 평가 중…',
   ranking: '최적 추천 정리 중…',
 };
+/** 로딩 단계 순서 — 진행 표시 눈금용 */
+const STAGE_ORDER = Object.keys(STAGE_LABEL);
 /** 첫 진입 온보딩 예시(클릭 즉시 sendText) */
 const EXAMPLE_PROMPTS = [
   '코딩용 무선 기계식 키보드 10만원',
@@ -168,20 +171,20 @@ export default function Chat() {
   return (
     <div className="ss-chat">
       <div className="ss-toolbar">
-        <button onClick={resetConversation} disabled={loading} className="ss-btn ghost" aria-label="새 대화">
+        <button onClick={resetConversation} disabled={loading} className="pol-btn-ghost pol-btn-sm ss-newchat" aria-label="새 대화">
           + 새 대화
         </button>
       </div>
       <div className="ss-stream" role="log" aria-live="polite" aria-atomic="false">
         {msgs.length === 0 && !loading && (
-          <div className="ss-empty-state">
+          <div className="ss-empty-state pol-panel">
             <p className="ss-welcome">
               무엇을 왜 사는지 알려주시면, <span>목적에 맞는 신뢰할 수 있는 최저가</span>를 찾아드려요.
             </p>
-            <span className="ss-hint">이렇게 물어보세요</span>
+            <span className="ss-hint pol-eyebrow">이렇게 물어보세요</span>
             <div className="ss-examples" role="group" aria-label="예시 검색">
               {EXAMPLE_PROMPTS.map((ex) => (
-                <button key={ex} onClick={() => sendText(ex)} disabled={loading} className="ss-chip">
+                <button key={ex} onClick={() => sendText(ex)} disabled={loading} className="pol-chip ss-chip">
                   {ex}
                 </button>
               ))}
@@ -195,10 +198,10 @@ export default function Chat() {
           return (
           <div key={i} className="ss-turn">
             {m.error && (
-              <div className="ss-error" role="alert">
+              <div className="ss-error pol-alert" role="alert">
                 <span className="ss-error-label">오류</span>
                 <span>{m.text}</span>
-                <button type="button" onClick={retryLast} disabled={loading} className="ss-btn ghost">
+                <button type="button" onClick={retryLast} disabled={loading} className="pol-btn-ghost pol-btn-sm ss-retry">
                   다시 시도
                 </button>
               </div>
@@ -237,7 +240,7 @@ export default function Chat() {
                     {m.rec.askUser.options && m.rec.askUser.options.length > 0 && (
                       <div className="ss-chips" role="group" aria-label="추천 옵션">
                         {m.rec.askUser.options.map((opt) => (
-                          <button key={opt} onClick={() => sendText(opt)} disabled={loading} className="ss-chip">
+                          <button key={opt} onClick={() => sendText(opt)} disabled={loading} className="pol-chip ss-chip">
                             {opt}
                           </button>
                         ))}
@@ -246,12 +249,12 @@ export default function Chat() {
                   </div>
                 )}
                 {comparableCount >= 2 && (
-                  <div className="ss-tabs" role="group" aria-label="보기 전환">
+                  <div className="ss-tabs pol-seg" role="group" aria-label="보기 전환">
                     <button
                       type="button"
                       onClick={() => setViews((v) => ({ ...v, [i]: 'cards' }))}
                       aria-pressed={view === 'cards'}
-                      className={`ss-tab ${view === 'cards' ? 'active' : ''}`}
+                      className={`ss-tab ${view === 'cards' ? 'is-active' : ''}`}
                     >
                       카드
                     </button>
@@ -259,7 +262,7 @@ export default function Chat() {
                       type="button"
                       onClick={() => setViews((v) => ({ ...v, [i]: 'table' }))}
                       aria-pressed={view === 'table'}
-                      className={`ss-tab ${view === 'table' ? 'active' : ''}`}
+                      className={`ss-tab ${view === 'table' ? 'is-active' : ''}`}
                     >
                       비교표
                     </button>
@@ -274,16 +277,22 @@ export default function Chat() {
                       .map((r, idx) => <ProductCard key={r.listing.id} {...r} rank={idx + 1} />)
                   ))}
                 {m.rec.ranked.length === 0 && !m.rec.askUser && (
-                  <div className="ss-empty">
-                    {m.rec.degraded
-                      ? '⚠️ 일시적으로 모든 쇼핑몰 검색에 실패했어요. 잠시 후 다시 시도해 주세요.'
-                      : '조건에 맞는 매물을 찾지 못했어요.'}
+                  <div className={`ss-empty ${m.rec.degraded ? 'pol-alert-warn' : 'pol-panel-quiet'}`}>
+                    {m.rec.degraded ? <AlertMark /> : null}
+                    <span>
+                      {m.rec.degraded
+                        ? '일시적으로 모든 쇼핑몰 검색에 실패했어요. 잠시 후 다시 시도해 주세요.'
+                        : '조건에 맞는 매물을 찾지 못했어요.'}
+                    </span>
                   </div>
                 )}
                 {m.failedSources && m.failedSources.length > 0 && (
                   <div className="ss-warn">
-                    ⚠ 일부 소스에서 결과를 못 가져왔어요:{' '}
-                    {m.failedSources.map((s) => SOURCE_LABEL[s] ?? s).join(', ')}
+                    <AlertMark size={13} />
+                    <span>
+                      일부 소스에서 결과를 못 가져왔어요:{' '}
+                      {m.failedSources.map((s) => SOURCE_LABEL[s] ?? s).join(', ')}
+                    </span>
                   </div>
                 )}
               </div>
@@ -293,17 +302,30 @@ export default function Chat() {
         })}
         {loading && (
           <div className="ss-loading" role="status">
-            <span className="ss-spinner" aria-hidden />
-            {stage ? STAGE_LABEL[stage] ?? 'ShopScout가 찾는 중…' : 'ShopScout가 찾는 중…'}
+            <span className="pol-spinner ss-spinner" aria-hidden />
+            <span className="ss-loading-label">
+              {stage ? STAGE_LABEL[stage] ?? 'ShopScout가 찾는 중…' : 'ShopScout가 찾는 중…'}
+            </span>
+            <span className="ss-steps" aria-hidden>
+              {STAGE_ORDER.map((s, k) => (
+                <span
+                  key={s}
+                  className={`ss-step ${stage && k <= STAGE_ORDER.indexOf(stage) ? 'is-done' : ''}`}
+                />
+              ))}
+            </span>
           </div>
         )}
         {loading && stage && SKELETON_STAGES.has(stage) && (
           <div className="ss-skel-group" aria-hidden>
             {[0, 1, 2].map((k) => (
               <div key={k} className="ss-skel-card">
-                <div className="ss-skeleton" style={{ width: '60%' }} />
-                <div className="ss-skeleton" style={{ width: '85%' }} />
-                <div className="ss-skeleton" style={{ width: '40%' }} />
+                <div className="ss-skel-photo" />
+                <div className="ss-skel-lines">
+                  <div className="ss-skeleton w60" />
+                  <div className="ss-skeleton w85" />
+                  <div className="ss-skeleton w40" />
+                </div>
               </div>
             ))}
           </div>
@@ -320,11 +342,11 @@ export default function Chat() {
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          className="ss-input"
+          className="pol-input ss-input"
           aria-label="상품 검색 입력"
           placeholder="무엇을 찾으세요? (예: 코딩용 무선 기계식 키보드 10만원)"
         />
-        <button type="submit" disabled={loading} className="ss-btn primary">
+        <button type="submit" disabled={loading} className="pol-btn-primary ss-send">
           보내기
         </button>
       </form>

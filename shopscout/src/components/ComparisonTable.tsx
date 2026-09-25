@@ -1,5 +1,7 @@
 'use client';
+import type { ReactNode } from 'react';
 import { totalPrice, type RankedItem } from '@/lib/types';
+import { AlertMark, CheckMark, StarMark } from './Marks';
 
 const FACTOR_NAMES: Record<string, string> = {
   a: '후기',
@@ -19,22 +21,45 @@ export default function ComparisonTable({ items }: { items: RankedItem[] }) {
   if (top.length < 2) return null;
   return (
     <div className="ss-table-wrap">
-      <table className="ss-table">
+      <table className="ss-table pol-table">
         <thead>
           <tr>
             <th>항목</th>
             {top.map((r, i) => (
               <th key={r.listing.id}>
-                {i === 0 && r.evaluation.passesTrustThreshold ? '⭐ ' : ''}
+                {i === 0 && r.evaluation.passesTrustThreshold ? (
+                  <span className="ss-sr">추천 1위 · </span>
+                ) : null}
+                {i === 0 && r.evaluation.passesTrustThreshold ? <StarMark size={12} /> : null}
                 {r.listing.marketplace}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          <Row label="가격(총)" cells={top.map((r) => `${totalPrice(r.listing).toLocaleString()}원`)} />
-          <Row label="신뢰" cells={top.map((r) => `${r.evaluation.trustScore}점`)} />
-          <Row label="통과" cells={top.map((r) => (r.evaluation.passesTrustThreshold ? '✅' : '⚠️'))} />
+          <Row
+            label="가격(총)"
+            cells={top.map((r) => (
+              <span className="ss-num">{totalPrice(r.listing).toLocaleString()}원</span>
+            ))}
+          />
+          <Row label="신뢰" cells={top.map((r) => <span className="ss-num">{r.evaluation.trustScore}점</span>)} />
+          <Row
+            label="통과"
+            cells={top.map((r) =>
+              r.evaluation.passesTrustThreshold ? (
+                <span className="ss-verdict is-ok">
+                  <CheckMark size={13} />
+                  통과
+                </span>
+              ) : (
+                <span className="ss-verdict is-flag">
+                  <AlertMark size={13} />
+                  주의
+                </span>
+              ),
+            )}
+          />
           {FACTOR_ORDER.filter((code) =>
             top.some((r) => r.evaluation.factors.some((x) => x.code === code)),
           ).map((code) => (
@@ -53,10 +78,12 @@ export default function ComparisonTable({ items }: { items: RankedItem[] }) {
   );
 }
 
-function Row({ label, cells }: { label: string; cells: string[] }) {
+function Row({ label, cells }: { label: string; cells: ReactNode[] }) {
   return (
     <tr>
-      <td className="ss-rowlabel">{label}</td>
+      <th scope="row" className="ss-rowlabel">
+        {label}
+      </th>
       {cells.map((c, i) => (
         <td key={i}>{c}</td>
       ))}
