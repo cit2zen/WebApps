@@ -122,7 +122,7 @@ function drawPackPhoto(cv, k, p, locked) {
   ctx.setTransform(2 * size / 96, 0, 0, 2 * size / 96, 0, 0);   // 96 기준 좌표계
   if (locked) {
     ctx.globalAlpha = 0.5; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.font = '36px sans-serif'; ctx.fillText('🔒', 48, 50); ctx.globalAlpha = 1; return;
+    ctx.font = '36px ' + cssVar('--font-mono'); ctx.fillText('🔒', 48, 50); ctx.globalAlpha = 1; return;
   }
   const on = cssVar('--gold-mid'), off = cssVar('--cream-400');
   for (let i = 0; i < 10; i++) {                                 // 5×2 점, 지름 12·gap 8 → 92×32 중앙

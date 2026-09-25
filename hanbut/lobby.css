@@ -1,8 +1,9 @@
 /* hanbut 로비·도움말·설정·결과·팩 완료 — Polaroid Editorial */
 
-/* ── hanbut 정본 대비 오버라이드 6줄(§4) ── */
-@media (max-width: 640px) { #packs { flex-direction: row; gap: 12px; --pol-width: 96px; } }
-@media (min-width: 641px) { .pol-group.open { min-height: 420px; } }
+/* ── 정본 대비 오버라이드(§4) · 팩 카드: 정본 cascade/pyramid는 3장 전용 → 팩 4~12용 가로 스크롤 행(전 폭, 기울기만) ── */
+#packs.pol-group, #packs.pol-group.open { display: flex; flex-direction: row; justify-content: flex-start; gap: 12px; min-height: auto; max-width: 100%; overflow-x: auto; padding: 12px 16px 16px; scroll-snap-type: x proximity; --pol-width: 96px; cursor: default; scrollbar-width: thin; scrollbar-color: var(--cream-400) transparent; }
+#packs.pol-group .pol-card { position: relative; left: auto; top: auto; margin: 0; flex: 0 0 auto; scroll-snap-align: center; }
+#packs.pol-group .pol-card:nth-child(odd), #packs.pol-group.open .pol-card:nth-child(odd) { transform: rotate(-2deg); } #packs.pol-group .pol-card:nth-child(even), #packs.pol-group.open .pol-card:nth-child(even) { transform: rotate(2deg); }
 .pol-photo > canvas { display: block; width: 100%; height: 100%; }
 #lobby .t-display { font-size: 46px; line-height: 1; }
 #result .t-title { font-size: 20px; white-space: nowrap; }

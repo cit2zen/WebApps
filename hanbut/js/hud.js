@@ -162,7 +162,7 @@ export function slideIn(dir) {
 export function showPause(auto) {
   const ov = E['overlay-pause'];
   if (!ov) return;
-  const title = ov.querySelector('#pause-title, .pause-title, h2, .t-title')
+  const title = ov.querySelector('#pause-title, .pause-title, h2')
     || ov.insertBefore(el('p', 'pause-title'), ov.firstChild);
   setText(title, auto ? 'tapToContinue' : 'paused');
   syncToggles(store.loadSettings());

@@ -15,7 +15,7 @@ const STEP_DT = 16.7;
 export function installHook(ctx) {
   const { game, clock, board, play } = ctx;
   const view = () => game.view();
-  const state = () => game.state();
+  const state = () => (typeof game.pending === 'function' && game.pending()) || game.state();   // 수락된 예약 전이 포함(§8 단계 7)
   const level = () => (typeof game.level === 'function' ? game.level() : view().level) || null;
 
   function drawNow() { if (!play.hidden) render.draw(game.view(), fx.list()); }
