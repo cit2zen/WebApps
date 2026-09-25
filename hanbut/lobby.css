@@ -1,0 +1,199 @@
+/* hanbut 로비·도움말·설정·결과·팩 완료 — Polaroid Editorial */
+
+/* ── hanbut 정본 대비 오버라이드 6줄(§4) ── */
+@media (max-width: 640px) { #packs { flex-direction: row; gap: 12px; --pol-width: 96px; } }
+@media (min-width: 641px) { .pol-group.open { min-height: 420px; } }
+.pol-photo > canvas { display: block; width: 100%; height: 100%; }
+#lobby .t-display { font-size: 46px; line-height: 1; }
+#result .t-title { font-size: 20px; white-space: nowrap; }
+#result .pol-caption, #packdone .pol-caption { color: var(--gold-mid); }
+
+/* 정본 카드는 content-box 기준(106 = 96 + 패딩 10) — style.css 전역 border-box 해제 */
+.pol-card { box-sizing: content-box; }
+
+/* ── 로비 레이아웃 (390×844 표) ── */
+#lobby {
+  height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.lb-top {
+  flex: 0 0 56px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lb-spacer { flex: 1 1 auto; }
+#btn-hub { color: var(--gold-mid); font-size: 12px; white-space: nowrap; }
+#btn-help, #btn-settings { color: var(--ink-mid); }
+
+.lb-title {
+  flex: 0 0 96px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+.lb-continue { flex: 0 0 auto; padding-top: 16px; }
+#lobby-msg { margin-top: 8px; color: var(--hb-alert); text-align: center; }
+
+/* 템플릿 .btn-start 스타일(:hover 그림자는 --shadow-card-lift로 교정) */
+.hb-btn {
+  display: block;
+  width: 100%;
+  max-width: 358px;
+  height: 56px;
+  margin: 0 auto;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--ink-warm);
+  background: var(--bg-card);
+  border: 1px solid var(--gold-mid);
+  box-shadow: var(--shadow-card);
+}
+.hb-btn:hover { box-shadow: var(--shadow-card-lift); }
+
+/* ── 팩 카드 행 ── */
+#packs { margin-top: 16px; flex: 0 0 auto; justify-content: center; }
+#packs .pol-card { cursor: pointer; }
+#packs .pol-card.is-selected { outline: 2px solid var(--gold-mid); outline-offset: -2px; }
+#packs .pol-card.is-locked .pol-photo { opacity: 0.5; }
+.nudge { animation: hb-nudge 120ms linear; }
+@keyframes hb-nudge {
+  0%, 100% { translate: 0 0; }
+  25% { translate: -4px 0; }
+  75% { translate: 4px 0; }
+}
+
+/* ── 레벨 칩 패널 (5×2, gap 8, 패딩 12) ── */
+#lvl-panel {
+  margin-top: 12px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+}
+.chip {
+  height: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 0;
+  border: 1px solid var(--rule-color);
+  background: var(--cream-100);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink-warm);
+}
+.chip > * + * {
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--gold-mid);
+  white-space: nowrap;
+}
+.chip.is-locked, .chip[aria-disabled="true"] {
+  background: var(--cream-400);
+  color: var(--ink-light);
+}
+.chip.is-locked > * + *, .chip[aria-disabled="true"] > * + * { color: var(--ink-light); }
+
+#best {
+  margin-top: 12px;
+  flex: 0 0 40px;
+  line-height: 40px;
+  text-align: center;
+}
+
+/* 시트가 열린 동안 로비 인터랙션 차단 */
+body:has(#help:not([hidden])) #lobby,
+body:has(#settings:not([hidden])) #lobby { pointer-events: none; }
+
+/* ── 도움말·설정 시트 ── */
+.hb-sheet {
+  width: 358px;
+  max-width: 100%;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+}
+.hb-sheet .t-body { align-self: stretch; }
+.hb-row {
+  width: 100%;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  border: 0;
+  border-bottom: 1px solid var(--rule-color);
+  background: transparent;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--ink-mid);
+}
+.hb-row.hb-toggle::after {
+  content: '';
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 11px 50%, var(--bg-card) 8px, transparent 9px) var(--cream-400);
+  transition: background-position 150ms ease;
+}
+.hb-row.hb-toggle.on::after {
+  background: radial-gradient(circle at 29px 50%, var(--bg-card) 8px, transparent 9px) var(--gold-mid);
+}
+#btn-wipe { color: var(--hb-alert); }
+
+/* ── 결과 카드 ── */
+#result { cursor: pointer; }
+.result-sub { text-align: center; margin-top: 2px; }
+.res-actions { display: flex; gap: 12px; width: 358px; max-width: 100%; }
+.res-actions:empty, .res-actions:not(:has(:not([hidden]))) { display: none; }
+.hb-half { flex: 1 1 0; width: auto; }
+/* #result-streak 배지 모양은 play.css .badge 공용 */
+
+/* ── 팩 완료 카드 ── */
+#pack-stars {
+  display: grid;
+  grid-template-columns: repeat(5, 30px);
+  gap: 2px;
+  justify-content: center;
+  margin-top: 4px;
+}
+#pack-stars > * {
+  font-family: var(--font-display);
+  color: var(--gold-mid);
+  font-size: 10px;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+  line-height: 14px;
+  text-align: center;
+}
+.wobble { animation: hb-wobble 350ms ease-in-out; }
+@keyframes hb-wobble {
+  0%, 100% { rotate: 0deg; }
+  25% { rotate: -3deg; }
+  75% { rotate: 3deg; }
+}
+
+/* ── 데스크톱(≥641px): 정본 cascade↔pyramid ── */
+@media (min-width: 641px) {
+  #packs { width: 100%; }
+  .lb-title { flex-basis: 120px; }
+}

@@ -1,0 +1,136 @@
+[hidden] { display: none !important; }
+
+/* hanbut 공통 — 로컬 토큰(--hb-*, 정본 design-tokens.css에 없는 값만) */
+:root {
+  --hb-alert: #b8452e;
+  --hb-overlay: rgba(236, 231, 220, 0.92);
+  --hb-overlay-soft: rgba(236, 231, 220, 0.88);
+  --hb-halo: rgba(212, 184, 122, 0.25);
+  --hb-ghost: rgba(212, 184, 122, 0.35);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg-base);
+  color: var(--ink-warm);
+  font-family: var(--font-display);
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  overflow: hidden;
+  overscroll-behavior: none;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  margin: 0;
+  cursor: pointer;
+}
+
+h1, h2, p { margin: 0; }
+
+/* 플레이 화면 세로 레이아웃 (§4 390×844 표) */
+.app {
+  height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+#topbar { flex: 0 0 56px; }
+
+#info {
+  flex: 0 0 auto;
+  height: calc(27.5% - 56px);
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 8px;
+}
+
+#board {
+  flex: 0 0 auto;
+  height: min(55%, calc(100% - 56px - 140px - 96px));
+}
+
+#actions {
+  flex: 1 0 96px;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 16px 24px;
+}
+
+#toast { visibility: hidden; }
+
+/* 아이콘 버튼 공통 — 글리프 24px, 히트 48×48 */
+.icon-btn {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 24px;
+  line-height: 1;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 모달 오버레이 공통: hidden 제거 → 다음 rAF에 .in (열림 150ms / 닫힘 100ms) */
+.hb-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+  background: var(--hb-overlay-soft);
+  opacity: 0;
+  transition: opacity 100ms ease-in;
+}
+.hb-overlay.in {
+  opacity: 1;
+  transition: opacity 150ms ease-out;
+}
+#overlay-pause { z-index: 10; }
+#result, #packdone { z-index: 20; }
+#help, #settings { z-index: 30; }
+
+/* 접근성: 골드 2px 포커스 링 */
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--gold-mid);
+  outline-offset: 2px;
+}
+
+/* 데스크톱: 가운데 480px 기둥 */
+@media (min-width: 641px) {
+  .app { max-width: 480px; }
+}
+
+/* reduced-motion: CSS 전환·키프레임 차단(캔버스 효과는 fx.js/fx_clear.js REDUCED 분기).
+   #btn-reset 링(--p)은 진행 표시라 유지 — 롱프레스 판정 시각 피드백 */
+@media (prefers-reduced-motion: reduce) {
+  *:not(#btn-reset), *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  #btn-reset::before { animation: none !important; }
+}

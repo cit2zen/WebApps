@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>한붓 — 엄지 하나로 긋는 한붓그리기</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%8D%EF%B8%8F%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,100..400&family=Space+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../design-tokens.css">
+  <link rel="stylesheet" href="../typography.css">
+  <link rel="stylesheet" href="../polaroid.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="play.css">
+  <link rel="stylesheet" href="lobby.css">
+</head>
+<body>
+  <!-- 로비 (idle) — Polaroid -->
+  <section id="lobby" aria-label="로비">
+    <header class="lb-top">
+      <a id="btn-hub" class="icon-btn t-caption" href="../" aria-label="허브로">← 허브</a>
+      <span class="lb-spacer"></span>
+      <button id="btn-help" class="icon-btn" type="button" aria-label="도움말">?</button>
+      <button id="btn-settings" class="icon-btn" type="button" aria-label="설정">⚙</button>
+    </header>
+    <div class="lb-title">
+      <h1 class="t-display">한붓</h1>
+      <p class="t-caption">엄지 하나로 긋는 한붓그리기</p>
+    </div>
+    <div class="lb-continue">
+      <button id="btn-continue" class="hb-btn" type="button">시작하기</button>
+      <p id="lobby-msg" class="t-caption" role="alert" hidden></p>
+    </div>
+    <div id="packs" class="pol-group" aria-label="팩"></div>
+    <div id="lvl-panel" aria-label="레벨" hidden></div>
+    <p id="best" class="t-label" hidden></p>
+  </section>
+
+  <!-- 플레이 (level_in · playing · clearing) — 인게임 크롬 -->
+  <section id="play" class="app" aria-label="플레이" hidden>
+    <header id="topbar">
+      <button id="btn-pause" class="icon-btn" type="button" aria-label="일시정지">⏸</button>
+      <span id="lvl-label"></span>
+      <span id="streak" class="badge" hidden></span>
+    </header>
+    <div id="info">
+      <div id="remain" aria-live="polite">
+        <span class="remain-label">남음</span>
+        <span class="remain-num"></span>
+      </div>
+      <div id="toast" role="status"></div>
+    </div>
+    <canvas id="board" tabindex="0" aria-label="한붓 격자"></canvas>
+    <footer id="actions">
+      <button id="btn-reset" type="button">다시</button>
+      <button id="btn-hint" type="button">힌트</button>
+    </footer>
+  </section>
+
+  <!-- 일시정지 (paused) — 인게임, z 10 -->
+  <div id="overlay-pause" class="hb-overlay" role="dialog" aria-modal="true" aria-label="일시정지" hidden>
+    <h2 class="pause-title">일시정지</h2>
+    <button id="btn-resume" class="hb-wide" type="button">계속</button>
+    <button id="btn-lobby" class="hb-wide" type="button">로비</button>
+    <div class="pause-toggles">
+      <button id="tg-sound-p" class="hb-toggle" type="button" aria-pressed="true">소리</button>
+      <button id="tg-vibe-p" class="hb-toggle" type="button" aria-pressed="true">진동</button>
+    </div>
+  </div>
+
+  <!-- 결과 카드 (result) — Polaroid, z 20 -->
+  <div id="result" class="hb-overlay" role="dialog" aria-modal="true" aria-label="결과" hidden>
+    <div class="pol-card">
+      <div class="pol-photo"><canvas width="320" height="320"></canvas></div>
+      <span class="pol-num"></span>
+      <div class="pol-caption t-title"></div>
+      <div class="result-sub t-caption"></div>
+    </div>
+    <span id="result-streak" class="badge" hidden></span>
+    <p class="result-next t-caption">탭하여 다음</p>
+    <div class="res-actions">
+      <button id="btn-go" class="hb-btn hb-half" type="button" hidden>이어하기</button>
+      <button id="btn-home" class="hb-btn hb-half" type="button" hidden>로비</button>
+    </div>
+  </div>
+
+  <!-- 팩 완료 카드 (pack_done) — Polaroid, z 20 -->
+  <div id="packdone" class="hb-overlay" role="dialog" aria-modal="true" aria-label="팩 완료" hidden>
+    <p class="packdone-title t-title"></p>
+    <div class="pol-card">
+      <div class="pol-photo"><canvas width="320" height="320"></canvas></div>
+      <span class="pol-num"></span>
+      <div class="pol-caption"></div>
+      <div id="pack-stars"></div>
+    </div>
+  </div>
+
+  <!-- 도움말 (idle 하위) — Polaroid, z 30 -->
+  <div id="help" class="hb-overlay" role="dialog" aria-modal="true" aria-label="도움말" hidden>
+    <div class="hb-sheet">
+      <div class="pol-card">
+        <div class="pol-photo"><canvas width="320" height="320"></canvas></div>
+        <span class="pol-num">№ 01 — 3×3</span>
+      </div>
+      <p class="t-body">시작 칸에서 긋기 — 손을 떼도 길은 남고, 머리 칸을 다시 누르면 이어짐</p>
+      <p class="t-body">되돌아가면 잉크가 지워짐</p>
+      <p class="t-body">방향키·Z 되감기·R 다시·H 힌트</p>
+      <p class="t-body">패 조건 없음</p>
+      <button id="btn-help-close" class="hb-btn" type="button">닫기</button>
+    </div>
+  </div>
+
+  <!-- 설정 (idle 하위) — Polaroid, z 30 -->
+  <div id="settings" class="hb-overlay" role="dialog" aria-modal="true" aria-label="설정" hidden>
+    <div class="hb-sheet">
+      <h2 class="t-title">설정</h2>
+      <button id="tg-sound" class="hb-toggle hb-row" type="button" aria-pressed="true">소리</button>
+      <button id="tg-vibe" class="hb-toggle hb-row" type="button" aria-pressed="true">진동</button>
+      <button id="btn-wipe" class="hb-row" type="button">진행 초기화</button>
+      <button id="btn-settings-close" class="hb-btn" type="button">닫기</button>
+    </div>
+  </div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
