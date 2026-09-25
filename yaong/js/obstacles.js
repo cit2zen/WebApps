@@ -1,4 +1,5 @@
 // 장애물(선인장) 생성·이동·충돌. 우→좌로 흐른다.
+import { PAL } from "./palette.js";
 export class ObstacleManager {
   constructor(width, groundY) {
     this.width = width;
@@ -56,8 +57,8 @@ export class ObstacleManager {
       const baseY = this.groundY;
       const top = baseY - o.h;
       ctx.save();
-      ctx.fillStyle = "#5fb86f";
-      ctx.strokeStyle = "#3f9954";
+      ctx.fillStyle = PAL.cactus;
+      ctx.strokeStyle = PAL.cactusLine;
       ctx.lineWidth = 2;
 
       // 몸통
@@ -69,7 +70,8 @@ export class ObstacleManager {
       this._roundRect(ctx, o.x + o.w - aw * 0.3, armY - o.h * 0.12, aw, o.w * 0.5, aw * 0.4, true);
 
       // 점박이 무늬
-      ctx.fillStyle = "rgba(255,255,255,0.35)";
+      ctx.fillStyle = PAL.cactusSpot;
+      ctx.globalAlpha = 0.35;
       ctx.beginPath();
       ctx.arc(o.x + o.w * 0.5, top + o.h * 0.3, 2.5, 0, Math.PI * 2);
       ctx.arc(o.x + o.w * 0.4, top + o.h * 0.6, 2.5, 0, Math.PI * 2);

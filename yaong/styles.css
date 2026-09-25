@@ -1,217 +1,183 @@
-/* yaong — Polaroid Editorial (토큰 정본: ../design-tokens.css).
-   인게임 캔버스(파스텔 하늘·주황 고양이)는 게임 고유 비주얼 유지, 메뉴·오버레이만 적용. */
+/* yaong — Polaroid Editorial v2. 공통 UI는 ../pol-ui.css(키트), 여기엔 게임 고유 규칙만.
+   캔버스 팔레트도 아래 토큰에서 읽는다(js/palette.js → getComputedStyle). */
+:root {
+  --yg-sky-top: var(--cream-300);
+  --yg-sky-bot: var(--paper);
+  --yg-cloud: var(--bg-card);
+  --yg-grass: var(--gold-light);
+  --yg-dirt: var(--cream-500);
+  --yg-dash: var(--paper);
+  --yg-cactus: var(--pol-ok);
+  --yg-cactus-line: var(--ink-mid);
+  --yg-cactus-spot: var(--bg-card);
+  --yg-cat: var(--gold-mid);
+  --yg-cat-dark: var(--gold-dark);
+  --yg-cat-ear: var(--gold-light);
+  --yg-cat-blush: var(--pol-danger);
+  --yg-cat-eye: var(--ink-brown);
+  --yg-cat-nose: var(--pol-danger);
+  --yg-shadow: var(--ink-brown);
+}
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body {
-  height: 100%;
-  background: var(--bg-base);
-  font-family: var(--font-display);
-  color: var(--ink-warm);
+body.pol-body {
   display: grid;
   place-items: center;
   overflow: hidden;
   word-break: keep-all;
 }
 
+/* 무대 = 흰 폴라로이드 테두리 안의 캔버스 */
 #stage {
   position: relative;
-  width: min(96vw, 800px);
+  box-sizing: content-box;
+  width: min(calc(96vw - 12px), 800px, calc((100dvh - 32px) * 16 / 9)); /* 가로 폰에서도 무대 전체가 보이게 */
   aspect-ratio: 16 / 9;
   overflow: hidden;
   background: var(--bg-card);
-  border: 1px solid var(--rule-color);
+  border: 6px solid var(--bg-card);
   box-shadow: var(--shadow-card-lift);
 }
 
-canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  image-rendering: auto;
-}
+canvas { display: block; width: 100%; height: 100%; image-rendering: auto; }
 
-/* HUD (인게임) */
+/* HUD (인게임) — 키트 .pol-hud 종이 칩 */
 #hud {
   position: absolute;
   inset: 0 0 auto 0;
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
+  padding: var(--space-3) var(--space-4);
   pointer-events: none;
-  font-weight: 700;
   z-index: 2;
 }
-#lives { font-size: clamp(18px, 3.5vw, 26px); letter-spacing: 2px; }
-#score {
-  font-family: var(--font-mono);
-  font-size: clamp(16px, 3vw, 24px);
-  color: var(--ink-warm);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
-}
+#hud .pol-hud-item { min-width: 72px; }
+.hud-lives { font-size: var(--fs-lg); letter-spacing: 0.02em; font-style: normal; } /* 이모지 하트 */
 
-/* Overlays */
-.overlay {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background: rgba(236, 231, 220, 0.62);
-  backdrop-filter: blur(4px);
-  z-index: 5;
-}
-.panel {
-  width: min(82%, 380px);
-  background: var(--bg-card);
-  border: 1px solid var(--rule-color);
-  padding: 28px 26px 24px;
-  text-align: center;
-  box-shadow: var(--shadow-card-open);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+/* 허브 버튼 터치 타깃 40px (키트 기본은 ~31px) */
+.pol-back-btn { display: inline-flex; align-items: center; min-height: 40px; }
 
-h2 {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 300;
-  font-size: clamp(24px, 6vw, 34px);
-  color: var(--ink-warm);
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-}
-.hint { font-style: italic; font-size: 13px; line-height: 1.6; color: var(--ink-mid); }
-.result { font-size: 18px; font-weight: 600; color: var(--ink-warm); }
-.result span { color: var(--gold-dark); font-size: 26px; font-family: var(--font-mono); }
-.best { font-size: 13px; color: var(--ink-light); min-height: 16px; font-family: var(--font-mono); }
+/* 로비 — 가로 폰(높이 ~390px)에서 위가 잘리지 않게 스크롤 + 안전한 가운데 정렬(키트 .pol-lobby는 overflow 미지정) */
+.pol-lobby { justify-content: flex-start; overflow-y: auto; }
+.pol-lobby > :first-child { margin-top: auto; }
+.pol-lobby > :last-child { margin-bottom: auto; }
+.pol-lbtns { justify-content: center; }
+.pol-lbest { min-height: 1.6em; }
 
-.btn {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 300;
-  letter-spacing: 0.12em;
-  border: 1px solid rgba(192, 160, 96, 0.45);
-  padding: 12px 18px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+/* 오버레이 다이얼로그 (키트 .pol-overlay/.pol-dialog) */
+.yg-dialog { display: flex; flex-direction: column; gap: var(--space-3); max-height: calc(100dvh - 2 * var(--gutter)); overflow-y: auto; }
+.yg-dialog > * + * { margin-top: 0; }
+.yg-dialog .pol-btn-primary, .yg-dialog .pol-btn-ghost { width: 100%; min-height: 44px; }
+.yg-dialog .pol-btn-primary:first-of-type { margin-top: var(--space-2); }
+.yg-eyebrow { justify-content: center; font-family: var(--font-display); font-style: italic; font-synthesis: none; font-size: var(--fs-sm); }
+.yg-title {
+  font-family: var(--font-display); font-style: italic; font-synthesis: none; font-weight: 400;
+  font-size: var(--fs-heading); line-height: 1.1; color: var(--ink-warm);
 }
-.btn:active { transform: translateY(1px); }
-.btn.primary {
-  background: var(--ink-warm);
-  color: var(--cream-100);
-  border-color: var(--ink-warm);
-  box-shadow: var(--shadow-card);
+.yg-hint { font-family: var(--font-body); font-size: var(--fs-sm); line-height: 1.6; color: var(--ink-mid); }
+.yg-hint b { color: var(--gold-text); font-weight: 600; }
+.result { font-family: var(--font-body); font-size: var(--fs-lg); font-weight: 500; color: var(--ink-warm); }
+.result-num {
+  font-family: var(--font-display); font-style: italic; font-synthesis: none; font-weight: 300;
+  font-size: var(--fs-display); line-height: 1; color: var(--gold-dark); font-variant-numeric: tabular-nums;
 }
-.btn.primary:hover { box-shadow: var(--shadow-card-lift); transform: translateY(-2px); }
-.btn.ghost {
-  background: var(--bg-card);
-  color: var(--gold-mid);
-}
-.btn.ghost:hover { color: var(--ink-warm); border-color: var(--gold-mid); box-shadow: var(--shadow-card); }
+.best { font-family: var(--font-label); font-size: var(--fs-sm); color: var(--ink-muted); min-height: 1.4em; }
 
-/* Settings */
+/* 설정 */
 .field {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
-  gap: 6px 10px;
+  gap: var(--space-1) var(--space-3);
   text-align: left;
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--ink-mid);
 }
 .field > span:first-child { grid-column: 1 / -1; }
 input[type="range"] {
   grid-column: 1;
   -webkit-appearance: none;
   appearance: none;
-  height: 8px;
-  border-radius: 6px;
-  background: var(--cream-400);
-  outline: none;
+  height: 40px;
+  background: transparent;
+  cursor: pointer;
 }
+input[type="range"]::-webkit-slider-runnable-track { height: 6px; border-radius: var(--r-pill); background: var(--cream-400); }
+input[type="range"]::-moz-range-track { height: 6px; border-radius: var(--r-pill); background: var(--cream-400); }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 22px; height: 22px;
+  width: 22px; height: 22px; margin-top: -8px;
   border-radius: 50%;
   background: var(--gold-mid);
   border: 3px solid var(--bg-card);
-  box-shadow: var(--shadow-card);
-  cursor: pointer;
+  box-shadow: var(--shadow-soft);
 }
 input[type="range"]::-moz-range-thumb {
   width: 22px; height: 22px; border: 3px solid var(--bg-card); border-radius: 50%;
-  background: var(--gold-mid); box-shadow: var(--shadow-card); cursor: pointer;
+  background: var(--gold-mid); box-shadow: var(--shadow-soft);
 }
-.val { font-variant-numeric: tabular-nums; color: var(--gold-dark); font-family: var(--font-mono); }
+.val { font-family: var(--font-display); font-style: italic; font-synthesis: none; font-size: var(--fs-lg); color: var(--gold-text); font-variant-numeric: tabular-nums; }
 
 .toggle {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-weight: 600;
-  font-size: 14px;
-  text-align: left;
+  min-height: 44px;
+  padding: 0 var(--space-1);
+  border-bottom: 1px solid var(--rule-color);
+  font-family: var(--font-label);
+  font-size: var(--fs-md);
+  font-weight: 500;
   color: var(--ink-mid);
+  text-align: left;
+  cursor: pointer;
 }
-.toggle input { width: 20px; height: 20px; accent-color: var(--gold-mid); cursor: pointer; }
+.toggle input { width: 20px; height: 20px; accent-color: var(--gold-dark); cursor: pointer; }
 
-.meter-wrap { text-align: left; margin-top: 4px; }
-.meter-label { font-size: 12px; color: var(--ink-light); font-family: var(--font-mono); letter-spacing: 0.06em; }
+.meter-wrap { text-align: left; }
 .meter {
   position: relative;
-  height: 18px;
-  border-radius: 10px;
+  height: 14px;
+  border-radius: var(--r-pill);
   background: var(--cream-200);
   border: 1px solid var(--rule-color);
   overflow: hidden;
-  margin-top: 4px;
+  margin-top: var(--space-1);
 }
 #meter-fill, #ready-meter-fill {
   position: absolute;
   inset: 0 auto 0 0;
   width: 0%;
-  background: linear-gradient(90deg, var(--gold-light), var(--gold-mid), var(--gold-dark));
+  background: var(--gold-mid);
   transition: width 0.05s linear;
 }
 #meter-threshold, #ready-meter-threshold {
   position: absolute;
   top: -2px; bottom: -2px;
-  width: 3px;
+  width: 2px;
   background: var(--ink-warm);
   left: 50%;
 }
-.mic-status { font-size: 13px; min-height: 18px; color: var(--gold-dark); font-weight: 600; }
+.mic-status { font-family: var(--font-label); font-size: var(--fs-sm); min-height: 1.4em; color: var(--pol-danger); font-weight: 500; }
 
 .hidden { display: none !important; }
 
-@media (max-aspect-ratio: 1/1) {
-  #stage { width: 96vw; }
+/* ── 시작 로비 SVG 아트 ── */
+.lp-bg { fill: var(--cream-200); }
+.lp-ground { stroke: var(--cream-500); stroke-width: 1.5; stroke-linecap: round; }
+.lp-tail { fill: none; stroke: var(--gold-mid); stroke-width: 5; stroke-linecap: round; }
+.lp-fur { fill: var(--gold-mid); }
+.lp-fur-dark { fill: var(--gold-dark); }
+.lp-ear { fill: var(--gold-light); }
+.lp-eye { fill: none; stroke: var(--ink-warm); stroke-width: 1.6; stroke-linecap: round; }
+.lp-whisker { stroke: var(--gold-dark); stroke-width: 1; stroke-linecap: round; }
+.lp-text { fill: var(--gold-dark); font-family: var(--font-display); font-style: italic; font-synthesis: none; }
+
+@media (max-width: 640px) {
+  #hud { padding: var(--space-2); }
+  #hud .pol-hud-item { padding: 4px 10px; min-width: 0; }
+  #hud .pol-hud-value { font-size: var(--fs-base); }
+  .hud-lives { font-size: var(--fs-md); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .btn, #meter-fill, #ready-meter-fill { transition: none !important; }
-  .btn.primary:hover, .btn.ghost:hover { transform: none !important; }
+  #meter-fill, #ready-meter-fill { transition: none !important; }
 }
-
-/* Polaroid Lobby 2026-06-07 (토큰화 2026-06-11) */
-.pol-lobby{position:fixed;inset:0;background:var(--bg-base);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:500}
-.pol-lcard{background:var(--bg-card);padding:5px 5px 22px;width:140px;box-shadow:var(--shadow-card);transform:rotate(-3deg);flex-shrink:0}
-.pol-lphoto{width:100%;aspect-ratio:1 / 1;background:var(--cream-200)}
-.pol-lphoto svg{display:block;width:100%;height:100%}
-.pol-lnum{font-family:var(--font-display);font-style:italic;font-weight:100;font-size:.6rem;color:var(--gold-mid);display:block;margin-top:5px}
-.pol-ltag{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.66rem;color:var(--ink-light);text-align:center;margin-top:2px;display:block}
-.pol-ltitle{font-family:var(--font-display);font-style:italic;font-weight:300;font-size:clamp(1.9rem,5vw,3rem);color:var(--ink-warm);line-height:1;text-align:center}
-.pol-ldesc{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.86rem;color:var(--ink-mid);text-align:center;max-width:260px;line-height:1.55}
-.pol-lbtns{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:6px}
-.pol-lbtn{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.88rem;letter-spacing:.16em;color:var(--gold-mid);background:var(--bg-card);border:1px solid rgba(192,160,96,.45);padding:11px 34px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:box-shadow .3s,transform .3s}
-.pol-lbtn:hover{box-shadow:0 8px 22px rgba(0,0,0,.15);transform:translateY(-2px)}
-.pol-lbest{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.06em;color:var(--ink-light);min-height:1em}
-.pol-llabel{font-family:var(--font-mono);font-size:.57rem;color:var(--ink-light);letter-spacing:.09em;text-transform:uppercase}
-
-/* pol-back-btn */
-.pol-back-btn{position:fixed;top:14px;left:14px;font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.78rem;color:var(--gold-mid);text-decoration:none;letter-spacing:.06em;z-index:9999;background:rgba(236,231,220,.88);padding:6px 14px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1px solid rgba(192,160,96,.25);transition:color .2s,background .2s}
-.pol-back-btn:hover{color:var(--ink-warm);background:rgba(236,231,220,.98)}
