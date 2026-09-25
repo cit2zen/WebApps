@@ -32,7 +32,7 @@ async function loadCheckboxes() {
     const a = document.createElement('a');
     a.href = '/';
     a.textContent = '항목 관리에서 먼저 추가해주세요.';
-    a.style.color = 'var(--gold-mid)';
+    a.className = 'link-gold';
     a.addEventListener('click', e => {
       e.preventDefault();
       document.querySelector('.snav-btn[data-tab="items"]')?.click();
@@ -45,7 +45,7 @@ async function loadCheckboxes() {
   items.forEach(item => {
     const chip = document.createElement('button');
     chip.type = 'button';
-    chip.className = 'item-chip';
+    chip.className = 'pol-chip item-chip';
     chip.dataset.id = item.id;
     chip.textContent = item.title;
     chip.addEventListener('click', () => chip.classList.toggle('selected'));

@@ -1,52 +1,54 @@
 {% extends "base.html" %}
 {% block title %}설정{% endblock %}
+{% block appbar_end %}<a href="{{ cross_url }}" class="pol-btn-ghost pol-btn-sm appbar-link">{{ cross_label }}</a>
+<a href="/logout" class="pol-btn-ghost pol-btn-sm appbar-link">로그아웃</a>{% endblock %}
 {% block body %}
-<div class="settings-wrap">
-  <nav class="settings-nav">
-    <a href="/" class="snav-btn" data-tab="items">항목 관리</a>
-    <a href="/sets-manage" class="snav-btn" data-tab="sets">셋 관리</a>
-    <a href="{{ cross_url }}" class="nav-link" style="margin-left:auto">{{ cross_label }}</a>
-    <a href="/logout" class="nav-link">로그아웃</a>
+<main class="settings-wrap">
+  <nav class="settings-nav" aria-label="설정 탭">
+    <div class="pol-seg settings-tabs">
+      <a href="/" class="snav-btn" data-tab="items">항목 관리</a>
+      <a href="/sets-manage" class="snav-btn" data-tab="sets">셋 관리</a>
+    </div>
   </nav>
 
   <!-- 항목 관리 패널 -->
   <div class="tab-panel" id="panel-items">
-    <div class="upload-form">
-      <label>이름 (필수)</label>
-      <input type="text" id="inp-title" placeholder="예: 피자">
-      <label>사진 (선택, jpg/png/webp, 최대 5MB)</label>
+    <div class="upload-form pol-panel">
+      <label class="pol-field-label" for="inp-title">이름 (필수)</label>
+      <input type="text" id="inp-title" class="pol-input" placeholder="예: 피자">
+      <label class="pol-field-label" for="inp-file">사진 (선택, jpg/png/webp, 최대 5MB)</label>
       <div class="drop-zone" id="drop-zone">
-        <img class="drop-preview" id="drop-preview">
+        <img class="drop-preview" id="drop-preview" alt="">
         <span id="drop-hint">여기에 이미지를 끌어다 놓거나 클릭하세요</span>
         <input type="file" id="inp-file" accept="image/jpeg,image/png,image/webp">
       </div>
-      <button class="btn" id="btn-add">추가하기</button>
-      <p class="status-msg" id="status"></p>
+      <button class="pol-btn-primary" id="btn-add">추가하기</button>
+      <p class="status-msg" id="status" role="status"></p>
     </div>
     <div id="items-grid" class="items-grid"></div>
   </div>
 
   <!-- 셋 관리 패널 -->
   <div class="tab-panel" id="panel-sets">
-    <div class="upload-form" id="set-form">
-      <span class="edit-badge" id="edit-badge" style="display:none">✏ 셋 수정 중</span>
-      <label>질문</label>
-      <input type="text" id="inp-question" placeholder="이 중에 가장 좋은 것은?">
-      <label>항목 선택 <span style="font-weight:300;color:var(--ink-light)">(2개 이상)</span></label>
+    <div class="upload-form pol-panel" id="set-form">
+      <span class="pol-badge edit-badge" id="edit-badge" style="display:none">✏ 셋 수정 중</span>
+      <label class="pol-field-label" for="inp-question">질문</label>
+      <input type="text" id="inp-question" class="pol-input" placeholder="이 중에 가장 좋은 것은?">
+      <p class="pol-field-label">항목 선택 <span class="field-hint">(2개 이상)</span></p>
       <div id="item-checkboxes" class="item-chips"></div>
       <div class="form-btn-row">
-        <button class="btn" id="btn-save-set">셋 만들기</button>
-        <button class="btn btn-cancel" id="btn-cancel-edit" style="display:none">취소</button>
+        <button class="pol-btn-primary" id="btn-save-set">셋 만들기</button>
+        <button class="pol-btn-ghost btn-cancel" id="btn-cancel-edit" style="display:none">취소</button>
       </div>
-      <p class="status-msg" id="set-status"></p>
+      <p class="status-msg" id="set-status" role="status"></p>
     </div>
     <div id="sets-cascade" class="sets-cascade-grid"></div>
   </div>
-</div>
+</main>
 
 <script src="/static/utils.js?v=1"></script>
 <script src="/static/settings.js?v=5"></script>
-<script src="/static/sets.js?v=4"></script>
+<script src="/static/sets.js?v=5"></script>
 <script>
 (function () {
   function getInitTab() {
