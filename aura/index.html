@@ -2,31 +2,24 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Aura — 음성 AI</title>
-  <link rel="icon" href="data:," />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,300..600&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,100..400&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500&family=Space+Mono&family=Nanum+Pen+Script&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="design-tokens.css" />
+  <link rel="stylesheet" href="typography.css" />
+  <link rel="stylesheet" href="polaroid.css" />
+  <link rel="stylesheet" href="pol-ui.css" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="/cityzen-ui.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet" />
-  <style>
-    /* cityzen 공통 헤더: 앱이 fixed로 화면을 꽉 채우므로 헤더만 상단에 띄움 (앱 레이아웃·캔버스 미변경) */
-    .cz-gamehead { position: fixed; top: 0; left: 0; right: 0; z-index: 30; background: linear-gradient(90deg, rgba(94,242,255,.05), rgba(2,3,10,.55)); backdrop-filter: blur(6px); }
-    /* Polaroid dock overrides */
-    .dock { font-family: 'Fraunces', serif; font-style: italic; }
-    .orb { border-color: rgba(192,160,96,.55); box-shadow: 0 0 18px rgba(192,160,96,.25); }
-    .orb:hover { box-shadow: 0 0 30px rgba(192,160,96,.4); }
-    .orb-core { background: radial-gradient(circle, rgba(192,160,96,.18), transparent 70%); }
-    #status { color: #c0a060; }
-    #status::before { background: #c0a060; box-shadow: 0 0 10px #c0a060; }
-  </style>
 </head>
-<body data-phase="idle" data-running="false">
-  <canvas id="stage"></canvas>
+<body class="pol-body" data-phase="idle" data-running="false">
+  <canvas id="stage" aria-hidden="true"></canvas>
   <div class="vignette" aria-hidden="true"></div>
-  <div class="grain" aria-hidden="true"></div>
+
+  <a class="pol-back-btn aura-back" href="https://cityzen.kr">&#8592; cityzen</a>
+  <p class="aura-mark" aria-hidden="true">Aura</p>
 
   <main id="ui">
     <p id="caption" class="caption" role="status" aria-live="polite">오브를 누르고 말을 걸어보세요</p>
@@ -48,10 +41,5 @@
   </main>
 
   <script type="module" src="src/main.js"></script>
-  <script type="module">
-    import { czHeader } from '/cityzen-ui.js';
-    czHeader({ title: 'Aura' });
-  </script>
-  <a class="pol-back-btn" href="https://portfolio.cityzen.kr">&#8592; cityzen</a>
 </body>
 </html>

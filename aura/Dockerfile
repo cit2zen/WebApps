@@ -14,7 +14,7 @@ ENV NODE_ENV=production PORT=3000
 RUN addgroup -g 1001 -S nodejs && adduser -S aura -u 1001
 COPY --from=deps --chown=aura:nodejs /app/node_modules ./node_modules
 COPY --chown=aura:nodejs server.js tts-worker.mjs package.json ./
-COPY --chown=aura:nodejs index.html style.css cityzen-ui.css cityzen-ui.js ./
+COPY --chown=aura:nodejs index.html style.css favicon.svg design-tokens.css typography.css polaroid.css pol-ui.css ./
 COPY --chown=aura:nodejs src ./src
 USER aura
 EXPOSE 3000

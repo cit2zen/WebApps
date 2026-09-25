@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Polaroid Editorial palette: card #ffffff · cream #ece7dc · gold #c0a060 · ink #4a3820 -->
+  <rect x="8" y="4" width="48" height="56" rx="2" fill="#ffffff" stroke="#d0c8b8" stroke-width="1.5"/>
+  <rect x="13" y="9" width="38" height="36" fill="#ece7dc"/>
+  <circle cx="32" cy="27" r="11" fill="none" stroke="#c0a060" stroke-width="2.5"/>
+  <circle cx="32" cy="27" r="4.5" fill="#4a3820"/>
+</svg>
