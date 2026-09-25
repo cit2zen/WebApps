@@ -1,17 +1,36 @@
-:root { --bg-base: #ece7dc; --bg-card: #ffffff; --gold-mid: #c0a060; --ink-warm: #1a1005; --ink-light: #a09060; }
-[hidden] { display: none !important; }   /* #loading의 display:flex가 hidden 속성을 덮지 않게 */
-html, body { margin: 0; height: 100%; background: var(--bg-base); overflow: hidden; overscroll-behavior: none; font-family: 'Pretendard', system-ui, sans-serif; }
-#unity-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; overscroll-behavior: none; }   /* iOS: 핀치·당겨서 새로고침을 페이지가 가로채지 않게 (maximum-scale=1은 무시됨) */
-#loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: var(--bg-base); color: var(--ink-warm); }
-#loading-bar { width: 60%; max-width: 320px; height: 6px; background: var(--bg-card); border-radius: 999px; overflow: hidden; }
-#loading-fill { width: 0; height: 100%; background: var(--gold-mid); transition: width .2s; }
-#input-panel { position: fixed; left: 0; right: 0; bottom: 0; box-sizing: border-box; padding: 8px 12px calc(12px + env(safe-area-inset-bottom)); background: rgba(255, 255, 255, .94); border-top: 2px solid var(--gold-mid); }
-#chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; min-height: 34px; }
-.chip { flex: 0 0 auto; border: 2px solid var(--gold-mid); background: var(--bg-card); color: var(--ink-warm); border-radius: 999px; padding: 4px 12px; font-size: 15px; }
-#answer { width: 100%; box-sizing: border-box; font-size: 18px; padding: 10px 14px; border: 2px solid var(--ink-light); border-radius: 999px; background: var(--bg-card); color: var(--ink-warm); outline: none; }
-#answer:focus { border-color: var(--gold-mid); }
+/* 지하철 퀴즈 — HTML 셸(Unity 캔버스 밖) · Polaroid Editorial v2
+   키트(../design-tokens.css · typography.css · polaroid.css · pol-ui.css)를 먼저 링크한다. 색·크기는 토큰만 쓴다. */
+[hidden] { display: none !important; }   /* #loading(.pol-lobby)의 display:flex가 hidden 속성을 덮지 않게 */
+html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; }
+body.is-playing.pol-body::after { display: none; }   /* 플레이 중엔 인화지 결 오버레이를 끈다(WebGL 위 합성 비용) */
+#unity-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: var(--bg-base); touch-action: none; overscroll-behavior: none; }   /* iOS: 핀치·당겨서 새로고침을 페이지가 가로채지 않게 */
+
+/* 허브 버튼 터치 목표 ≥ 40px (키트 기본은 약 35px) */
+.pol-back-btn { display: inline-flex; align-items: center; min-height: 40px; box-sizing: border-box; }
+
+/* 로딩 = 게임 로비 카드(.pol-lobby) — 노선도 폴라로이드 + 제목 + 금색 진행 막대 */
+#loading-bar { width: min(260px, 70vw); height: 4px; background: var(--cream-400); border-radius: var(--r-pill); overflow: hidden; }
+#loading-fill { width: 0; height: 100%; background: var(--gold-mid); transition: width var(--dur-base) var(--ease-out); }
+#loading-text { margin: 0; max-width: min(360px, 86vw); overflow-wrap: anywhere; }
+#loading.is-error #loading-bar { display: none; }
+#loading.is-error #loading-text { color: var(--pol-danger); }
+.sw-loop, .sw-l1, .sw-l2 { fill: none; stroke-width: 4.5; stroke-linecap: round; stroke-linejoin: round; }
+.sw-loop { stroke: var(--pol-ok); }
+.sw-l1 { stroke: var(--pol-info); }
+.sw-l2 { stroke: var(--gold-mid); }
+.sw-st { fill: var(--bg-card); stroke: var(--ink-warm); stroke-width: 1.2; }
+.sw-xfer { fill: var(--bg-card); stroke: var(--ink-warm); stroke-width: 1.6; }
+
+/* 답 입력 패널(게임 중 DOM) — 흰 인화지 띠 + 금색 헤어라인 */
+#input-panel { position: fixed; left: 0; right: 0; bottom: 0; box-sizing: border-box; padding: var(--space-2) var(--space-3) calc(var(--space-3) + env(safe-area-inset-bottom)); background: var(--paper); border-top: 1px solid var(--rule-strong); box-shadow: var(--shadow-soft); }
+#chips { display: flex; gap: var(--space-2); overflow-x: auto; padding-bottom: var(--space-2); min-height: 40px; scrollbar-width: none; }
+#chips::-webkit-scrollbar { display: none; }
+.chip { flex: 0 0 auto; display: inline-flex; align-items: center; min-height: 40px; box-sizing: border-box; padding: 0 var(--space-4); border: 1px solid var(--rule-strong); border-radius: var(--r-pill); background: var(--bg-card); color: var(--ink-mid); font-family: var(--font-label); font-size: var(--fs-md); font-weight: 500; cursor: pointer; transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease; }
+.chip:hover, .chip:focus-visible { border-color: var(--gold-mid); color: var(--ink-warm); }
+#answer { min-height: 44px; }
+
 /* 출처 표기: 입력 패널 안 #answer 아래 한 줄(패널·키보드와 함께 움직임). 패널이 숨겨지면 출처만 남은 투명 띠로 좌하단에 고정 */
-#attribution { margin-top: 4px; padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left); font-size: 10px; line-height: 1.3; word-break: keep-all; color: var(--ink-warm); opacity: .6; pointer-events: none; user-select: none; }
+#attribution { margin-top: var(--space-1); padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left); font-family: var(--font-body); font-size: var(--fs-2xs); line-height: 1.4; word-break: keep-all; color: var(--ink-muted); pointer-events: none; user-select: none; }
 /* 주의: hidden이어도 출처 표기 줄만 남기려 display:block — 패널 표시 여부는 computed display가 아니라 panel.hidden / #answer 가시성으로 판정 */
-#input-panel[hidden] { display: block !important; padding: 0 8px calc(4px + env(safe-area-inset-bottom)); background: none; border-top: 0; pointer-events: none; }
+#input-panel[hidden] { display: block !important; padding: 0 var(--space-2) calc(var(--space-1) + env(safe-area-inset-bottom)); background: none; border-top: 0; box-shadow: none; pointer-events: none; }
 #input-panel[hidden] > :not(#attribution) { display: none; }
