@@ -1,6 +1,7 @@
 // components/WordHighlight.tsx
 'use client'
 import styles from './WordHighlight.module.css'
+import tip from './Tooltip.module.css'
 import type { Term } from '@/lib/types'
 
 interface Props {
@@ -10,11 +11,11 @@ interface Props {
 
 export default function WordHighlight({ term, onOpenThread }: Props) {
   return (
-    <span className={styles.word}>
+    <span className={`${tip.host} ${styles.word}`}>
       {term.word}
-      <span className={styles.tooltip}>
+      <span className={tip.tip}>
         <strong>{term.word}</strong>
-        <p>{term.definition}</p>
+        <span className={tip.body}>{term.definition}</span>
         {term.formula && <code className={styles.formula}>{term.formula}</code>}
         {onOpenThread && (
           <button className={styles.more} onClick={() => onOpenThread(term.word)}>

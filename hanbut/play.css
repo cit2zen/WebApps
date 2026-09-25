@@ -1,4 +1,4 @@
-/* hanbut 인게임 크롬 — 토큰 변수만(폴라로이드·타이포 클래스 0개) */
+/* hanbut 인게임 크롬 — 토큰 변수만(폴라로이드·타이포 클래스 0개) · 한글은 --font-label, 라틴 숫자는 Fraunces */
 
 @property --p {
   syntax: '<number>';
@@ -13,15 +13,21 @@
   align-items: center;
   padding: 0 16px;
 }
-#btn-pause { color: var(--ink-mid); justify-self: start; }
+#btn-pause {
+  justify-self: start;
+  width: 44px; height: 44px; flex-basis: 44px;
+  font-size: var(--fs-lg); color: var(--ink-mid);
+  background: var(--bg-card); border: 1px solid var(--rule-color); border-radius: var(--r-pill); box-shadow: var(--shadow-soft);
+}
+#btn-pause:hover { border-color: var(--gold-mid); color: var(--ink-warm); }
 
 #lvl-label {
   justify-self: center;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--ink-light);
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
+  font-family: var(--font-label); /* "팩 1 · L3" — 한글 포함 */
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--ink-muted);
+  letter-spacing: 0.03em;
   white-space: nowrap;
   transition: opacity 300ms ease;
 }
@@ -31,13 +37,14 @@
   align-items: center;
   height: 28px;
   padding: 0 12px;
-  border: 1px solid var(--gold-mid);
-  border-radius: 999px;
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 14px;
-  color: var(--gold-dark);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-pill);
+  font-family: var(--font-label); /* "3연속" */
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--gold-text);
   background: var(--bg-card);
+  box-shadow: var(--shadow-soft);
   white-space: nowrap;
 }
 #streak { justify-self: end; }
@@ -52,18 +59,20 @@
   transition: opacity 300ms ease;
 }
 #remain .remain-label {
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-family: var(--font-label); /* "남음" */
+  font-size: var(--fs-xs);
+  font-weight: 500;
   line-height: 16px;
-  color: var(--ink-light);
-  letter-spacing: 0.09em;
+  color: var(--ink-muted);
+  letter-spacing: 0.03em;
 }
 #remain .remain-num {
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 300;
-  font-size: 56px;
-  line-height: 64px;
+  font-size: var(--fs-hero);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
   color: var(--ink-warm);
   min-height: 64px;
 }
@@ -75,11 +84,12 @@
   display: inline-flex;
   align-items: center;
   border: 1px solid var(--rule-color);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: var(--bg-card);
-  box-shadow: var(--shadow-card);
-  font-family: var(--font-mono);
-  font-size: 12px;
+  box-shadow: var(--shadow-soft);
+  font-family: var(--font-label); /* 힌트 토스트 — 한글 */
+  font-size: var(--fs-sm);
+  font-weight: 500;
   color: var(--ink-mid);
 }
 #toast.show { visibility: visible; }
@@ -102,13 +112,14 @@ body:has(#overlay-pause:not([hidden])) #board { filter: blur(6px); }
 #actions button {
   flex: 1 1 0;
   height: 56px;
-  border: 1px solid var(--rule-color);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-xs);
   background: var(--bg-card);
-  box-shadow: var(--shadow-card);
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 18px;
-  color: var(--gold-dark);
+  box-shadow: var(--shadow-soft);
+  font-family: var(--font-label); /* "다시"·"힌트" */
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--ink-mid);
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
@@ -141,30 +152,34 @@ body:has(#overlay-pause:not([hidden])) #board { filter: blur(6px); }
 /* ── 일시정지 오버레이 ── */
 #overlay-pause { background: var(--hb-overlay); }
 #overlay-pause .pause-title {
-  font-family: var(--font-display);
+  font-family: var(--font-display); /* "일시정지" — Noto Serif KR upright */
   font-style: italic;
-  font-weight: 300;
-  font-size: 28px;
-  color: var(--ink-mid);
+  font-weight: 400;
+  font-size: var(--fs-heading);
+  color: var(--ink-warm);
 }
 #overlay-pause .pause-title.is-auto {
-  font-size: 16px;
-  color: var(--ink-light);
+  font-family: var(--font-label);
+  font-style: normal;
+  font-size: var(--fs-base);
+  color: var(--ink-muted);
 }
 .hb-wide, .pause-toggles .hb-toggle {
   height: 56px;
-  border: 1px solid var(--rule-color);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-xs);
   background: var(--bg-card);
-  box-shadow: var(--shadow-card);
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 18px;
-  color: var(--gold-dark);
+  box-shadow: var(--shadow-soft);
+  font-family: var(--font-label);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--ink-mid);
 }
+.hb-wide.hb-primary { color: var(--bg-base); background: var(--ink-warm); border-color: var(--ink-warm); }
 .hb-wide { width: 358px; max-width: 100%; }
 .pause-toggles { display: flex; gap: 12px; width: 358px; max-width: 100%; }
 .pause-toggles .hb-toggle { flex: 1 1 0; }
-.pause-toggles .hb-toggle:not(.on) { color: var(--ink-light); text-decoration: line-through; }
+.pause-toggles .hb-toggle:not(.on) { color: var(--ink-muted); background: var(--cream-200); text-decoration: line-through; }
 
 /* ── 키프레임: 무효 흔들림 · 막다른 길 · level_in 슬라이드 ── */
 .shake { animation: hb-shake 120ms linear; }

@@ -1,0 +1,356 @@
+/* SOURCE OF TRUTH: develop_web/design-system/ — 직접 수정 금지, develop_web/scripts/sync_design.py로 동기 */
+/* Requires design-tokens.css + typography.css
+   Polaroid Editorial v2 — 공통 UI 컴포넌트 (앱 셸·버튼·폼·패널·모달·HUD)
+   규칙: 색은 var()만, font-size는 var(--fs-*)만, 한글 텍스트에 --font-mono 금지. */
+
+/* ── Base (body에 class="pol-body") ── */
+.pol-body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--paper-light) no-repeat, var(--bg-base);
+  color: var(--ink-warm);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.pol-body::after { /* 인화지 결 */
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  pointer-events: none;
+  background-image: var(--paper-grain);
+  opacity: 0.18;
+  mix-blend-mode: multiply;
+}
+.pol-body :focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--r-xs); }
+.pol-body ::selection { background: var(--gold-light); color: var(--ink-warm); }
+
+/* ── App bar: cityzen. 로 돌아가기 + 앱 이름 ── */
+.pol-appbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: var(--header-h);
+  padding: 0 var(--gutter);
+  background: var(--bg-header);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rule-color);
+}
+.pol-brand {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-synthesis: none;
+  font-weight: 400;
+  font-size: var(--fs-xl);
+  color: var(--ink-warm);
+  text-decoration: none;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+}
+.pol-brand::after { content: "."; color: var(--gold-mid); }
+.pol-appbar-sep { width: 1px; height: 18px; background: var(--rule-strong); }
+.pol-appbar-title {
+  font-family: var(--font-label);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  color: var(--ink-mid);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pol-appbar-end { margin-left: auto; display: flex; align-items: center; gap: var(--space-2); }
+
+/* ── Layout ── */
+.pol-page {
+  width: 100%;
+  max-width: calc(var(--page-max) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: var(--space-7) var(--gutter) var(--space-8);
+  box-sizing: border-box;
+}
+.pol-page > .pol-measure,
+.pol-measure { max-width: var(--measure); }
+.pol-stack { display: flex; flex-direction: column; gap: var(--space-4); }
+.pol-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+
+/* 에디토리얼 라벨 — 짧은 금색 선 + 라벨 */
+.pol-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-label);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--gold-text);
+}
+.pol-eyebrow::before { content: ""; width: 28px; height: 1px; background: var(--gold-mid); }
+
+/* ── Buttons ── */
+.pol-btn-primary,
+.pol-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-label);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  padding: 12px 20px;
+  border-radius: var(--r-xs);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+.pol-btn-primary { background: var(--ink-warm); color: var(--bg-base); border: 1px solid var(--ink-warm); }
+.pol-btn-primary:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--ink-mid); border-color: var(--ink-mid); transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+.pol-btn-ghost { background: transparent; color: var(--ink-mid); border: 1px solid var(--rule-strong); }
+.pol-btn-ghost:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--bg-card); border-color: var(--gold-mid); color: var(--ink-warm); transform: translateY(-2px); }
+.pol-btn-primary:active,
+.pol-btn-ghost:active { transform: translateY(0) scale(0.98); box-shadow: none; }
+.pol-btn-primary:disabled, .pol-btn-primary[aria-disabled="true"],
+.pol-btn-ghost:disabled, .pol-btn-ghost[aria-disabled="true"] {
+  opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none;
+}
+.pol-btn-sm { padding: 8px 14px; font-size: var(--fs-sm); }
+.pol-btn-lg { padding: 16px 28px; font-size: var(--fs-base); }
+.pol-btn-icon { padding: 10px; aspect-ratio: 1; }
+
+/* ── Chips / segmented ── */
+.pol-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-label);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  padding: 7px 14px;
+  border: 1px solid var(--rule-strong);
+  background: transparent;
+  color: var(--ink-mid);
+  text-decoration: none;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+}
+.pol-chip:hover { border-color: var(--gold-mid); color: var(--ink-warm); background: var(--bg-card); }
+.pol-chip[aria-selected="true"], .pol-chip[aria-pressed="true"], .pol-chip.is-active {
+  background: var(--ink-warm); border-color: var(--ink-warm); color: var(--bg-base);
+}
+.pol-seg {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  background: var(--cream-200);
+  border: 1px solid var(--rule-color);
+  border-radius: var(--r-pill);
+}
+.pol-seg > button, .pol-seg > a {
+  font-family: var(--font-label);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+  text-decoration: none;
+}
+.pol-seg > [aria-selected="true"], .pol-seg > .is-active { background: var(--bg-card); color: var(--ink-warm); box-shadow: var(--shadow-soft); }
+
+/* ── Forms ── */
+.pol-field { display: flex; flex-direction: column; gap: 6px; }
+.pol-field-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); }
+.pol-field-row .link-gold { font-family: var(--font-label); font-size: var(--fs-xs); }
+.pol-field-label { font-family: var(--font-label); font-size: var(--fs-xs); font-weight: 500; color: var(--ink-muted); }
+.pol-input, .pol-select, .pol-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--cream-400);
+  border-radius: var(--r-xs);
+  background: var(--cream-100);
+  color: var(--ink-warm);
+  padding: 0.7rem 0.85rem;
+  font-family: var(--font-body);
+  font-size: var(--fs-base); /* iOS 확대 방지: 16px 이상 */
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease, background var(--dur-fast) ease;
+}
+.pol-textarea { resize: vertical; min-height: 96px; line-height: 1.6; }
+.pol-input::placeholder, .pol-textarea::placeholder { color: var(--ink-muted); opacity: 0.7; }
+.pol-input:hover, .pol-select:hover, .pol-textarea:hover { border-color: var(--cream-500); }
+.pol-input:focus-visible, .pol-select:focus-visible, .pol-textarea:focus-visible {
+  outline: none; background: var(--bg-card); border-color: var(--gold-mid); box-shadow: var(--focus-ring);
+}
+
+/* ── Surfaces ── */
+.pol-panel {
+  background: var(--bg-card);
+  border-radius: var(--r-xs);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5);
+}
+.pol-panel-quiet { background: var(--cream-100); border: 1px solid var(--rule-color); border-radius: var(--r-xs); padding: var(--space-5); }
+/* 종이 인덱스 카드 — 상단 금색 헤어라인 */
+.pol-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  background: var(--bg-card);
+  border-radius: var(--r-xs);
+  box-shadow: var(--shadow-card);
+  color: inherit;
+  text-decoration: none;
+  transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+}
+.pol-tile::before { content: ""; position: absolute; inset: 0 0 auto; height: 1px; background: var(--hairline-gold); }
+a.pol-tile:hover, button.pol-tile:hover { transform: translateY(-4px) rotate(-0.5deg); box-shadow: var(--shadow-card-lift); }
+
+/* ── Feedback ── */
+.pol-alert, .pol-alert-warn, .pol-alert-ok, .pol-alert-info {
+  font-size: var(--fs-md); line-height: 1.6; border-radius: var(--r-xs); padding: 10px 14px; border: 1px solid;
+}
+.pol-alert { color: var(--pol-danger); border-color: var(--pol-danger-line); background: var(--pol-danger-soft); }
+.pol-alert-warn { color: var(--ink-mid); border-color: var(--rule-color); background: var(--cream-200); }
+.pol-alert-ok { color: var(--pol-ok); border-color: var(--pol-ok-line); background: var(--pol-ok-soft); }
+.pol-alert-info { color: var(--pol-info); border-color: var(--rule-color); background: var(--pol-info-soft); }
+.pol-divider { display: flex; align-items: center; gap: var(--space-3); font-family: var(--font-label); font-size: var(--fs-xs); color: var(--ink-muted); }
+.pol-divider::before, .pol-divider::after { content: ""; flex: 1; height: 1px; background: var(--rule-color); }
+.pol-badge {
+  display: inline-block; font-family: var(--font-label); font-size: var(--fs-2xs); font-weight: 600;
+  padding: 2px 8px; border-radius: var(--r-pill); border: 1px solid var(--rule-strong); color: var(--gold-text); background: var(--cream-100);
+}
+.pol-badge-gold { background: linear-gradient(90deg, var(--gold-light), var(--gold-mid)); border-color: transparent; color: var(--ink-warm); }
+.pol-spinner {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid var(--rule-color); border-top-color: var(--gold-mid);
+  animation: pol-spin 0.8s linear infinite;
+}
+@keyframes pol-spin { to { transform: rotate(360deg); } }
+.pol-toast {
+  position: fixed; left: 50%; bottom: var(--space-6); transform: translateX(-50%); z-index: 400;
+  background: var(--ink-warm); color: var(--bg-base); font-family: var(--font-label); font-size: var(--fs-md);
+  padding: 10px 18px; border-radius: var(--r-xs); box-shadow: var(--shadow-card-lift);
+}
+
+/* ── Modal / overlay (게임 일시정지·결과 화면 포함) ── */
+.pol-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  display: grid; place-items: center; padding: var(--gutter);
+  background: var(--bg-overlay);
+  backdrop-filter: blur(3px);
+}
+.pol-overlay[hidden], .pol-overlay.hidden { display: none; }
+.pol-dialog {
+  width: min(100%, 420px);
+  background: var(--bg-card);
+  padding: var(--space-6) var(--space-5) var(--space-5);
+  border-radius: var(--r-xs);
+  box-shadow: var(--shadow-card-lift);
+  text-align: center;
+  rotate: -0.6deg; /* 탁자 위 사진처럼 살짝 */
+}
+.pol-dialog > * + * { margin-top: var(--space-3); }
+
+/* ── Game HUD — 종이 칩 위 숫자 ── */
+.pol-hud { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.pol-hud-item {
+  display: inline-flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  padding: 6px 12px; background: var(--bg-card); border-radius: var(--r-xs); box-shadow: var(--shadow-soft);
+}
+.pol-hud-label { font-family: var(--font-label); font-size: var(--fs-2xs); font-weight: 500; color: var(--ink-muted); }
+.pol-hud-value { font-family: var(--font-display); font-style: italic; font-synthesis: none; font-size: var(--fs-xl); line-height: 1; color: var(--ink-warm); font-variant-numeric: tabular-nums; }
+.pol-kbd {
+  display: inline-block; min-width: 1.6em; padding: 1px 6px; text-align: center;
+  font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-mid);
+  background: var(--bg-card); border: 1px solid var(--cream-400); border-bottom-width: 2px; border-radius: var(--r-sm);
+}
+
+/* ── Table ── */
+.pol-table { width: 100%; border-collapse: collapse; font-size: var(--fs-md); }
+.pol-table th { font-family: var(--font-label); font-size: var(--fs-xs); font-weight: 500; color: var(--ink-muted); text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule-strong); }
+.pol-table td { padding: 10px; border-bottom: 1px solid var(--rule-color); color: var(--ink-mid); }
+
+/* ── Footer ── */
+.pol-appfoot {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3);
+  padding: var(--space-5) var(--gutter);
+  border-top: 1px solid var(--rule-color);
+  font-family: var(--font-label); font-size: var(--fs-xs); color: var(--ink-muted);
+}
+.pol-appfoot a { color: var(--gold-text); text-decoration: none; }
+.pol-appfoot a:hover { text-decoration: underline; }
+
+/* ── Game lobby (게임 시작/게임오버 화면) — 게임별 SVG 아트(.lp-*)만 각자 CSS에 ── */
+.pol-lobby {
+  position: fixed; inset: 0; z-index: 500;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-5);
+  padding: var(--gutter);
+  background: var(--paper-light) no-repeat, var(--bg-base);
+  text-align: center;
+}
+.pol-lobby.hidden, .pol-lobby[hidden] { display: none; }
+.pol-lcard { background: var(--bg-card); padding: 6px 6px 24px; width: 150px; box-shadow: var(--shadow-card); transform: rotate(-3deg); flex-shrink: 0; }
+.pol-lphoto { width: 100%; aspect-ratio: 1 / 1; background: var(--cream-200); overflow: hidden; }
+.pol-lphoto svg, .pol-lphoto img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pol-lnum { display: block; margin-top: 6px; font-family: var(--font-display); font-style: italic; font-synthesis: none; font-weight: 300; font-size: var(--fs-2xs); color: var(--gold-text); text-align: left; padding-left: 2px; }
+.pol-ltag { display: block; margin-top: 2px; font-family: var(--font-display); font-style: italic; font-synthesis: none; font-weight: 300; font-size: var(--fs-sm); color: var(--ink-muted); }
+.pol-ltitle { margin: 0; font-family: var(--font-display); font-style: italic; font-synthesis: none; font-weight: 300; font-size: var(--fs-display); line-height: 1.05; color: var(--ink-warm); }
+.pol-ldesc { margin: 0; max-width: 300px; font-family: var(--font-body); font-size: var(--fs-md); line-height: 1.65; color: var(--ink-mid); word-break: keep-all; }
+.pol-lbtn { /* = .pol-btn-primary 크기 lg */
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  margin-top: var(--space-2); padding: 14px 36px;
+  font-family: var(--font-label); font-size: var(--fs-base); font-weight: 600; letter-spacing: 0.01em;
+  color: var(--bg-base); background: var(--ink-warm); border: 1px solid var(--ink-warm); border-radius: var(--r-xs);
+  cursor: pointer; word-break: keep-all;
+  transition: background var(--dur-base) var(--ease-out), transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+}
+.pol-lbtn:hover { background: var(--ink-mid); transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+.pol-lbtn:active { transform: scale(0.98); box-shadow: none; }
+.pol-lbtn-ghost { color: var(--ink-mid); background: transparent; border-color: var(--rule-strong); }
+.pol-lbtn-ghost:hover { background: var(--bg-card); color: var(--ink-warm); border-color: var(--gold-mid); }
+.pol-llabel { font-family: var(--font-label); font-size: var(--fs-2xs); font-weight: 500; color: var(--ink-muted); letter-spacing: 0.02em; }
+.pol-lhelp { font-family: var(--font-body); font-size: var(--fs-sm); color: var(--ink-muted); line-height: 1.6; }
+.pol-lstats { display: flex; gap: var(--space-5); justify-content: center; }
+.pol-lstat { display: flex; flex-direction: column-reverse; gap: 2px; }
+.pol-lstat dt, .pol-lstat-label { font-family: var(--font-label); font-size: var(--fs-2xs); font-weight: 500; color: var(--ink-muted); }
+.pol-lstat dd, .pol-lstat-value { margin: 0; font-family: var(--font-display); font-style: italic; font-synthesis: none; font-weight: 300; font-size: var(--fs-2xl); line-height: 1; color: var(--ink-warm); font-variant-numeric: tabular-nums; }
+
+/* 허브로 돌아가기 — href="../" (상대 경로). 로비가 숨겨진(게임 중) 동안엔 자동으로 숨김 */
+.pol-back-btn {
+  position: fixed; top: 14px; left: 14px; z-index: 9999;
+  display: inline-flex; align-items: center; min-height: 40px; box-sizing: border-box;
+  padding: 6px 14px;
+  font-family: var(--font-label); font-size: var(--fs-sm); font-weight: 500;
+  color: var(--gold-text); text-decoration: none; word-break: keep-all;
+  background: var(--bg-header); border: 1px solid var(--rule-color); border-radius: var(--r-pill);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  transition: color var(--dur-fast) ease, background var(--dur-fast) ease, opacity var(--dur-base) ease;
+}
+.pol-back-btn:hover { color: var(--ink-warm); background: var(--bg-card); }
+body:has(.pol-lobby.hidden) .pol-back-btn,
+body:has(.pol-lobby[hidden]) .pol-back-btn,
+body.is-playing .pol-back-btn { opacity: 0; pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pol-btn-primary, .pol-btn-ghost, .pol-tile, .pol-chip, .pol-lbtn { transition: none; }
+  .pol-btn-primary:hover, .pol-btn-ghost:hover, a.pol-tile:hover, button.pol-tile:hover { transform: none; }
+  .pol-spinner { animation-duration: 2.4s; }
+}

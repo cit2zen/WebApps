@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block title %}게임{% endblock %}
+{% block appbar_end %}<a href="/logout" class="pol-btn-ghost pol-btn-sm appbar-link">로그아웃</a>{% endblock %}
 {% block body %}
-<div class="game-wrap">
-  <h1 class="game-title">⚖ 밸런스 게임</h1>
+<main class="game-wrap">
+  <h1 class="pol-eyebrow game-kicker">⚖ 밸런스 게임</h1>
   <p id="game-question" class="game-subtitle" style="display:none"></p>
   <div id="round-badge" class="round-badge" style="display:none"></div>
 
@@ -12,9 +13,8 @@
     <div id="card-b" class="pol-card"></div>
   </div>
 
-  <div id="loading" style="font-style:italic;color:var(--ink-light)">불러오는 중...</div>
-  <a href="/logout" class="nav-link" style="margin-top:auto">로그아웃</a>
-</div>
+  <div id="loading" class="loading-msg" role="status">불러오는 중...</div>
+</main>
 <script src="/static/utils.js?v=1"></script>
 <script src="/static/game.js?v=4"></script>
 {% endblock %}

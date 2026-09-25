@@ -98,7 +98,7 @@ function endGame(win) {
 }
 
 function spawnConfetti() {
-  const colors = ["#e8b54a", "#ff6a5a", "#6bc46e", "#ff4d4d"];
+  const colors = ["var(--gold-mid)", "var(--apple-hi)", "var(--leaf-hi)", "var(--gold-light)", "var(--pol-danger)"]; // 키트 토큰
   let html = "";
   for (let i = 0; i < 44; i++) {
     const left = (Math.random() * 100).toFixed(1);

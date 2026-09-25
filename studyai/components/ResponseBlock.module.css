@@ -1,26 +1,48 @@
-.wrap { margin-bottom: 24px; }
+/* ResponseBlock — each part of the answer is a paper card with a coloured spine */
+.wrap { margin-bottom: var(--space-7); }
 .block {
   position: relative;
-  border-radius: 0 8px 8px 0;
-  padding: 10px 14px 28px;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-3);
+  padding: var(--space-4) var(--space-5) var(--space-7);
+  background: var(--bg-card);
+  border-left: 3px solid var(--sa-detailed);
+  border-radius: 0 var(--r-xs) var(--r-xs) 0;
+  box-shadow: var(--shadow-soft);
   cursor: pointer;
-  transition: filter .15s;
+  transition: box-shadow var(--dur-base) var(--ease-out);
 }
-.block:hover { filter: brightness(1.07); }
-.focused { outline: 1px solid rgba(68,170,255,0.5); }
-.label { font-size: 9px; font-weight: 600; letter-spacing: .5px; margin-bottom: 6px; }
-.body { font-size: 13px; line-height: 1.8; color: #ccc; }
-.body p { margin: 0 0 6px; }
+.block:hover { box-shadow: var(--shadow-card); }
+.block.focused { box-shadow: var(--focus-ring), var(--shadow-card); }
+.label {
+  margin-bottom: var(--space-2);
+  font-family: var(--font-label);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+}
+.body {
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  line-height: 1.8;
+  color: var(--ink-mid);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
 
-.intuitive { border-left: 3px solid #4af; background: #0d1a2a; }
-.intuitive .label { color: #7cb9e8; }
-.formula   { border-left: 3px solid #f4a; background: #1e0d18; }
-.formula   .label { color: #f07cbf; }
-.chart     { border-left: 3px solid #8f4; background: #111c0d; }
-.chart     .label { color: #8f4; }
-.detailed  { border-left: 3px solid #666; background: #161b22; }
-.detailed  .label { color: #888; }
+.intuitive { border-left-color: var(--sa-intuitive); background: var(--paper); }
+.intuitive .label { color: var(--gold-text); }
+.formula { border-left-color: var(--sa-formula); }
+.formula .label { color: var(--pol-info); }
+.chart { border-left-color: var(--sa-chart); }
+.chart .label { color: var(--pol-ok); }
+.detailed { border-left-color: var(--sa-detailed); }
+.detailed .label { color: var(--ink-muted); }
 
-.formulaBlock { margin-bottom: 12px; }
-.vars { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.formulaBlock { margin-bottom: var(--space-3); }
+.vars { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--space-2); }
+
+@media (max-width: 640px) {
+  .block { padding: var(--space-3) var(--space-4) var(--space-7); }
+  .body { font-size: var(--fs-md); line-height: 1.75; }
+}

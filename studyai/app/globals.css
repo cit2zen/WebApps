@@ -1,22 +1,94 @@
-/* app/globals.css */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* app/globals.css — Polaroid Editorial v2 (kit copies in ./styles, never edit them) */
+@import './styles/design-tokens.css';
+@import './styles/typography.css';
+@import './styles/polaroid.css';
+@import './styles/pol-ui.css';
 
+/* App-local tokens: next/font variables + block palette (derived from kit tokens only) */
 :root {
-  --bg: #0d1117;
-  --surface: #161b22;
-  --border: #21262d;
-  --text: #cdd9e5;
-  --muted: #555;
-  --accent: #4af;
+  --font-display: var(--font-fraunces), var(--font-serif-kr), serif;
+  --font-body: var(--font-sans-kr), system-ui, sans-serif;
+  --font-label: var(--font-sans-kr), system-ui, sans-serif;
+  --font-mono: var(--font-space-mono), ui-monospace, monospace;
+  --font-hand: var(--font-nanum-pen), cursive;
+
+  --sa-sidebar-w: 248px;
+  --sa-panel-w: 320px;
+  --sa-intuitive: var(--gold-mid);
+  --sa-formula: var(--pol-info);
+  --sa-chart: var(--pol-ok);
+  --sa-detailed: var(--cream-500);
+  --sa-info-line: rgba(74, 106, 138, 0.35); /* = --pol-info at 35% (kit has no info-line token) */
 }
 
-html, body { height: 100%; overflow: hidden; }
-body { background: var(--bg); color: var(--text); font-family: -apple-system, 'Segoe UI', sans-serif; font-size: 13px; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-::-webkit-scrollbar { width: 5px; height: 5px; }
+html { -webkit-text-size-adjust: 100%; background: var(--bg-base); } /* no white flash on overscroll */
+body { color: var(--ink-warm); }
+
+* { scrollbar-width: thin; scrollbar-color: var(--cream-500) transparent; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #2a3a4a; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--cream-500); border-radius: var(--r-pill); }
 
-button { cursor: pointer; }
+button { cursor: pointer; font-family: inherit; color: inherit; }
 input { font-family: inherit; }
-a { color: var(--accent); text-decoration: none; }
+a { color: var(--gold-text); text-decoration: none; }
+
+/* Markdown / rich text rendered inside answer blocks */
+.sa-prose p { margin: 0 0 var(--space-2); }
+.sa-prose p:last-child { margin-bottom: 0; }
+.sa-prose ul, .sa-prose ol { margin: 0 0 var(--space-2); padding-left: 1.4em; }
+.sa-prose li + li { margin-top: 2px; }
+.sa-prose h1, .sa-prose h2, .sa-prose h3, .sa-prose h4 {
+  margin: var(--space-4) 0 var(--space-2);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-synthesis: none;
+  font-weight: 400;
+  font-size: var(--fs-lg);
+  line-height: 1.3;
+  color: var(--ink-warm);
+}
+.sa-prose h1:first-child, .sa-prose h2:first-child, .sa-prose h3:first-child { margin-top: 0; }
+.sa-prose strong { color: var(--ink-warm); font-weight: 600; }
+.sa-prose a { color: var(--gold-text); text-decoration: underline; text-decoration-color: var(--rule-strong); text-underline-offset: 3px; }
+.sa-prose code {
+  font-family: var(--font-mono), var(--font-body);
+  font-size: var(--fs-sm);
+  letter-spacing: 0;
+  padding: 1px 5px;
+  background: var(--cream-200);
+  border: 1px solid var(--rule-color);
+  border-radius: var(--r-xs);
+  color: var(--ink-brown);
+}
+.sa-prose pre {
+  margin: 0 0 var(--space-2);
+  padding: var(--space-3);
+  overflow-x: auto;
+  background: var(--cream-100);
+  border: 1px solid var(--rule-color);
+  border-radius: var(--r-xs);
+}
+.sa-prose pre code { padding: 0; border: 0; background: none; }
+.sa-prose blockquote {
+  margin: 0 0 var(--space-2);
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--gold-mid);
+  color: var(--ink-muted);
+}
+.sa-prose table { width: 100%; border-collapse: collapse; margin: 0 0 var(--space-2); font-size: var(--fs-md); display: block; overflow-x: auto; }
+.sa-prose th { font-family: var(--font-label); font-weight: 500; font-size: var(--fs-xs); color: var(--ink-muted); text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--rule-strong); }
+.sa-prose td { padding: 6px 8px; border-bottom: 1px solid var(--rule-color); }
+.sa-prose hr { border: 0; height: 1px; background: var(--rule-color); margin: var(--space-3) 0; }
+
+/* ≥40px tap targets for the app-bar links on touch layouts */
+@media (max-width: 900px) {
+  .pol-appbar .pol-brand,
+  .pol-appbar a.pol-appbar-title { padding-block: 9px; }
+}
+
+/* KaTeX sits on paper: ink colour, no overflow on phones */
+.katex { color: var(--ink-warm); }
+.katex-display { margin: var(--space-2) 0; overflow-x: auto; overflow-y: hidden; padding: 2px 0; }

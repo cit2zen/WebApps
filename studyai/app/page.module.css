@@ -1,27 +1,212 @@
-/* app/page.module.css */
-.app { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-.topbar { height: 46px; background: #161b22; border-bottom: 1px solid #21262d; display: flex; align-items: center; padding: 0 14px; gap: 10px; flex-shrink: 0; }
-.logo { font-size: 15px; font-weight: 700; color: #7cb9e8; }
-.viewToggle { margin-left: auto; display: flex; background: #1a2030; border-radius: 6px; overflow: hidden; border: 1px solid #2a3a4a; }
-.toggleBtn { padding: 5px 14px; background: none; border: none; color: #555; font-size: 11px; cursor: pointer; white-space: nowrap; }
-.toggleActive { background: #1a3a5a; color: #4af; }
-.body { display: flex; flex: 1; overflow: hidden; }
-.content { flex: 1; display: flex; flex-direction: column; min-width: 0; border-right: 1px solid #21262d; }
-.breadcrumb { height: 32px; background: #161b22; border-bottom: 1px solid #21262d; display: flex; align-items: center; padding: 0 14px; gap: 4px; font-size: 11px; color: #555; flex-shrink: 0; }
-.breadcrumb span { cursor: pointer; }
-.breadcrumb span:hover { color: #aaa; }
-.sep { color: #333; }
-.curCrumb { color: #7cb9e8; }
-.treeBtn { margin-left: auto; background: #1a2030; border: 1px solid #2a3a4a; border-radius: 5px; padding: 3px 10px; color: #555; font-size: 10px; }
-.treeBtn:hover { color: #aaa; }
-.scroll { flex: 1; overflow-y: auto; padding: 18px 20px; }
-.qLabel { font-size: 11px; color: #555; margin-bottom: 10px; }
-.hint { font-size: 13px; color: #444; text-align: center; margin-top: 60px; }
-.thinkingMsg { font-size: 12px; color: #555; text-align: center; padding: 12px; }
-.inputArea { padding: 12px 16px; border-top: 1px solid #21262d; flex-shrink: 0; }
-.inputWrap { background: #1f2937; border-radius: 8px; border: 1px solid #2a3a4a; display: flex; align-items: center; gap: 8px; padding: 8px 12px; }
-.input { flex: 1; background: none; border: none; outline: none; color: #ccc; font-size: 12px; }
-.input::placeholder { color: #444; }
-.input:disabled { opacity: .5; }
-.sendBtn { background: #1a3a5a; border: none; border-radius: 5px; color: #7cb9e8; padding: 5px 14px; font-size: 11px; }
-.sendBtn:disabled { opacity: .5; }
+/* app/page.module.css — Polaroid Editorial v2 app shell */
+.app { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
+
+/* App bar (base = .pol-appbar) */
+.topbar { flex-shrink: 0; }
+.navBtn { display: none; }
+.topEnd { min-width: 0; }
+.viewToggle { flex-shrink: 0; }
+.viewToggle > button { white-space: nowrap; }
+
+.body { position: relative; display: flex; flex: 1; min-height: 0; overflow: hidden; }
+
+/* Left: session list (drawer on narrow screens) */
+.nav { display: flex; flex-shrink: 0; width: var(--sa-sidebar-w); min-height: 0; }
+.scrim { display: none; }
+
+/* Deep view ("추가 질문 전체 보기"): no answer column → the follow-up panel fills the row */
+.body:not(:has(> main)) > aside { flex: 1 1 auto; width: auto; min-width: 0; }
+
+/* Center */
+.content { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 52px;
+  padding: var(--space-2) var(--space-5);
+  border-bottom: 1px solid var(--rule-color);
+  font-family: var(--font-label);
+  font-size: var(--fs-sm);
+  color: var(--ink-muted);
+  flex-shrink: 0;
+  min-width: 0;
+}
+.breadcrumb > span { cursor: pointer; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color var(--dur-fast) ease; }
+.breadcrumb > span:first-child { color: var(--ink-mid); font-weight: 500; }
+.breadcrumb > span:hover { color: var(--ink-warm); }
+.breadcrumb > .sep { color: var(--gold-mid); flex-shrink: 0; cursor: default; }
+.breadcrumb > .curCrumb { color: var(--ink-warm); }
+.breadcrumb .treeBtn { margin-left: auto; flex-shrink: 0; }
+
+.scroll { flex: 1; overflow-y: auto; padding: var(--space-6) var(--space-5) var(--space-7); }
+.scroll > * { max-width: var(--measure); margin-left: auto; margin-right: auto; }
+
+.qLabel {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink-warm);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.qMark {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-synthesis: none;
+  font-weight: 400;
+  font-size: var(--fs-xl);
+  line-height: 1;
+  color: var(--gold-dark);
+}
+
+/* Empty state — a small polaroid on the table */
+.scroll > .hint {
+  max-width: 380px;
+  margin-top: var(--space-8);
+  padding: var(--space-6) var(--space-5) var(--space-4);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+  border-radius: var(--r-xs);
+  rotate: -0.8deg;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  line-height: 1.7;
+  color: var(--ink-mid);
+  word-break: keep-all;
+}
+.hint::after {
+  content: "StudyAI";
+  display: block;
+  margin-top: var(--space-6);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-synthesis: none;
+  font-weight: 300;
+  font-size: var(--fs-sm);
+  color: var(--gold-text);
+}
+
+.thinkingMsg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  font-family: var(--font-label);
+  font-size: var(--fs-sm);
+  color: var(--ink-muted);
+}
+.spinner.spinner { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* Composer */
+.inputArea {
+  flex-shrink: 0;
+  padding: var(--space-3) var(--space-5) var(--space-4);
+  border-top: 1px solid var(--rule-color);
+  background: var(--bg-header);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.inputWrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 5px 5px 5px var(--space-4);
+  background: var(--bg-card);
+  border: 1px solid var(--cream-400);
+  border-radius: var(--r-xs);
+  box-shadow: var(--shadow-soft);
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+}
+.inputWrap:focus-within { border-color: var(--gold-mid); box-shadow: var(--focus-ring), var(--shadow-soft); }
+.inputWrap .input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 0;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--ink-warm);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  text-overflow: ellipsis;
+}
+.inputWrap .input:focus-visible { box-shadow: none; }
+.input::placeholder { color: var(--ink-muted); opacity: 0.8; }
+.input:disabled { cursor: not-allowed; }
+.inputWrap .sendBtn { flex-shrink: 0; min-height: 40px; min-width: 64px; }
+
+/* ── ≤900px: drawer + stacked panels, page scrolls ── */
+@media (max-width: 900px) {
+  .app { height: auto; min-height: 100dvh; overflow: visible; }
+
+  .topbar.topbar {
+    position: relative;
+    flex-wrap: wrap;
+    height: auto;
+    min-height: var(--header-h);
+    row-gap: var(--space-2);
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-2);
+  }
+  .topbar .navBtn { display: inline-flex; margin-left: auto; min-height: 40px; }
+  .topbar .topEnd { order: 5; width: 100%; margin-left: 0; }
+  .viewToggle { width: 100%; }
+  .viewToggle.viewToggle > button { flex: 1; min-height: 40px; padding-left: var(--space-2); padding-right: var(--space-2); }
+
+  .body { flex-direction: column; overflow: visible; }
+
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 120;
+    width: min(300px, 86vw);
+    transform: translateX(-104%);
+    visibility: hidden;
+    transition: transform var(--dur-base) var(--ease-out), visibility 0s linear var(--dur-base);
+  }
+  .nav.navOpen {
+    transform: none;
+    visibility: visible;
+    box-shadow: var(--shadow-card-lift);
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .scrim { display: block; position: fixed; inset: 0; z-index: 110; background: var(--bg-overlay); }
+
+  .content { flex: none; overflow: visible; }
+  .breadcrumb { padding: var(--space-2) var(--space-4); }
+  .breadcrumb .treeBtn { min-height: 40px; }
+  .inputWrap .input { min-height: 40px; }
+  .scroll { overflow: visible; padding: var(--space-5) var(--space-4) var(--space-6); }
+  .scroll > .hint { margin-top: var(--space-6); }
+
+  .inputArea {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    padding: var(--space-2) var(--space-3) calc(var(--space-2) + env(safe-area-inset-bottom));
+  }
+  .inputWrap { padding-left: var(--space-3); }
+}
+
+@media (max-width: 640px) {
+  .qLabel { font-size: var(--fs-base); }
+  .qMark { font-size: var(--fs-lg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav, .nav.navOpen { transition: none; }
+}

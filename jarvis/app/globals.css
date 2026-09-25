@@ -1,135 +1,169 @@
-* { margin: 0; padding: 0; box-sizing: border-box; }
-/* cityzen Neon Arcade 토큰 (정본: WebApps/cityzen-ui.css) */
+/* JARVIS — Polaroid Editorial v2 (킷: design-tokens · typography · polaroid · pol-ui, layout.tsx에서 먼저 import)
+   색은 var(--token)만, font-size는 var(--fs-*)만. 한글은 mono 금지(라벨=--font-label).
+   WebGL/캔버스 색은 lib/palette.ts(토큰 미러)에서 온다. */
+
+/* next/font 변수 → 킷 폰트 역할 (rule 5) */
 :root {
-  --bg: #06060b;
-  --text: #eef0ff;
-  --dim: #9a9ac0;
-  --mute: #64647e;
-  --cyan: #5ef2ff;
-  --violet: #a98bff;
-  --magenta: #ff4fc8;
-  --green: #39ff96;
-  --amber: #ffd250;
-  --border: rgba(255,255,255,.08);
-  --r: 16px;
-  --rs: 12px;
-  --font-ui: var(--font-geist), ui-sans-serif, system-ui, "Segoe UI", sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", "Segoe UI Mono", monospace;
+  --font-display: var(--font-fraunces), var(--font-serif-kr), serif;
+  --font-body: var(--font-sans-kr), system-ui, sans-serif;
+  --font-label: var(--font-sans-kr), system-ui, sans-serif;
+  --font-mono: var(--font-space-mono), ui-monospace, monospace;
+  --font-hand: var(--font-nanum-pen), cursive;
 }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
 /* iOS Safari 주소창 대응: 동적 뷰포트 단위(dvh). 100vh는 하단 자막이 가려짐. */
-html, body { width: 100%; height: 100dvh; background: var(--bg); overflow: hidden; color: var(--text);
-  font-family: var(--font-ui); -webkit-font-smoothing: antialiased; }
-#__next, main { width: 100vw; height: 100dvh; }
+html { background: var(--bg-base); }
+html, body { width: 100%; height: 100dvh; overflow: hidden; }
+#__next, main { width: 100%; height: 100dvh; }
 
-/* 키보드 포커스 링 (WCAG 2.4.7) — 마우스 클릭엔 안 뜸 */
-:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 8px; }
-
-/* ── 시작 오버레이 ── */
-.jv-overlay { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 18px; z-index: 10; text-align: center; padding: 24px;
-  padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
-/* 중앙 소프트 백드롭 — 분주한 오브 위에서 타이틀/버튼 가독성·깊이감 */
-.jv-overlay::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background: radial-gradient(60% 50% at 50% 50%, rgba(6,6,11,.72), rgba(6,6,11,.30) 55%, transparent 78%); }
-.jv-title { font-family: var(--font-mono); font-weight: 700; font-size: clamp(2rem, 9vw, 3.4rem);
-  letter-spacing: .14em; margin: 0;
-  background: linear-gradient(90deg, var(--cyan), var(--violet)); -webkit-background-clip: text;
-  background-clip: text; color: transparent; filter: drop-shadow(0 0 24px rgba(169,139,255,.34)); }
-.jv-sub { color: var(--dim); font-size: clamp(.9rem, 3.4vw, 1.02rem); line-height: 1.55;
-  max-width: 32ch; margin: 0; }
-.jv-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 92vw; }
-.jv-chip { font-family: var(--font-mono); font-size: .72rem; color: var(--dim); padding: 6px 12px;
-  border: 1px solid var(--border); border-radius: 999px; background: rgba(94,242,255,.05); }
-
-/* ── 시작 버튼 (.cz-btn 패턴: hover glow · active scale · focus 링) ── */
-.jv-btn { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-ui);
-  font-weight: 700; font-size: 1.02rem; padding: 15px 30px; border-radius: var(--r);
-  border: 1px solid transparent; cursor: pointer;
-  background: linear-gradient(135deg, var(--cyan), var(--violet)); color: #06060a;
-  box-shadow: 0 0 36px rgba(94,242,255,.45); transition: transform .18s, box-shadow .18s; }
-.jv-btn:hover { transform: translateY(-2px); box-shadow: 0 0 52px rgba(169,139,255,.8); }
-.jv-btn:active { transform: translateY(0) scale(.98); }
-
-/* ── 하단 상태/자막 영역 ── */
-.jv-hud { position: fixed; left: 0; right: 0; bottom: 28px; text-align: center;
-  padding: 0 16px calc(env(safe-area-inset-bottom)); pointer-events: none; }
-.jv-status { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono);
-  font-size: .76rem; letter-spacing: .14em; color: var(--cyan); text-transform: uppercase;
-  padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(94,242,255,.22);
-  background: rgba(94,242,255,.06); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  text-shadow: 0 0 10px rgba(94,242,255,.5); }
-.jv-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan);
-  box-shadow: 0 0 8px var(--cyan); animation: jv-pulse 1.4s ease-in-out infinite; }
-.jv-notice { color: var(--amber); }
-.jv-transcript { margin: 10px auto 0; color: var(--dim); font-size: .86rem;
-  width: fit-content; max-width: min(720px, 92vw); padding: 5px 14px; border-radius: 999px;
-  background: rgba(255,255,255,.03); border: 1px solid var(--border);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* AI 응답 — 글래스 패널로 가독성·고급감 */
-.jv-response { margin: 8px auto 0; color: var(--text); font-size: 1.02rem; line-height: 1.55;
-  width: fit-content; max-width: min(680px, 92vw);
-  padding: 13px 20px; border-radius: var(--r);
-  background: linear-gradient(180deg, rgba(20,22,40,.62), rgba(10,11,22,.62));
-  border: 1px solid rgba(169,139,255,.20);
-  box-shadow: 0 8px 40px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06),
-    0 0 28px rgba(94,242,255,.10);
-  backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-  animation: jv-rise .35s ease both; }
-@keyframes jv-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-
-/* ── 텍스트 입력 폴백 (STT 미지원/보조 입력) ── */
-.jv-fallback { position: fixed; left: 0; right: 0; bottom: 0; z-index: 11;
-  display: flex; gap: 8px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-  width: min(720px, 100vw); margin: 0 auto; }
-.jv-input { flex: 1; font-family: var(--font-ui); font-size: 1rem; color: var(--text);
-  background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: var(--rs);
-  padding: 12px 14px; resize: none; transition: border-color .15s, box-shadow .15s; outline: none; }
-.jv-input::placeholder { color: var(--mute); }
-.jv-input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(94,242,255,.18); }
-.jv-send { flex: 0 0 auto; font-family: var(--font-ui); font-weight: 700; font-size: .95rem;
-  padding: 0 18px; border-radius: var(--rs); border: 1px solid transparent; cursor: pointer;
-  background: linear-gradient(135deg, var(--cyan), var(--violet)); color: #06060a;
-  box-shadow: 0 0 22px rgba(94,242,255,.35); transition: transform .18s, box-shadow .18s; }
-.jv-send:hover { transform: translateY(-1px); box-shadow: 0 0 34px rgba(169,139,255,.7); }
-.jv-send:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
-
-@keyframes jv-pulse { 0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: .4; transform: scale(.7); } }
-
-/* ── 홀로그래픽 HUD 오버레이 ── */
-.jv-hud {
-  position: absolute; inset: 0; pointer-events: none; z-index: 2;
-  display: grid; place-items: center; overflow: hidden;
+/* ── 무대: 투명 WebGL 캔버스 + 따뜻한 잉크 비네팅 ── */
+.jv-stage { position: fixed; inset: 0; overflow: hidden; }
+.jv-stage::after {
+  content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background: radial-gradient(ellipse 80% 75% at 50% 44%, transparent 58%,
+    color-mix(in srgb, var(--ink-brown) 9%, transparent));
 }
-.jv-hud-wave, .jv-hud-svg {
-  grid-area: 1 / 1; pointer-events: none;
+
+/* ── 레티클: 금색 헤어라인 링 + 파형 + 크롭 마크 (오브와 같은 비율로 6.25% 위) ── */
+.jv-reticle {
+  position: absolute; inset: 0 0 12.5% 0; z-index: 2; pointer-events: none;
+  display: grid; place-items: center;
 }
-/* 캔버스는 매 프레임 갱신 → CSS filter(컴포지터 재블러)는 깜빡임 유발 → 글로우는 캔버스 내부에서만 */
-.jv-hud-svg {
-  width: min(78vmin, 560px); height: min(78vmin, 560px);
-  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--hud) 55%, transparent));
-  opacity: .9;
-}
+.jv-hud-wave, .jv-hud-svg, .jv-frame { grid-area: 1 / 1; pointer-events: none; }
+.jv-hud-svg, .jv-frame { width: min(78vmin, 560px); height: min(78vmin, 560px); }
+.jv-hud-svg { opacity: 0.85; }
+.jv-hud-svg circle, .jv-hud-svg line { transition: stroke var(--dur-slow) var(--ease-out); }
 .jv-ring { transform-origin: 100px 100px; }
 .jv-ring-a { animation: jv-spin 26s linear infinite; }
 .jv-ring-b { animation: jv-spin 14s linear infinite reverse; }
 .jv-ring-c { animation: jv-spin 60s linear infinite; }
+.jv-reticle[data-mode="thinking"] .jv-ring-b { animation-duration: 6s; }
 @keyframes jv-spin { to { transform: rotate(360deg); } }
 
-/* 코너 타겟 브래킷 */
+/* 사진 모서리 크롭 마크 */
+.jv-frame { position: relative; }
 .jv-bracket {
-  position: absolute; width: 26px; height: 26px; pointer-events: none;
-  border: 1.5px solid color-mix(in srgb, var(--hud) 70%, transparent);
-  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--hud) 50%, transparent));
+  position: absolute; width: 22px; height: 22px;
+  border: 1px solid var(--hud); opacity: 0.7;
+  transition: border-color var(--dur-slow) var(--ease-out);
 }
-.jv-tl { top: 22px; left: 22px; border-right: none; border-bottom: none; }
-.jv-tr { top: 22px; right: 22px; border-left: none; border-bottom: none; }
-.jv-bl { bottom: 22px; left: 22px; border-right: none; border-top: none; }
-.jv-br { bottom: 22px; right: 22px; border-left: none; border-top: none; }
+.jv-tl { top: 0; left: 0; border-right: none; border-bottom: none; }
+.jv-tr { top: 0; right: 0; border-left: none; border-bottom: none; }
+.jv-bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+.jv-br { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+/* ── cityzen.kr로 돌아가기 (킷 .pol-back-btn + 터치 영역·safe-area) ── */
+.jv-home {
+  top: max(14px, env(safe-area-inset-top)); left: max(14px, env(safe-area-inset-left));
+  display: inline-flex; align-items: center; min-height: 40px;
+}
+
+/* ── 시작 화면: 에디토리얼 표지 (위 타이틀 · 가운데 오브 · 아래 안내+버튼) ── */
+.jv-overlay {
+  position: fixed; inset: 0; z-index: 10; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  gap: var(--space-4); text-align: center;
+  padding: calc(var(--space-8) + env(safe-area-inset-top)) var(--space-4)
+    calc(var(--space-6) + env(safe-area-inset-bottom));
+}
+.jv-overlay :is(a, button) { pointer-events: auto; }
+.jv-overlay.is-static { justify-content: flex-start; }
+.jv-overlay.is-intro ~ .jv-hud { display: none; } /* 시작 전엔 하단 상태 표시 숨김(버튼과 겹침 방지) */
+
+.jv-intro-head { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
+.jv-title {
+  font-family: var(--font-display); font-style: italic; font-synthesis: none; font-weight: 300;
+  font-size: var(--fs-display); line-height: 1; letter-spacing: 0.04em; color: var(--ink-warm);
+}
+.jv-sub {
+  font-family: var(--font-body); font-size: var(--fs-lead); line-height: 1.6; color: var(--ink-mid);
+  max-width: 34ch; word-break: keep-all;
+}
+
+.jv-intro-foot {
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-4);
+  width: min(100%, 460px);
+}
+/* 예시 문장: 버튼이 아닌 손글씨 메모 */
+.jv-suggest { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.jv-suggest-label {
+  font-family: var(--font-label); font-size: var(--fs-xs); font-weight: 500;
+  letter-spacing: 0.03em; color: var(--ink-muted);
+}
+.jv-suggest-list {
+  display: flex; flex-wrap: wrap; justify-content: center; column-gap: var(--space-3);
+  font-family: var(--font-hand); font-size: var(--fs-2xl); line-height: 1.3; color: var(--ink-mid);
+  rotate: -1deg;
+}
+.jv-suggest-item:not(:last-child)::after { content: "·"; margin-left: var(--space-3); color: var(--gold-mid); }
+.jv-btn { min-height: 48px; }
+.jv-alert { width: 100%; word-break: keep-all; }
+
+/* ── 하단 상태/자막 영역 ── */
+.jv-hud {
+  position: fixed; left: 0; right: 0; bottom: calc(var(--space-5) + env(safe-area-inset-bottom)); z-index: 5;
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-2);
+  padding: 0 var(--space-4); text-align: center; pointer-events: none;
+}
+.jv-hud.is-above-input { bottom: calc(84px + env(safe-area-inset-bottom)); }
+.jv-status {
+  display: inline-flex; align-items: center; gap: var(--space-2); min-height: 32px;
+  font-family: var(--font-label); font-size: var(--fs-sm); font-weight: 500; letter-spacing: 0.02em;
+  color: var(--ink-mid); padding: 5px 14px; border-radius: var(--r-pill);
+  background: var(--bg-card); border: 1px solid var(--rule-color); box-shadow: var(--shadow-soft);
+}
+.jv-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  background: var(--gold-mid); animation: jv-pulse 1.4s ease-in-out infinite;
+}
+.jv-status[data-mode="idle"] .jv-dot { background: var(--gold-light); animation-duration: 2.8s; }
+.jv-status[data-mode="listening"] .jv-dot { background: var(--pol-danger); animation-duration: 1s; } /* 녹음 중 */
+.jv-status[data-mode="thinking"] .jv-dot { background: var(--gold-dark); animation-duration: 0.7s; }
+.jv-notice { color: var(--pol-danger); }
+.jv-transcript {
+  font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink-muted);
+  max-width: min(720px, 100%); padding: 5px 14px; border-radius: var(--r-pill);
+  background: var(--cream-100); border: 1px solid var(--rule-color);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* AI 응답 — 흰 인화지 카드 + 상단 금색 헤어라인 */
+.jv-response {
+  position: relative; max-width: min(680px, 100%); padding: 14px 20px;
+  font-family: var(--font-body); font-size: var(--fs-base); line-height: 1.65; color: var(--ink-warm);
+  text-align: left; word-break: keep-all; overflow-wrap: anywhere;
+  background: var(--bg-card); border-radius: var(--r-xs); box-shadow: var(--shadow-card);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  animation: jv-rise var(--dur-slow) var(--ease-out) both;
+}
+.jv-response::before { content: ""; position: absolute; inset: 0 0 auto; height: 1px; background: var(--hairline-gold); }
+@keyframes jv-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ── 텍스트 입력 폴백 (STT 미지원/보조 입력) ── */
+.jv-fallback {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 11;
+  display: flex; gap: var(--space-2);
+  padding: 12px max(var(--space-4), calc((100% - 720px) / 2)) calc(12px + env(safe-area-inset-bottom));
+  background: var(--bg-header); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--rule-color);
+}
+.jv-input { flex: 1; min-height: 48px; resize: none; line-height: 1.4; padding: 12px 14px; }
+.jv-send { flex: 0 0 auto; min-height: 48px; }
+
+@keyframes jv-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+
+/* 낮은 화면(가로 모드 휴대폰 등): 오브 가림을 줄이려 보조 문구 숨김 */
+@media (max-height: 560px) {
+  .jv-overlay { padding-top: calc(var(--space-7) + env(safe-area-inset-top)); padding-bottom: var(--space-4); }
+  .jv-overlay.is-intro .jv-sub, .jv-suggest { display: none; }
+}
+@media (max-width: 640px) {
+  .jv-suggest-list { font-size: var(--fs-xl); }
+  .jv-response { font-size: var(--fs-md); padding: 12px 16px; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .jv-dot { animation: none !important; }
-  .jv-btn:hover, .jv-send:hover { transform: none !important; }
   .jv-ring-a, .jv-ring-b, .jv-ring-c { animation: none !important; }
+  .jv-response { animation: none; }
 }

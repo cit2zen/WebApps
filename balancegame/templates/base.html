@@ -6,21 +6,22 @@
   <title>{% block title %}홈{% endblock %} — 밸런스 게임</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,200;0,300;1,100;1,200;1,300;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/style.css?v=9">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,100..400&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500&family=Space+Mono&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/design-tokens.css?v=1">
+  <link rel="stylesheet" href="/static/typography.css?v=1">
+  <link rel="stylesheet" href="/static/polaroid.css?v=1">
+  <link rel="stylesheet" href="/static/pol-ui.css?v=1">
+  <link rel="stylesheet" href="/static/style.css?v=10">
+  {% block head %}{% endblock %}
 </head>
-<body>
+<body class="pol-body">
+  <header class="pol-appbar">
+    <a class="pol-brand" href="https://cityzen.kr">cityzen</a>
+    <span class="pol-appbar-sep" aria-hidden="true"></span>
+    <span class="pol-appbar-title">밸런스 게임</span>
+    <nav class="pol-appbar-end" aria-label="이동">{% block appbar_end %}{% endblock %}</nav>
+  </header>
   {% block body %}{% endblock %}
-  <script>
-    // 뒤로가기 → onvoicing 허브 (설정 호스트 제외)
-    (function () {
-      if (location.hostname.indexOf('settings') !== -1) return;
-      if (history.state && history.state.czHub) return;
-      history.pushState({ czHub: 1 }, '');
-      window.addEventListener('popstate', function (e) {
-        if (!e.state || !e.state.czHub) location.replace('https://onvoicing.cityzen.kr/');
-      });
-    }());
-  </script>
 </body>
 </html>

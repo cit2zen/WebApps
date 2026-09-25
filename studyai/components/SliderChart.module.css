@@ -1,6 +1,19 @@
-.wrap { background: #0d1107; border-radius: 8px; padding: 12px; }
+/* SliderChart — chart on a cream sheet with gold sliders */
+.wrap { padding: var(--space-3); background: var(--cream-100); border: 1px solid var(--rule-color); border-radius: var(--r-xs); cursor: default; }
 .chartArea { height: 120px; margin-bottom: 10px; }
-.sliderRow { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 12px; }
-.varLabel { color: #8f4; min-width: 20px; font-style: italic; }
-.slider { flex: 1; accent-color: #8f4; }
-.value { color: #fff; min-width: 32px; text-align: right; font-size: 11px; }
+.sliderRow { display: flex; align-items: center; gap: var(--space-2); min-height: 36px; margin-top: 6px; font-size: var(--fs-sm); }
+.varLabel { min-width: 24px; font-family: var(--font-display); font-style: italic; font-synthesis: none; font-size: var(--fs-lg); color: var(--ink-warm); }
+.slider { flex: 1; min-width: 0; height: 28px; margin: 0; background: transparent; accent-color: var(--gold-mid); cursor: pointer; -webkit-appearance: none; appearance: none; }
+/* paper track + gold thumb (native accent-color paints the empty track near-black) */
+.slider::-webkit-slider-runnable-track { height: 4px; background: var(--cream-500); border-radius: var(--r-pill); }
+.slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; margin-top: -7px; border-radius: 50%; background: var(--gold-mid); border: 2px solid var(--bg-card); box-shadow: var(--shadow-soft); transition: transform var(--dur-fast) ease; }
+.slider:hover::-webkit-slider-thumb { transform: scale(1.12); }
+.slider::-moz-range-track { height: 4px; background: var(--cream-500); border: 0; border-radius: var(--r-pill); }
+.slider::-moz-range-progress { height: 4px; background: var(--gold-mid); border-radius: var(--r-pill); }
+.slider::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--gold-mid); border: 2px solid var(--bg-card); box-shadow: var(--shadow-soft); }
+.value { min-width: 40px; text-align: right; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-mid); font-variant-numeric: tabular-nums; }
+
+@media (max-width: 900px) {
+  .sliderRow { min-height: 40px; }
+  .slider { height: 40px; }
+}

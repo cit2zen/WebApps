@@ -1,240 +1,212 @@
 :root {
-  /* 인게임 네온 크롬은 로컬 변수로 자립 (cityzen-ui.css 의존 제거) */
-  --neon-cyan: #5ef2ff;
-  --neon-mag: #ff4fc8;
-  --neon-grn: #39ff96;
-  --neon-amb: #ffd250;
-  --neon-vio: #a98bff;
-  --accent: var(--neon-mag);
-  --accent2: var(--neon-cyan);
-  --ink: #eef0ff;
-  --muted: #9a9ac0;
-  --panel: rgba(12, 12, 20, 0.62);
-  --panel-border: rgba(255, 255, 255, 0.08);
-  --level-hue: 0deg;
+  /* 테트리스 앱 팔레트 — Polaroid(cream·gold·ink·ok·danger) 파생. 공통 UI는 ../design-tokens.css + ../pol-ui.css.
+     캔버스 색은 palette.js 가 이 변수들을 읽는다 (JS에 색 리터럴 없음). */
+  --tt-ground: var(--paper);
+  --tt-grid: rgba(192, 160, 96, 0.18);
+  --tt-i: #3f7f86;         --tt-i-light: #9cc4c2;  --tt-i-dark: #2c5f66;   /* 틸 */
+  --tt-o: #c9a24a;         --tt-o-light: #ead69c;  --tt-o-dark: var(--gold-dark); /* 골드 */
+  --tt-t: #8a5a7a;         --tt-t-light: #c49ab4;  --tt-t-dark: #664058;   /* 플럼 */
+  --tt-s: var(--pol-ok);   --tt-s-light: #a6bf8f;  --tt-s-dark: #435e33;   /* 세이지 */
+  --tt-z: var(--pol-danger); --tt-z-light: #d98474; --tt-z-dark: #862f23;  /* 벽돌 */
+  --tt-j: #3e4a78;         --tt-j-light: #8f98c0;  --tt-j-dark: #2a3358;   /* 남색 잉크 */
+  --tt-l: #c87533;         --tt-l-light: #e6b284;  --tt-l-dark: #99561f;   /* 테라코타 */
+  --tt-bevel-hi: rgba(255, 252, 244, 0.42);
+  --tt-bevel-side: rgba(255, 252, 244, 0.2);
+  --tt-bevel-lo: rgba(26, 16, 5, 0.22);
+  --tt-edge: rgba(26, 16, 5, 0.45);
+  --tt-flash: var(--gold-light);
+  --tt-fx-level: var(--ink-warm);
+  --tt-fx-tetris: var(--gold-text);
+  --tt-fx-tspin: var(--tt-t-dark);
+  --tt-fx-clear: var(--ink-mid);
+  --tt-fx-score: var(--gold-text);
+  --tt-fx-halo: var(--paper);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-@keyframes drift {
-  0%   { background-position: 0% 0%, 100% 0%, 0 0; }
-  100% { background-position: 40% 30%, 60% 80%, 0 0; }
-}
-
 body {
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--ink);
-  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-  letter-spacing: 0.01em;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse 70% 60% at 22% 18%, rgba(255, 79, 200, 0.18), transparent 60%),
-    radial-gradient(ellipse 70% 60% at 80% 82%, rgba(94, 242, 255, 0.16), transparent 60%),
-    linear-gradient(160deg, #06060b 0%, #0d0b1d 45%, #06060b 100%);
-  background-size: 200% 200%, 200% 200%, 100% 100%;
-  animation: drift 28s ease-in-out infinite alternate;
-  transition: --accent 0.6s;
-}
-/* accent palette cycles by level */
-body[data-level="2"] { --accent: var(--neon-vio); --accent2: var(--neon-mag); }
-body[data-level="3"] { --accent: var(--neon-grn); --accent2: var(--neon-amb); }
-body[data-level="4"] { --accent: #fb923c; --accent2: #f43f5e; }
-body[data-level="5"] { --accent: var(--neon-cyan); --accent2: var(--neon-vio); }
-body[data-level="6"] { --accent: #f43f5e; --accent2: var(--neon-cyan); }
-
-.scanlines {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    to bottom, rgba(0, 0, 0, 0) 0 2px, rgba(0, 0, 0, 0.16) 2px 4px);
-  mix-blend-mode: multiply;
-  z-index: 5;
 }
 
 .game {
   position: relative;
   display: flex;
   align-items: stretch;
-  gap: 22px;
-  padding: 26px;
-  z-index: 1;
+  gap: var(--space-5);
+  padding: var(--space-5);
 }
 
 .logo {
-  /* Polaroid Editorial: Fraunces italic */
   font-family: var(--font-display);
   font-style: italic;
+  font-synthesis: none;
   font-weight: 300;
-  font-size: 20px;
-  line-height: 1.3;
-  letter-spacing: 0.02em;
-  background: linear-gradient(120deg, var(--accent2), var(--accent));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 0 10px rgba(255, 79, 200, 0.55));
-  margin-bottom: 4px;
+  font-size: var(--fs-heading);
+  line-height: 1.05;
+  color: var(--ink-warm);
+  margin-bottom: var(--space-1);
 }
+.logo::after { content: "."; color: var(--gold-mid); }
 
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
   width: 158px;
 }
 .panel--right { justify-content: flex-start; }
 
+/* 종이 카드 패널 */
 .box {
-  border: 1px solid var(--panel-border);
-  background: var(--panel);
-  backdrop-filter: blur(6px);
-  border-radius: 12px;
-  padding: 13px;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03) inset,
-              0 8px 30px rgba(0, 0, 0, 0.35);
+  background: var(--bg-card);
+  border-radius: var(--r-xs);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-card);
 }
-
-h2 {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--muted);
-  margin-bottom: 9px;
-  letter-spacing: 0.18em;
+.box-title {
+  font-family: var(--font-label);
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--ink-muted);
+  margin-bottom: var(--space-2);
 }
 
 canvas#hold, canvas#next { display: block; width: 100%; }
 
+/* ── 보드: 폴라로이드 인화 프레임 ── */
 .stage {
   position: relative;
-  padding: 8px;
-  border-radius: 14px;
-  background: rgba(12, 9, 28, 0.5);
-  border: 1px solid var(--panel-border);
-  box-shadow:
-    0 0 28px rgba(255, 79, 200, 0.16),
-    0 0 60px rgba(94, 242, 255, 0.1),
-    0 18px 60px rgba(0, 0, 0, 0.5);
+  padding: var(--space-2) var(--space-2) var(--space-6);
+  background: var(--bg-card);
+  border-radius: var(--r-xs);
+  box-shadow: var(--shadow-card);
+}
+.stage::after {
+  content: "tetris";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--space-2);
+  text-align: center;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-synthesis: none;
+  font-weight: 300;
+  font-size: var(--fs-sm);
+  color: var(--ink-muted);
+  pointer-events: none;
 }
 .board {
   display: block;
-  border-radius: 8px;
-  background: rgba(6, 5, 16, 0.6);
+  background: var(--tt-ground);
+  border: 1px solid var(--rule-color);
   touch-action: none; /* 보드 위 스와이프 시 페이지 스크롤 차단 */
-  /* 고레벨에서 누적 hue 회전으로 연속 변화 (네온 블록에만 영향) */
-  filter: hue-rotate(var(--level-hue));
 }
 
-/* ── 게임오버/일시정지 DOM 오버레이 (터치 가능) ── */
-.board-overlay {
-  position: absolute;
-  inset: 8px;
-  border-radius: 8px;
+/* ── 점수판 (.pol-hud-label/.pol-hud-value) ── */
+.stats .stat {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  background: rgba(8, 7, 18, 0.6);
-  backdrop-filter: blur(2px);
-  z-index: 6;
+  gap: 2px;
+  padding: var(--space-2) 0;
 }
-.board-overlay[hidden] { display: none; }
+.stats .stat + .stat { border-top: 1px solid var(--rule-color); }
+.stats .stat:first-child { padding-top: 0; }
+.stats .stat:last-child { padding-bottom: 0; }
 
-.stats div {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  padding: 7px 0;
-}
-.stats div + div { border-top: 1px solid var(--panel-border); }
-.stats span { font-family: var(--font-mono); font-size: 9px; color: var(--muted); letter-spacing: 0.14em; }
-.stats strong {
-  font-family: var(--font-mono);
-  font-size: 24px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--accent2);
-  text-shadow: 0 0 12px color-mix(in srgb, var(--accent2) 60%, transparent);
-}
+.help ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.help li { display: flex; align-items: center; gap: 6px; font-size: var(--fs-xs); }
+.help i { font-style: normal; font-family: var(--font-label); color: var(--ink-muted); }
 
-.help ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
-.help li { display: flex; align-items: center; gap: 6px; font-size: 11px; }
-.help i { color: var(--muted); font-style: normal; }
-
-kbd {
-  display: inline-block;
-  min-width: 18px;
-  padding: 2px 6px;
-  border: 1px solid var(--panel-border);
-  border-bottom-width: 2px;
-  border-radius: 4px;
-  background: rgba(40, 32, 78, 0.7);
-  color: var(--ink);
-  font: 600 10px var(--font-mono);
-  text-align: center;
-}
-
-.volume { display: flex; flex-direction: column; gap: 10px; }
-.vol-row { display: flex; align-items: center; gap: 8px; }
+.volume { display: flex; flex-direction: column; gap: var(--space-2); }
+.vol-row { display: flex; align-items: center; gap: var(--space-2); }
 .vol-row span {
-  width: 30px;
+  width: 32px;
   font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--muted);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
 }
 .vol-row input[type="range"] {
   flex: 1 1 0;
   min-width: 0;
   width: 100%;
+  height: 24px;
   -webkit-appearance: none;
   appearance: none;
-  height: 4px;
-  border-radius: 4px;
-  background: linear-gradient(90deg, var(--accent2), var(--accent));
-  outline: none;
+  background: transparent;
   cursor: pointer;
+}
+.vol-row input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--cream-400);
+}
+.vol-row input[type="range"]::-moz-range-track {
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--cream-400);
+}
+.vol-row input[type="range"]::-moz-range-progress {
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--gold-mid);
 }
 .vol-row input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
   border-radius: 50%;
-  background: #fff;
-  border: 2px solid var(--accent);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--accent2) 70%, transparent);
+  background: var(--ink-warm);
+  border: 3px solid var(--bg-card);
+  box-shadow: var(--shadow-soft);
 }
 .vol-row input[type="range"]::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  background: #fff;
-  border: 2px solid var(--accent);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--accent2) 70%, transparent);
+  background: var(--ink-warm);
+  border: 3px solid var(--bg-card);
+  box-shadow: var(--shadow-soft);
 }
 
-.mute {
-  margin-top: auto;
-  padding: 10px;
-  border: 1px solid var(--panel-border);
-  border-radius: 12px;
-  background: var(--panel);
-  color: var(--accent2);
-  font: 700 12px var(--font-mono);
-  letter-spacing: 0.1em;
-  cursor: pointer;
-  transition: all 0.18s;
-  box-shadow: 0 0 14px color-mix(in srgb, var(--accent2) 35%, transparent);
+.mute { margin-top: auto; width: 100%; background: var(--bg-card); }
+.mute.off { color: var(--ink-muted); opacity: 0.7; }
+
+/* ── 로비·일시정지·게임오버 (../pol-ui.css .pol-lobby) — 게임 고유 부분만 ── */
+.pol-ovtitle { /* 상태 한 줄 (게임 오버 · 일시정지) — 키트에 없음 */
+  font-family: var(--font-display);
+  font-style: italic;
+  font-synthesis: none;
+  font-weight: 300;
+  font-size: var(--fs-xl);
+  letter-spacing: 0.02em;
+  color: var(--gold-text);
+  word-break: keep-all;
 }
-.mute:hover { transform: translateY(-1px); }
-.mute.off { color: var(--muted); box-shadow: none; opacity: 0.7; }
+.pol-ovtitle:empty { display: none; } /* ready 로비에선 타이틀 빈 값 → flex gap 공백 제거 */
+.pol-lstats[hidden] { display: none; }
+.pol-lhelp { max-width: 360px; padding: 0 var(--space-3); word-break: keep-all; }
+.pol-lhelp .lh { white-space: nowrap; } /* 조작 항목 단위로만 줄바꿈 */
+
+/* 로비 폴라로이드 SVG 아트 */
+.lp-bg { fill: var(--cream-200); }
+.lp-cells rect { stroke: var(--paper); stroke-width: 1.5; }
+.lp-i { fill: var(--tt-i); }
+.lp-o { fill: var(--tt-o); }
+.lp-t { fill: var(--tt-t); }
+.lp-s { fill: var(--tt-s); }
+.lp-l { fill: var(--tt-l); }
+
+/* 로비/일시정지/게임오버 오버레이 표시 중엔 터치패드 숨김 */
+body:has(.board-overlay:not([hidden])) .touchpad { display: none; }
 
 /* ── 모바일 온스크린 D-pad (데스크톱에선 숨김) ── */
 .touchpad { display: none; }
@@ -242,27 +214,23 @@ kbd {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--panel-border);
-  background: var(--panel);
-  color: var(--accent2);
-  font-size: 22px;
-  border-radius: 12px;
+  border: 1px solid var(--rule-color);
+  background: var(--bg-card);
+  color: var(--ink-mid);
+  font-size: var(--fs-2xl);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-soft);
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
-  box-shadow: 0 0 10px color-mix(in srgb, var(--accent2) 25%, transparent);
+  transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) ease;
 }
-.tp-btn:active { transform: scale(0.94); background: rgba(94, 242, 255, 0.12); }
-.tp-btn--hard { color: var(--accent); }
-.tp-btn--sys { color: var(--muted); font-size: 18px; }
+.tp-btn:active { transform: scale(0.94); background: var(--cream-200); }
+.tp-btn--hard { background: var(--ink-warm); border-color: var(--ink-warm); color: var(--bg-base); }
+.tp-btn--hard:active { background: var(--ink-mid); }
+.tp-btn--sys { color: var(--ink-muted); font-size: var(--fs-lg); }
 .tp-btn--sys.off { opacity: 0.55; }
-
-/* keyboard focus ring (WCAG 2.4.7) */
-:focus-visible {
-  outline: 2px solid var(--neon-cyan);
-  outline-offset: 2px;
-}
 
 /* ── 반응형: 모바일 — 보드 우선, HOLD/NEXT는 보드 양옆 컴팩트,
    터치패드는 화면 하단 고정 → 보드와 컨트롤이 한 화면에 동시 표시 ── */
@@ -272,23 +240,23 @@ kbd {
     flex-direction: row;
     align-items: flex-start;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
     /* 하단 고정 터치패드(2줄 + 여백)에 가리지 않도록 확보 */
     padding: 10px 8px calc(146px + env(safe-area-inset-bottom));
     width: 100%;
   }
   .logo { display: none; }
-  .panel { width: 70px; gap: 8px; }
-  .box { padding: 7px; border-radius: 8px; }
-  h2 { font-size: 7px; letter-spacing: 0.06em; margin-bottom: 5px; }
-  .stats div { padding: 4px 0; }
-  .stats span { font-size: 7px; letter-spacing: 0.06em; }
-  .stats strong { font-size: 14px; }
+  .panel { width: 70px; gap: var(--space-2); }
+  .box { padding: 6px; }
+  .box-title { margin-bottom: var(--space-1); }
+  .lbl-en { display: none; }
+  .stats .stat { padding: var(--space-1) 0; }
+  .stats .pol-hud-value { font-size: var(--fs-md); }
   .stage { padding: 5px; }
+  .stage::after { display: none; }
   .board {
     /* 세로: 뷰포트에서 터치패드·여백을 뺀 높이, 가로: 양옆 패널을 뺀 폭 — 둘 중 작은 쪽 */
     width: auto;
-    height: min(100vh - 190px, (100vw - 192px) * 2, 560px);
     height: min(100dvh - 190px, (100vw - 192px) * 2, 560px);
   }
   .help, .volume, .mute { display: none; } /* 모바일은 온스크린 패드로 대체 */
@@ -300,7 +268,7 @@ kbd {
     transform: translateX(-50%);
     bottom: calc(10px + env(safe-area-inset-bottom));
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    gap: var(--space-2);
     width: min(96vw, 420px);
     z-index: 4;
   }
@@ -313,33 +281,6 @@ kbd {
 
 /* ── prefers-reduced-motion: 장식 모션 정지 (낙하 게임플레이는 유지) ── */
 @media (prefers-reduced-motion: reduce) {
-  body { animation: none !important; }
-  .pol-lbtn:hover, .tp-btn:active, .mute:hover { transform: none !important; }
+  .tp-btn { transition: none; }
+  .tp-btn:active { transform: none !important; }
 }
-
-/* Polaroid Lobby 2026-06-07 (토큰 정본: ../design-tokens.css) */
-.pol-lobby{position:fixed;inset:0;background:var(--bg-base);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;z-index:500}
-.board-overlay.pol-lobby{position:fixed;inset:0;background:var(--bg-base);border-radius:0;backdrop-filter:none;z-index:500}
-.pol-ovtitle{font-family:var(--font-display);font-style:italic;font-weight:300;font-size:1.1rem;letter-spacing:.14em;color:var(--gold-dark);text-align:center;word-break:keep-all}
-.pol-ovtitle:empty{display:none} /* ready 로비에선 타이틀 빈 값 → flex gap 공백 제거 */
-.pol-lcard{background:var(--bg-card);padding:5px 5px 22px;width:140px;box-shadow:var(--shadow-card);transform:rotate(-3deg);flex-shrink:0}
-.pol-lphoto{width:100%;aspect-ratio:1 / 1}
-.pol-lnum{font-family:var(--font-display);font-style:italic;font-weight:100;font-size:.6rem;color:var(--gold-mid);display:block;margin-top:5px}
-.pol-ltag{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.66rem;color:var(--ink-light);text-align:center;margin-top:2px;display:block}
-.pol-ltitle{font-family:var(--font-display);font-style:italic;font-weight:300;font-size:clamp(1.9rem,5vw,3rem);color:var(--ink-warm);line-height:1;text-align:center}
-.pol-ldesc{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.86rem;color:var(--ink-mid);text-align:center;max-width:260px;line-height:1.55;word-break:keep-all}
-.pol-lstats{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;color:var(--ink-mid);text-align:center}
-.pol-lhelp{font-family:var(--font-mono);font-size:.62rem;line-height:1.9;letter-spacing:.03em;color:var(--ink-light);text-align:center;max-width:320px;padding:0 14px;word-break:keep-all}
-.pol-lbtn{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.88rem;letter-spacing:.16em;color:var(--gold-mid);background:var(--bg-card);border:1px solid rgba(192,160,96,.45);padding:11px 46px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:box-shadow .3s,transform .3s;margin-top:6px}
-.pol-lbtn:hover{box-shadow:0 8px 22px rgba(0,0,0,.15);transform:translateY(-2px)}
-.pol-lbtn:focus-visible{outline:2px solid var(--gold-mid);outline-offset:2px}
-.pol-llabel{font-family:var(--font-mono);font-size:.57rem;color:var(--ink-light);letter-spacing:.09em;text-transform:uppercase}
-
-/* 로비/일시정지/게임오버 오버레이 표시 중엔 스캔라인·터치패드 숨김
-   (.game이 z-index:1 스태킹 컨텍스트라 내부 z-500 로비가 루트 z-5/z-4 위로 못 올라옴) */
-body:has(.board-overlay:not([hidden])) .scanlines,
-body:has(.board-overlay:not([hidden])) .touchpad { display: none; }
-
-/* pol-back-btn */
-.pol-back-btn{position:fixed;top:14px;left:14px;font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.78rem;color:var(--gold-mid);text-decoration:none;letter-spacing:.06em;z-index:9999;background:rgba(236,231,220,.88);padding:6px 14px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1px solid rgba(192,160,96,.25);transition:color .2s,background .2s}
-.pol-back-btn:hover{color:var(--ink-warm);background:rgba(236,231,220,.98)}

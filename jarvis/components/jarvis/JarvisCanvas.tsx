@@ -10,7 +10,7 @@ const JarvisScene = dynamic(() => import("./JarvisScene"), {
 
 export function JarvisCanvas() {
   return (
-    <div style={{ position: "fixed", inset: 0 }}>
+    <div className="jv-stage">
       <JarvisScene />
       <HudOverlay />
     </div>

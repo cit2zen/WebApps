@@ -1,0 +1,35 @@
+/* Shared hover card for VariableChip + WordHighlight (was duplicated in both modules) */
+.host { position: relative; }
+.host:hover .tip,
+.host:focus-within .tip { display: block; }
+.tip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  width: 220px;
+  max-width: 80vw;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--rule-color);
+  border-top: 2px solid var(--gold-mid);
+  border-radius: var(--r-xs);
+  box-shadow: var(--shadow-card-lift);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--ink-mid);
+  text-align: left;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  cursor: default;
+}
+.tip::after { content: ""; position: absolute; top: 100%; left: 0; right: 0; height: 10px; } /* hover bridge */
+.tip strong { display: block; margin-bottom: 4px; font-family: var(--font-label); font-weight: 600; color: var(--ink-warm); }
+.tip .body { display: block; margin: 4px 0 0; font-size: var(--fs-xs); color: var(--ink-muted); } /* span, not <p>: the host sits inside markdown <p> */
+.passive { pointer-events: none; }

@@ -3,30 +3,62 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f04444" />
-    <title>Reaction Duel</title>
+    <title>Reaction Duel — 반응속도 대결</title>
     <link rel="icon" href="data:," />
-    <link rel="stylesheet" href="./static/styles.css?v=2" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,100..400&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500&family=Space+Mono&family=Nanum+Pen+Script&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../design-tokens.css" />
+    <link rel="stylesheet" href="../typography.css" />
+    <link rel="stylesheet" href="../polaroid.css" />
+    <link rel="stylesheet" href="../pol-ui.css" />
+    <link rel="stylesheet" href="./static/styles.css?v=4" />
   </head>
-  <body>
+  <body class="pol-body">
+    <a class="pol-back-btn" href="../">← 게임 허브</a>
+
+    <!-- 로비 (시작 화면) — Polaroid -->
+    <section id="lobby" class="pol-lobby" aria-label="로비">
+      <div class="pol-lcard">
+        <div class="pol-lphoto">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <rect class="lp-top" x="0" y="0" width="100" height="50" />
+            <rect class="lp-bot" x="0" y="50" width="100" height="50" />
+            <line class="lp-seam" x1="0" y1="50" x2="100" y2="50" />
+            <circle class="lp-dot-top" cx="50" cy="25" r="10" />
+            <circle class="lp-dot-bot" cx="50" cy="75" r="10" />
+            <path class="lp-bolt" d="M55 34 L41 53 L50 53 L45 67 L60 47 L51 47 Z" />
+          </svg>
+        </div>
+        <span class="pol-lnum">№ 1P — 2P</span>
+        <span class="pol-ltag">face to face</span>
+      </div>
+      <h1 class="pol-ltitle">Reaction Duel</h1>
+      <p class="pol-ldesc">한 화면을 마주 보고 둘이서. <b>지금!</b> 신호가 뜨면 먼저 누르는 사람이 이겨요. 신호 전에 누르면 반칙패.</p>
+      <button id="lobby-start" class="pol-lbtn" type="button">대결 시작</button>
+      <p class="pol-lhelp">위쪽 1P <kbd class="pol-kbd">W</kbd> · 아래쪽 2P <kbd class="pol-kbd">↓</kbd><br />터치는 각자 자기 구역을 누르세요</p>
+    </section>
+
     <main id="game" data-state="ready" aria-live="polite">
       <section class="player-zone" data-player="p1" aria-label="1P 구역">
         <div class="zone-content">
           <p class="player-label">1P · W</p>
           <h1 class="state-word"></h1>
           <p class="result-detail"></p>
-          <button class="round-action" type="button"></button>
+          <button class="round-action pol-btn-primary pol-btn-lg" type="button"></button>
         </div>
       </section>
       <div class="center-seam" aria-label="대결 상태">
-        <span id="round-count">ROUND 0</span><span id="latest-time">READY</span>
+        <span id="round-count">ROUND 0</span>
+        <button id="seam-lobby" class="seam-btn" type="button">로비</button>
+        <span id="latest-time">READY</span>
       </div>
       <section class="player-zone" data-player="p2" aria-label="2P 구역">
         <div class="zone-content">
           <p class="player-label">2P · ↓</p>
           <h1 class="state-word"></h1>
           <p class="result-detail"></p>
-          <button class="round-action" type="button"></button>
+          <button class="round-action pol-btn-primary pol-btn-lg" type="button"></button>
         </div>
       </section>
     </main>
@@ -36,5 +68,6 @@
     </aside>
     <p class="rotate-hint">세로로 돌리면 더 좋아요</p>
     <script src="./src/browser.js"></script>
+    <script src="./src/lobby.js"></script>
   </body>
 </html>

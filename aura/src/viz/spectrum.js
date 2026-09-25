@@ -1,17 +1,19 @@
-// 레이어 A: 발광 멤브레인 링 + 절제된 광선 코로나(테이퍼드 삼각형) + 코어.
-// 블룸 버퍼에 그려지므로 shadowBlur 불필요.
+// 레이어 A: 멤브레인 링(잉크 선) + 절제된 광선 코로나(테이퍼드 삼각형) + 코어.
+// 워시 버퍼에 일반 합성으로 그려진다(가산 없음).
+import { mix, rgba } from './color.js';
+
 const MAJOR = 56;
 let smooth = null;
 
-function ray(ctx, a, r0, len, width, hue, sat, alpha, m) {
+function ray(ctx, a, r0, len, width, col, alpha, m) {
   const c = Math.cos(a), s = Math.sin(a);
   const bx = c * r0, by = s * r0;
   const tx = c * (r0 + len), ty = s * (r0 + len);
   const px = -s, py = c, hw = width / 2;
   const g = ctx.createLinearGradient(bx, by, tx, ty);
-  g.addColorStop(0, `hsla(${hue} ${sat}% 66% / ${alpha * (0.45 + m * 0.55)})`);
-  g.addColorStop(0.22, `hsla(${hue} ${sat}% 72% / ${alpha * (0.5 + m * 0.5)})`);
-  g.addColorStop(1, `hsla(${hue} ${sat}% 64% / 0)`);
+  g.addColorStop(0, rgba(col, alpha * (0.35 + m * 0.45)));
+  g.addColorStop(0.22, rgba(col, alpha * (0.42 + m * 0.4)));
+  g.addColorStop(1, rgba(col, 0));
   ctx.fillStyle = g;
   ctx.beginPath();
   ctx.moveTo(bx + px * hw, by + py * hw);
@@ -21,17 +23,21 @@ function ray(ctx, a, r0, len, width, hue, sat, alpha, m) {
   ctx.fill();
 }
 
-export function drawSpectrum(ctx, w, h, frame) {
-  const { level, spectrum, palette, t } = frame;
+export function drawSpectrum(layers, w, h, frame) {
+  const { level, spectrum, palette, t, op } = frame;
+  const { wash, trail } = layers;
   const cx = w / 2, cy = h / 2;
   const base = Math.min(w, h) * 0.15;
   if (!smooth || smooth.length !== MAJOR) smooth = new Float32Array(MAJOR);
 
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(t * 0.035);
+  for (const c of [wash, trail]) {
+    c.save();
+    c.translate(cx, cy);
+    c.rotate(t * 0.035);
+  }
 
-  // 발광 멤브레인 링 2겹.
+  // 멤브레인 링 2겹(trail — 잔상이 겹겹이) — 안쪽은 강조색, 바깥은 잉크 쪽으로.
+  let ctx = trail;
   for (let r = 0; r < 2; r++) {
     const r0 = base * (1 + r * 0.5) + level * base * 0.7;
     ctx.beginPath();
@@ -43,12 +49,13 @@ export function drawSpectrum(ctx, w, h, frame) {
       i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
     }
     ctx.closePath();
-    ctx.strokeStyle = `hsla(${palette.h + r * 14} ${palette.sat}% ${palette.light + 6}% / ${0.42 + level * 0.4})`;
-    ctx.lineWidth = 1.4 + level * 1.8;
+    ctx.strokeStyle = rgba(mix(palette.a, palette.ink, 0.15 + r * 0.3), op(0.5 + level * 0.35));
+    ctx.lineWidth = 1.2 + level * 1.6;
     ctx.stroke();
   }
 
-  // 광선 코로나: 절제된 단일 레이어. 여백을 두어 우아하게, 강한 빈만 길게 솟구침.
+  // 광선 코로나(wash): 절제된 단일 레이어. 여백을 두어 우아하게, 강한 빈만 길게 솟구침.
+  ctx = wash;
   const r0 = base * 1.95 + level * base * 0.5;
   for (let i = 0; i < MAJOR; i++) {
     const a = (i / MAJOR) * Math.PI * 2;
@@ -64,19 +71,20 @@ export function drawSpectrum(ctx, w, h, frame) {
     smooth[i] += (target - smooth[i]) * 0.2;
     const m = Math.max(0, smooth[i]);
     const flare = m > 0.7 ? (m - 0.7) * 2.2 : 0;
-    const hue = palette.h + (i / MAJOR) * 36 - 18;
-    ray(ctx, a, r0, base * (0.35 + (m + flare) * 1.7) * (0.85 + level * 0.5), 2.0 + m * 2.6, hue, palette.sat, 0.85, m);
+    const col = mix(palette.a, palette.b, 0.5 + 0.5 * Math.sin((i / MAJOR) * Math.PI * 2));
+    ray(ctx, a, r0, base * (0.35 + (m + flare) * 1.7) * (0.85 + level * 0.5), 2.0 + m * 2.6, col, 0.6, m);
   }
 
-  // 코어 — 흰색 포화 없이 색을 머금은 소프트 펄스.
+  // 코어 — 강조색을 머금은 소프트 펄스.
   const cr = base * (0.22 + level * 0.34);
   const cg = ctx.createRadialGradient(0, 0, 0, 0, 0, cr);
-  cg.addColorStop(0, `hsla(${palette.h} ${palette.sat}% 60% / ${0.18 + level * 0.22})`);
-  cg.addColorStop(1, `hsla(${palette.h} ${palette.sat}% 52% / 0)`);
+  cg.addColorStop(0, rgba(palette.a, 0.14 + level * 0.18));
+  cg.addColorStop(1, rgba(palette.a, 0));
   ctx.fillStyle = cg;
   ctx.beginPath();
   ctx.arc(0, 0, cr, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.restore();
+  wash.restore();
+  trail.restore();
 }

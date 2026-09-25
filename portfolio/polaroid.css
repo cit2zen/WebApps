@@ -32,9 +32,10 @@
 .pol-num {
   font-family: var(--font-display);
   font-style: italic;
-  font-weight: 100;
-  font-size: 0.6rem;
-  color: var(--gold-mid);
+  font-synthesis: none;
+  font-weight: 300;
+  font-size: var(--fs-2xs);
+  color: var(--gold-text);
   display: block;
   margin-top: 5px;
 }
@@ -42,9 +43,10 @@
 .pol-caption {
   font-family: var(--font-display);
   font-style: italic;
-  font-weight: 200;
-  font-size: 0.72rem;
-  color: #999;
+  font-synthesis: none;
+  font-weight: 300;
+  font-size: var(--fs-xs);
+  color: var(--ink-muted);
   text-align: center;
   margin-top: 2px;
 }

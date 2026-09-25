@@ -38,14 +38,13 @@ export function VoiceController() {
   if (!supported) {
     return (
       <>
-        <Overlay>
-          <h1 className="jv-title">JARVIS</h1>
-          <p className="jv-sub">
+        <Overlay variant="static">
+          <IntroHead>
             이 브라우저는 음성 인식을 지원하지 않아요. 아래에 입력해 대화할 수 있어요.
             (답변은 음성으로 들려드려요.)
-          </p>
+          </IntroHead>
         </Overlay>
-        <Hud mode={mode} notice={notice} transcript={transcript} response={response} />
+        <Hud mode={mode} notice={notice} transcript={transcript} response={response} aboveInput />
         <TextFallback onSend={sendText} />
       </>
     );
@@ -54,18 +53,23 @@ export function VoiceController() {
   return (
     <>
       {!started && (
-        <Overlay>
-          <h1 className="jv-title">JARVIS</h1>
-          <p className="jv-sub">한국어 음성으로 대화하는 AI 비서. 웹검색·시간·메모리·리서치 팀을 부려요.</p>
-          <div className="jv-chips" aria-hidden="true">
-            {EXAMPLES.map((ex) => <span key={ex} className="jv-chip">{ex}</span>)}
+        <Overlay variant="intro">
+          <IntroHead>한국어 음성으로 대화하는 AI 비서. 웹검색·시간·메모리·리서치 팀을 부려요.</IntroHead>
+          <div className="jv-intro-foot">
+            {/* 예시 문장 — 누르는 버튼이 아니라 손글씨 메모처럼 보이는 안내 */}
+            <p className="jv-suggest">
+              <span className="jv-suggest-label">이렇게 말해 보세요</span>
+              <span className="jv-suggest-list">
+                {EXAMPLES.map((ex) => <span key={ex} className="jv-suggest-item">“{ex}”</span>)}
+              </span>
+            </p>
+            <button className="pol-btn-primary pol-btn-lg jv-btn" onClick={handleStart}>
+              <MicIcon /> 음성으로 대화 시작
+            </button>
+            {notice && (
+              <p className="pol-alert jv-alert" role="alert" aria-live="assertive">{notice}</p>
+            )}
           </div>
-          <button className="jv-btn" onClick={handleStart}>
-            <span aria-hidden="true">🎙️</span> 음성으로 대화 시작
-          </button>
-          {notice && (
-            <p className="jv-sub jv-notice" role="alert" aria-live="assertive">{notice}</p>
-          )}
         </Overlay>
       )}
       <Hud mode={mode} notice={notice} transcript={transcript} response={response} />
@@ -73,12 +77,12 @@ export function VoiceController() {
   );
 }
 
-function Hud({ mode, notice, transcript, response }: {
-  mode: string; notice: string; transcript: string; response: string;
+function Hud({ mode, notice, transcript, response, aboveInput = false }: {
+  mode: string; notice: string; transcript: string; response: string; aboveInput?: boolean;
 }) {
   return (
-    <div className="jv-hud">
-      <div className="jv-status" role="status" aria-live="polite">
+    <div className={aboveInput ? "jv-hud is-above-input" : "jv-hud"}>
+      <div className="jv-status" role="status" aria-live="polite" data-mode={mode}>
         <span className="jv-dot" aria-hidden="true" />
         {LABEL[mode]}{notice ? <span className="jv-notice"> · {notice}</span> : ""}
       </div>
@@ -107,7 +111,7 @@ function TextFallback({ onSend }: { onSend: (text: string) => void }) {
     <form className="jv-fallback" onSubmit={submit}>
       <textarea
         ref={ref}
-        className="jv-input"
+        className="pol-textarea jv-input"
         rows={1}
         placeholder="메시지를 입력해 대화하기…"
         aria-label="메시지 입력"
@@ -115,11 +119,33 @@ function TextFallback({ onSend }: { onSend: (text: string) => void }) {
           if (e.key === "Enter" && !e.shiftKey) submit(e);
         }}
       />
-      <button type="submit" className="jv-send">보내기</button>
+      <button type="submit" className="pol-btn-primary jv-send">보내기</button>
     </form>
   );
 }
 
-function Overlay({ children }: { children: React.ReactNode }) {
-  return <div className="jv-overlay">{children}</div>;
+function Overlay({ children, variant }: { children: React.ReactNode; variant: "intro" | "static" }) {
+  return <div className={`jv-overlay is-${variant}`}>{children}</div>;
+}
+
+// 에디토리얼 표지 머리: 금색 선 라벨 + Fraunces 이탤릭 타이틀 + 리드 문장
+function IntroHead({ children }: { children: React.ReactNode }) {
+  return (
+    <header className="jv-intro-head">
+      <p className="pol-eyebrow">음성 AI 비서</p>
+      <h1 className="jv-title">JARVIS</h1>
+      <p className="jv-sub">{children}</p>
+    </header>
+  );
+}
+
+// 마이크 아이콘 — 버튼 글자색(currentColor)을 따른다
+function MicIcon() {
+  return (
+    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="3" width="6" height="11" rx="3" />
+      <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7" />
+    </svg>
+  );
 }

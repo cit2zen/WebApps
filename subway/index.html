@@ -2,20 +2,49 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<title>subway</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>지하철 퀴즈</title>
+<!-- Polaroid Editorial v2 — 게임 허브(games.cityzen.kr) 루트의 키트를 상대 경로로 링크 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,100..400&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500&family=Space+Mono&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../design-tokens.css">
+<link rel="stylesheet" href="../typography.css">
+<link rel="stylesheet" href="../polaroid.css">
+<link rel="stylesheet" href="../pol-ui.css">
 <link rel="stylesheet" href="TemplateData/overlay.css">
 <script src="TemplateData/overlay.js"></script>
 </head>
-<body>
+<body class="pol-body">
 <canvas id="unity-canvas" tabindex="-1"></canvas>
-<div id="loading">
+<a class="pol-back-btn" href="../">← 게임 허브</a>
+<div id="loading" class="pol-lobby">
+  <div class="pol-lcard">
+    <div class="pol-lphoto">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <rect class="sw-loop" x="24" y="28" width="72" height="64" rx="20"/>
+        <path class="sw-l1" d="M6 60 H114"/>
+        <path class="sw-l2" d="M60 6 V114"/>
+        <g class="sw-st">
+          <circle cx="44" cy="28" r="2.6"/><circle cx="76" cy="28" r="2.6"/><circle cx="44" cy="92" r="2.6"/><circle cx="76" cy="92" r="2.6"/>
+          <circle cx="12" cy="60" r="2.6"/><circle cx="40" cy="60" r="2.6"/><circle cx="80" cy="60" r="2.6"/><circle cx="108" cy="60" r="2.6"/>
+          <circle cx="60" cy="12" r="2.6"/><circle cx="60" cy="44" r="2.6"/><circle cx="60" cy="76" r="2.6"/><circle cx="60" cy="108" r="2.6"/>
+        </g>
+        <g class="sw-xfer">
+          <circle cx="24" cy="60" r="4.2"/><circle cx="96" cy="60" r="4.2"/><circle cx="60" cy="28" r="4.2"/><circle cx="60" cy="92" r="4.2"/><circle cx="60" cy="60" r="4.2"/>
+        </g>
+      </svg>
+    </div>
+    <span class="pol-lnum">Unity WebGL</span>
+    <span class="pol-ltag">역 이름 퀴즈</span>
+  </div>
+  <h1 class="pol-ltitle">지하철 퀴즈</h1>
   <div id="loading-bar"><div id="loading-fill"></div></div>
-  <div id="loading-text">노선도 불러오는 중…</div>
+  <p id="loading-text" class="pol-lhelp" role="status">노선도 불러오는 중…</p>
 </div>
 <div id="input-panel" hidden>
   <div id="chips"></div>
-  <input id="answer" type="text" maxlength="30" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" placeholder="역 이름을 입력하세요">
+  <input id="answer" class="pol-input" type="text" maxlength="30" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" placeholder="역 이름을 입력하세요">
   <div id="attribution">노선도 원본: Wikimedia Commons · IRTC1015 (Public Domain) · 데이터 출처: 서울특별시 열린데이터광장(공공누리 1유형)</div>
 </div>
 <script src="Build/subway.loader.js"></script>
@@ -35,7 +64,9 @@
   }).then(function (instance) {
     window.unityInstance = instance;
     document.getElementById('loading').hidden = true;
+    document.body.classList.add('is-playing');   // 게임 시작 — 허브 버튼·인화지 결 숨김
   }).catch(function (err) {
+    document.getElementById('loading').classList.add('is-error');
     document.getElementById('loading-text').textContent = '로딩 실패: ' + err;
     console.error(err);
   });

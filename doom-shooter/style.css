@@ -1,10 +1,25 @@
+/* 둠블래스트 — Polaroid Editorial v2 (kit: ../design-tokens.css ../typography.css ../polaroid.css ../pol-ui.css)
+   색은 var() 토큰만. 앱 전용 색은 아래 :root 한 곳(팔레트 파생)에만 둔다.
+   3D 씬(three.js 머티리얼·포그·조명)은 게임플레이 가독성을 위해 원래 색 유지. */
+:root {
+  --doom-amber: #b8702e; /* gold-mid × danger — 미니맵 차저 점 */
+  --doom-plum: #7a3a52;  /* danger 계열 심홍 — 미니맵 보스 점 */
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
-body { font-family: "Courier New", monospace; color: #e8d8a0; cursor: default; }
+html, body { width: 100%; height: 100%; overflow: hidden; }
+body { cursor: default; }
 canvas { display: block; }
 .hidden { display: none !important; }
 
 #app { position: fixed; inset: 0; }
+
+/* 인화지 결: 로비(z 500) 위로 올리고, 플레이 중(3D 화면)에는 끈다 */
+.pol-body:has(#overlay:not(.hidden))::after { z-index: 600; }
+.pol-body:has(#overlay.hidden)::after { display: none; }
+
+/* 허브로 돌아가기 — 터치 타깃 40px */
+.pol-back-btn { display: inline-flex; align-items: center; min-height: 40px; }
 
 /* ---- HUD ---- */
 #hud { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
@@ -13,93 +28,154 @@ canvas { display: block; }
   position: absolute; left: 50%; top: 50%; width: 22px; height: 22px;
   transform: translate(-50%, -50%);
   background:
-    linear-gradient(#f4e7b0,#f4e7b0) center/2px 22px no-repeat,
-    linear-gradient(#f4e7b0,#f4e7b0) center/22px 2px no-repeat;
+    linear-gradient(var(--paper), var(--paper)) center/2px 22px no-repeat,
+    linear-gradient(var(--paper), var(--paper)) center/22px 2px no-repeat;
   opacity: .85; mix-blend-mode: difference;
 }
 
+/* 플레이 중엔 .pol-back-btn이 자동으로 숨으므로 상단 모서리를 쓴다 */
 #topbar {
-  /* 좌상단 고정 .pol-back-btn 아래로 내려 겹치지 않게 */
-  position: absolute; top: 52px; left: 0; right: 0;
-  display: flex; justify-content: space-between; padding: 0 22px;
-  font-size: 20px; letter-spacing: 2px; text-shadow: 2px 2px 0 #000;
+  position: absolute; top: 14px; left: 14px; right: 14px;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-2);
 }
-#enemies { color: #ff7a4d; }
+#topbar .pol-hud-value { font-size: var(--fs-md); line-height: 1.4; white-space: nowrap; }
+.hud-stage { max-width: 44%; }
+.hud-stage .pol-hud-value { overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+#enemies { color: var(--pol-danger); }
 
 #bottombar {
-  position: absolute; bottom: 16px; left: 0; right: 0;
-  display: flex; justify-content: space-between; align-items: flex-end;
-  padding: 0 26px;
+  position: absolute; bottom: 16px; left: 14px; right: 14px;
+  display: flex; justify-content: space-between; align-items: flex-end; gap: var(--space-2);
 }
-#hp-wrap { display: flex; align-items: center; gap: 10px; text-shadow: 2px 2px 0 #000; }
-.label { font-size: 13px; letter-spacing: 2px; color: #b9a66a; }
+.hp-row { display: flex; align-items: center; gap: var(--space-3); }
 #hp-bar {
-  width: 220px; height: 20px; border: 2px solid #6b5a2a; background: #1a1408;
-  box-shadow: inset 0 0 8px #000;
+  display: block;
+  width: clamp(88px, 22vw, 220px); height: 10px;
+  background: var(--cream-300);
+  border: 1px solid var(--cream-400);
+  border-radius: var(--r-pill);
+  overflow: hidden;
 }
-#hp-fill { height: 100%; width: 100%; background: linear-gradient(#ff5a3c, #b81f12); transition: width .15s; }
-#hp-num { font-size: 24px; font-weight: bold; min-width: 44px; }
-#ammo { font-size: 40px; font-weight: bold; letter-spacing: 1px; text-shadow: 3px 3px 0 #000; }
-#ammo .sep { color: #6b5a2a; margin: 0 4px; }
-#ammo-res { color: #b9a66a; font-size: 26px; }
+#hp-fill { display: block; height: 100%; width: 100%; background: var(--pol-danger); transition: width .15s; }
+#hp-num { min-width: 2.2em; }
+#ammo { align-items: flex-end; }
+#ammo .pol-hud-value { font-size: var(--fs-2xl); }
+#ammo .sep { color: var(--gold-mid); margin: 0 4px; }
+#ammo-res { color: var(--ink-muted); font-size: var(--fs-lg); }
 
-#banner {
-  position: absolute; top: 30%; left: 0; right: 0; text-align: center;
-  font-size: 34px; font-weight: bold; letter-spacing: 3px; color: #ffd34d;
-  text-shadow: 0 0 18px #ff8a00, 3px 3px 0 #000; opacity: 0; transition: opacity .25s;
+/* 무기 이름 — game.js가 #hud 안에 주입 (라틴 대문자 전용 → mono 허용) */
+#weaponname {
+  position: fixed; bottom: 82px; right: 14px;
+  padding: 4px 10px;
+  font-family: var(--font-mono); font-size: var(--fs-2xs); letter-spacing: 0.08em;
+  color: var(--ink-mid);
+  background: var(--bg-card); border-radius: var(--r-xs); box-shadow: var(--shadow-soft);
+  pointer-events: none; user-select: none;
 }
+#weaponname:empty { display: none; }
+
+/* 보스 체력 — game.js가 주입, display는 JS가 인라인으로 토글 */
+#bosshp {
+  display: none;
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+  width: min(320px, calc(100vw - 32px)); height: 38px;
+  padding: 22px 10px 8px;
+  background: var(--bg-card); border-radius: var(--r-xs); box-shadow: var(--shadow-card);
+  pointer-events: none; z-index: 100;
+}
+#bosshp-fill {
+  height: 100%; width: 100%;
+  background: var(--pol-danger); border-radius: var(--r-pill);
+  transition: width .1s;
+}
+#bosshp-label {
+  position: absolute; top: 5px; left: 0; right: 0; text-align: center;
+  font-family: var(--font-mono); font-size: var(--fs-2xs); line-height: 14px; letter-spacing: 0.1em;
+  color: var(--ink-mid);
+}
+
+/* 스테이지·안내 배너 — 탁자 위에 놓인 인화지 한 장 */
+#banner {
+  position: absolute; top: 30%; left: 50%;
+  width: max-content; max-width: calc(100vw - 32px);
+  padding: var(--space-3) var(--space-5);
+  transform: translateX(-50%) rotate(-1deg);
+  text-align: center; word-break: keep-all;
+  font-family: var(--font-display); font-style: italic; font-synthesis: none; font-weight: 300;
+  font-size: var(--fs-title); line-height: 1.3; color: var(--ink-warm);
+  background: var(--bg-card); border-radius: var(--r-xs); box-shadow: var(--shadow-card-lift);
+  opacity: 0; transition: opacity .25s;
+}
+#banner:empty { visibility: hidden; }
 #banner.show { opacity: 1; }
 
 /* ---- damage flash ---- */
 #damage {
   position: fixed; inset: 0; z-index: 7; pointer-events: none; opacity: 0;
-  box-shadow: inset 0 0 200px 60px rgba(200,0,0,.85);
+  box-shadow: inset 0 0 200px 60px var(--pol-danger);
   transition: opacity .08s;
 }
 
-/* ---- overlay ----
-   로비(메뉴)와 PAUSED/사망/승리 모두 같은 #overlay(Polaroid 로비 테마) 사용.
-   시각 정의는 아래 'Polaroid Lobby' 섹션(.pol-l*)과 #o-controls/#touch-notice. */
-#overlay {
-  position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center;
-  background: var(--bg-base);
-}
-#overlay.hidden { display: none; }
-
-#settings {
-  margin-top: 28px; padding-top: 20px; border-top: 1px solid #6b4423;
-  text-align: left;
-}
-#settings h3 {
-  font-size: 14px; letter-spacing: 3px; color: #ff8a4d; margin-bottom: 14px; text-align: center;
-}
-#settings label {
-  display: grid; grid-template-columns: 90px 1fr; align-items: center; gap: 14px;
-  font-size: 14px; color: #d8c694; margin: 10px 0;
-}
-#settings input[type=range] {
-  -webkit-appearance: none; appearance: none; height: 6px; border-radius: 3px;
-  background: #4a2e16; outline: none; cursor: pointer;
-}
-#settings input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%;
-  background: #ffae2e; box-shadow: 0 0 6px #ff7a00; cursor: pointer;
-}
-#settings input[type=range]::-moz-range-thumb {
-  width: 18px; height: 18px; border: none; border-radius: 50%;
-  background: #ffae2e; box-shadow: 0 0 6px #ff7a00; cursor: pointer;
+/* 떠오르는 피해 숫자 — combatfx.js가 .dmg-num 클래스를 붙인다 */
+.dmg-num {
+  font-family: var(--font-display); font-style: italic; font-synthesis: none; font-weight: 400;
+  font-size: var(--fs-lg); color: var(--paper);
+  text-shadow: 0 1px 2px var(--ink-warm), 0 0 1px var(--ink-warm);
 }
 
-/* ---- MiniMap ---- */
+/* ---- overlay (로비·PAUSED·사망·승리 공용, .pol-lobby kit) ---- */
+#overlay { overflow-y: auto; justify-content: safe center; }
+
+/* 로비 폴라로이드 사진 아트 — 원근 복도 + 조준점 */
+.lp-ground { fill: var(--cream-200); }
+.lp-ceil { fill: var(--cream-300); }
+.lp-floor { fill: var(--cream-400); }
+.lp-wall { fill: var(--cream-100); }
+.lp-door { fill: var(--ink-brown); }
+.lp-exit { fill: var(--gold-light); }
+.lp-line { fill: none; stroke: var(--ink-light); stroke-width: 0.8; }
+.lp-cross { fill: none; stroke: var(--pol-danger); stroke-width: 1.6; stroke-linecap: round; }
+
+/* 조작 안내 (메뉴에선 노출, PAUSED에서 game.js가 토글) — 한글은 라벨 폰트, 키캡만 mono */
+#o-controls {
+  list-style: none;
+  font-family: var(--font-label); font-size: var(--fs-sm); color: var(--ink-mid);
+  line-height: 2.2; text-align: center; word-break: keep-all;
+}
+#o-controls .pol-kbd { margin: 0 2px; }
+#o-controls .kbd-ko { font-family: var(--font-label); letter-spacing: 0; }
+
+/* 결과 화면 점수 표기 (예비 클래스) */
+.final-score {
+  display: block; margin: 10px 0 4px;
+  font-family: var(--font-display); font-style: italic; font-synthesis: none; font-weight: 300;
+  font-size: var(--fs-2xl); color: var(--ink-warm); font-variant-numeric: tabular-nums;
+}
+.final-kills { display: block; margin-bottom: 8px; font-family: var(--font-label); font-size: var(--fs-sm); color: var(--ink-muted); }
+
+/* 터치/포인터-coarse 환경 안내 — 데스크톱 권장 (game.js가 display 토글) */
+#touch-notice {
+  display: none;
+  max-width: 320px; text-align: center; word-break: keep-all;
+}
+
+/* 사운드 설정 (현재 마크업에서 숨김) */
+#settings { width: min(100%, 340px); text-align: left; }
+#settings h3 { margin-bottom: var(--space-3); }
+.set-row {
+  display: grid; grid-template-columns: 80px 1fr; align-items: center; gap: var(--space-3);
+  margin: var(--space-2) 0;
+}
+.set-row input[type=range] { width: 100%; height: 40px; accent-color: var(--gold-mid); cursor: pointer; }
+
+/* ---- MiniMap — 인화지 위 약도 (그림 색은 minimap.js가 토큰에서 읽음) ---- */
 #minimap {
-  position: fixed;
-  top: 92px;
-  right: 18px;
-  width: 150px;
-  height: 150px;
-  background: rgba(0, 0, 0, .62);
-  border: 1px solid rgba(160, 120, 60, .55);
-  box-shadow: 0 0 12px rgba(0, 0, 0, .7), inset 0 0 8px rgba(0, 0, 0, .5);
+  position: fixed; top: 64px; right: 14px;
+  width: 150px; height: 150px;
+  padding: 4px;
+  background: var(--paper);
+  border-radius: var(--r-xs);
+  box-shadow: var(--shadow-card);
   z-index: 11;
   pointer-events: none;
   image-rendering: pixelated;
@@ -107,51 +183,38 @@ canvas { display: block; }
 
 /* ---- Score / Combo ---- */
 #score {
-  /* 상단 고정 요소(.pol-back-btn)와 겹치지 않게 아래로 */
-  position: fixed; top: 52px; left: 50%; transform: translateX(-50%);
-  font-size: 22px; font-weight: bold; letter-spacing: 3px; color: #ffd34d;
-  text-shadow: 2px 2px 0 #000, 0 0 12px #ff8a00;
+  position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+  display: inline-flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 6px 14px;
+  font-family: var(--font-display); font-style: italic; font-synthesis: none; font-weight: 400;
+  font-size: var(--fs-xl); line-height: 1; color: var(--ink-warm); font-variant-numeric: tabular-nums;
+  background: var(--bg-card); border-radius: var(--r-xs); box-shadow: var(--shadow-soft);
   pointer-events: none; z-index: 11; white-space: nowrap;
 }
+#score::before {
+  content: "점수";
+  font-family: var(--font-label); font-style: normal; font-size: var(--fs-2xs); font-weight: 500;
+  color: var(--ink-muted); line-height: 1.4;
+}
 #combo {
-  position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
-  font-size: 16px; font-weight: bold; letter-spacing: 2px; color: #ff7a4d;
-  text-shadow: 1px 1px 0 #000; pointer-events: none; z-index: 11;
+  position: fixed; top: 68px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+  padding: 2px 10px;
+  font-family: var(--font-display); font-style: italic; font-synthesis: none; font-weight: 400;
+  font-size: var(--fs-md); color: var(--ink-warm);
+  background: var(--gold-light); border-radius: var(--r-pill);
+  pointer-events: none; z-index: 11;
   opacity: 0; transition: opacity .3s;
 }
 #combo.active { opacity: 1; }
 
-/* ---- Overlay: 조작 안내 목록 (메뉴에선 노출, PAUSED에서 game.js가 토글) ---- */
-#o-controls {
-  list-style: none; font-family: var(--font-mono); font-size: 12px; color: var(--ink-mid);
-  line-height: 2.0; letter-spacing: .04em; text-align: center; word-break: keep-all;
-}
-#o-controls b { color: var(--gold-dark); font-weight: 700; }
-
-/* Results screen score display */
-.final-score {
-  display: block;
-  font-size: 28px; font-weight: bold;
-  color: #ffd34d;
-  text-shadow: 0 0 14px rgba(255, 180, 0, .55), 2px 2px 0 #000;
-  margin: 10px 0 4px; letter-spacing: 4px;
-}
-.final-kills {
-  display: block;
-  font-size: 14px; color: #ff7a4d;
-  letter-spacing: 3px; margin-bottom: 8px;
-}
-
-/* 터치/포인터-coarse 환경 안내(시작 오버레이) — 데스크톱 권장 (game.js가 노출 토글) */
-#touch-notice {
-  display: none;
-  margin: 0; padding: 10px 16px;
-  border: 1px solid var(--rule-color);
-  background: var(--bg-warm);
-  color: var(--ink-mid);
-  font-family: var(--font-display); font-style: italic; font-weight: 200;
-  font-size: .84rem; line-height: 1.6; letter-spacing: .02em;
-  max-width: 320px; text-align: center; word-break: keep-all;
+/* ---- Mobile ---- */
+@media (max-width: 640px) {
+  .hud-stage { max-width: 58%; }
+  #minimap { width: 104px; height: 104px; }
+  #score { top: 64px; }
+  #combo { top: 114px; }
+  #ammo .pol-hud-value { font-size: var(--fs-xl); }
+  #bosshp { bottom: 118px; }
 }
 
 /* 전정기관 민감 사용자 배려: 화면 전환/페이드 트랜지션 비활성.
@@ -161,19 +224,3 @@ canvas { display: block; }
   .pol-lbtn, .pol-lbtn:hover,
   #hp-fill { transition: none !important; }
 }
-
-/* Polaroid Lobby 2026-06-07 — 색·폰트는 ../design-tokens.css 토큰 사용 */
-.pol-lobby{position:fixed;inset:0;background:var(--bg-base);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:500}
-.pol-lcard{background:var(--bg-card);padding:5px 5px 22px;width:140px;box-shadow:var(--shadow-card);transform:rotate(-3deg);flex-shrink:0}
-.pol-lphoto{width:100%;aspect-ratio:1 / 1}
-.pol-lnum{font-family:var(--font-display);font-style:italic;font-weight:100;font-size:.6rem;color:var(--gold-mid);display:block;margin-top:5px}
-.pol-ltag{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.66rem;color:var(--ink-light);text-align:center;margin-top:2px;display:block}
-.pol-ltitle{font-family:var(--font-display);font-style:italic;font-weight:300;font-size:clamp(1.9rem,5vw,3rem);color:var(--ink-warm);line-height:1;text-align:center}
-.pol-ldesc{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.86rem;color:var(--ink-mid);text-align:center;max-width:260px;line-height:1.55;word-break:keep-all}
-.pol-lbtn{font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.88rem;letter-spacing:.16em;color:var(--gold-mid);background:var(--bg-card);border:1px solid rgba(192,160,96,.45);padding:11px 46px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:box-shadow .3s,transform .3s;margin-top:6px}
-.pol-lbtn:hover{box-shadow:var(--shadow-card-lift);transform:translateY(-2px)}
-.pol-llabel{font-family:var(--font-mono);font-size:.57rem;color:var(--ink-light);letter-spacing:.09em;text-transform:uppercase}
-
-/* pol-back-btn */
-.pol-back-btn{position:fixed;top:14px;left:14px;font-family:var(--font-display);font-style:italic;font-weight:200;font-size:.78rem;color:var(--gold-mid);text-decoration:none;letter-spacing:.06em;z-index:9999;background:rgba(236,231,220,.88);padding:6px 14px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1px solid var(--rule-color);transition:color .2s,background .2s}
-.pol-back-btn:hover{color:var(--ink-warm);background:rgba(236,231,220,.98)}

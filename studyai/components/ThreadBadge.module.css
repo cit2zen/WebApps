@@ -1,8 +1,75 @@
-.badge { position: absolute; bottom: 8px; right: 10px; background: #1a3050; border: 1px solid #2a5080; border-radius: 10px; padding: 2px 8px; font-size: 9px; color: #4af; cursor: pointer; user-select: none; }
-.badge:hover { background: #1e3a60; }
-.popup { position: absolute; bottom: 26px; right: 0; background: #1a2a3a; border: 1px solid #2a4a6a; border-radius: 8px; padding: 8px; min-width: 190px; font-size: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.6); display: flex; flex-direction: column; gap: 2px; z-index: 40; }
-.popLabel { color: #555; font-size: 9px; margin-bottom: 3px; }
-.popRow { background: none; border: none; padding: 4px 6px; border-radius: 4px; cursor: pointer; color: #aaa; text-align: left; }
-.popRow:hover { background: #1e3a5a; color: #4af; }
-.popAdd { background: none; border: none; border-top: 1px solid #2a3a4a; padding: 4px 6px; margin-top: 2px; color: #3a5a7a; cursor: pointer; text-align: left; }
-.popAdd:hover { color: #7cb9e8; }
+/* ThreadBadge — small paper tag listing follow-up threads of a block */
+.badge {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  font-family: var(--font-label);
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  color: var(--gold-text);
+  background: var(--bg-card);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease;
+}
+.badge::after { content: ""; position: absolute; inset: -9px -6px; } /* larger tap area */
+.badge:hover { border-color: var(--gold-mid); background: var(--cream-100); }
+.popup {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 210px;
+  max-width: min(280px, 80vw);
+  padding: var(--space-2);
+  background: var(--bg-card);
+  border: 1px solid var(--rule-color);
+  border-radius: var(--r-xs);
+  box-shadow: var(--shadow-card-lift);
+  font-family: var(--font-label);
+  font-size: var(--fs-sm);
+  font-weight: 400;
+  cursor: default;
+}
+.popLabel { padding: 2px 8px 4px; font-size: var(--fs-2xs); font-weight: 500; color: var(--ink-muted); }
+.popRow {
+  min-height: 36px;
+  padding: 8px;
+  background: none;
+  border: none;
+  border-radius: var(--r-xs);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  color: var(--ink-mid);
+  text-align: left;
+  transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+.popRow:hover { background: var(--cream-200); color: var(--ink-warm); }
+.popAdd {
+  min-height: 36px;
+  margin-top: 2px;
+  padding: 8px;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--rule-color);
+  font-family: var(--font-label);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--gold-text);
+  text-align: left;
+  transition: color var(--dur-fast) ease;
+}
+.popAdd:hover { color: var(--ink-warm); }
+
+@media (max-width: 900px) {
+  .popRow, .popAdd { min-height: 40px; }
+}

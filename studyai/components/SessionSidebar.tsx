@@ -36,7 +36,7 @@ export default function SessionSidebar({ sessions, activeId, onSelect, onNew }: 
           </button>
         ))}
       </div>
-      <button className={styles.newBtn} onClick={onNew}>＋ 새 주제 시작</button>
+      <button className={`pol-btn-ghost pol-btn-sm ${styles.newBtn}`} onClick={onNew}>＋ 새 주제 시작</button>
     </aside>
   )
 }

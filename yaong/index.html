@@ -7,83 +7,89 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🐱</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Space+Mono:wght@400;700&display=swap" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,100..400&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500&family=Space+Mono&family=Nanum+Pen+Script&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../design-tokens.css" />
   <link rel="stylesheet" href="../typography.css" />
   <link rel="stylesheet" href="../polaroid.css" />
+  <link rel="stylesheet" href="../pol-ui.css" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body class="pol-body">
   <div id="stage">
     <canvas id="game" width="800" height="450"></canvas>
 
     <!-- HUD -->
-    <div id="hud" class="hidden">
-      <div id="lives" aria-label="생명"></div>
-      <div id="score">0 m</div>
+    <div id="hud" class="pol-hud hidden">
+      <div class="pol-hud-item">
+        <span class="pol-hud-label">생명</span>
+        <span id="lives" class="pol-hud-value hud-lives" aria-label="생명"></span>
+      </div>
+      <div class="pol-hud-item">
+        <span class="pol-hud-label">거리</span>
+        <span id="score" class="pol-hud-value">0 m</span>
+      </div>
     </div>
 
     <!-- 시작 화면 -->
-    <div id="start-screen" class="overlay pol-lobby">
+    <div id="start-screen" class="pol-lobby">
       <div class="pol-lcard">
         <div class="pol-lphoto">
-          <!-- 크림/골드 톤 고양이 일러스트 (디자인 토큰 색상값) -->
           <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="점프하는 고양이 일러스트">
-            <rect width="100" height="100" fill="#f5f0e8" />
-            <line x1="12" y1="79" x2="88" y2="79" stroke="#d0c8b8" stroke-width="1.5" stroke-linecap="round" />
-            <path d="M67 68 Q81 63 78 49" fill="none" stroke="#c0a060" stroke-width="5" stroke-linecap="round" />
-            <ellipse cx="54" cy="64" rx="18" ry="12" fill="#c0a060" />
-            <rect x="45" y="70" width="4.5" height="8" rx="2" fill="#9a7840" />
-            <rect x="59" y="70" width="4.5" height="8" rx="2" fill="#9a7840" />
-            <path d="M31 39 L29 24 L40 32 Z" fill="#c0a060" />
-            <path d="M53 39 L55 24 L44 32 Z" fill="#c0a060" />
-            <path d="M33 36 L32 28 L38 32.5 Z" fill="#d4b87a" />
-            <circle cx="42" cy="45" r="13.5" fill="#c0a060" />
-            <path d="M35.5 45.5 q2.2 -2.6 4.4 0 M44.1 45.5 q2.2 -2.6 4.4 0" fill="none" stroke="#1a1005" stroke-width="1.6" stroke-linecap="round" />
-            <circle cx="42" cy="50" r="1.4" fill="#9a7840" />
-            <path d="M29 48 H23 M29.5 51 L24 53 M55 48 H61 M54.5 51 L60 53" stroke="#9a7840" stroke-width="1" stroke-linecap="round" />
-            <text x="60" y="32" font-size="10" font-style="italic" fill="#9a7840" font-family="Fraunces, serif">야옹!</text>
+            <rect class="lp-bg" width="100" height="100" />
+            <line class="lp-ground" x1="12" y1="79" x2="88" y2="79" />
+            <path class="lp-tail" d="M67 68 Q81 63 78 49" />
+            <ellipse class="lp-fur" cx="54" cy="64" rx="18" ry="12" />
+            <rect class="lp-fur-dark" x="45" y="70" width="4.5" height="8" rx="2" />
+            <rect class="lp-fur-dark" x="59" y="70" width="4.5" height="8" rx="2" />
+            <path class="lp-fur" d="M31 39 L29 24 L40 32 Z" />
+            <path class="lp-fur" d="M53 39 L55 24 L44 32 Z" />
+            <path class="lp-ear" d="M33 36 L32 28 L38 32.5 Z" />
+            <circle class="lp-fur" cx="42" cy="45" r="13.5" />
+            <path class="lp-eye" d="M35.5 45.5 q2.2 -2.6 4.4 0 M44.1 45.5 q2.2 -2.6 4.4 0" />
+            <circle class="lp-fur-dark" cx="42" cy="50" r="1.4" />
+            <path class="lp-whisker" d="M29 48 H23 M29.5 51 L24 53 M55 48 H61 M54.5 51 L60 53" />
+            <text class="lp-text" x="60" y="32" font-size="10">야옹!</text>
           </svg>
         </div>
-        <span class="pol-lnum">cityzen</span>
+        <span class="pol-lnum">&#8470; 02 &mdash; voice runner</span>
         <span class="pol-ltag">yaong</span>
       </div>
       <h2 class="pol-ltitle">yaong</h2>
-      <p class="pol-ldesc">목소리로 점프하는 고양이 러너</p>
-      <div class="pol-lbtns">
+      <p class="pol-ldesc">목소리로 점프하는 고양이 러너. 크게 &ldquo;야옹!&rdquo; 외칠수록 높이 뛰어요.</p>
+      <div class="pol-row pol-lbtns">
         <button class="pol-lbtn" id="start-btn">시작하기</button>
-        <button class="pol-lbtn" id="settings-btn">⚙️ 설정</button>
+        <button class="pol-lbtn pol-lbtn-ghost" id="settings-btn"><span aria-hidden="true">⚙︎</span> 설정</button>
       </div>
-      <p id="best-line" class="pol-lbest"></p>
-      <span class="pol-llabel">cityzen &middot; Game - Cat</span>
+      <p id="best-line" class="pol-lhelp pol-lbest"></p>
+      <span class="pol-llabel">voice &middot; tap &middot; space</span>
     </div>
 
     <!-- 준비(대기) 화면 -->
-    <div id="ready-screen" class="overlay hidden">
-      <div class="panel">
-        <h2>준비됐나요?</h2>
-        <p class="hint">마이크에 대고 크게 <b>"야옹!"</b> 외치면 점프해요.<br />소리가 클수록 더 높이 뛰어요.</p>
+    <div id="ready-screen" class="pol-overlay hidden">
+      <div class="pol-dialog yg-dialog" role="dialog" aria-modal="true" aria-labelledby="ready-title">
+        <h2 id="ready-title" class="yg-title">준비됐나요?</h2>
+        <p class="yg-hint">마이크에 대고 크게 <b>&ldquo;야옹!&rdquo;</b> 외치면 점프해요.<br />소리가 클수록 더 높이 뛰어요.</p>
         <div class="meter-wrap">
-          <span class="meter-label" id="ready-meter-label">목소리 테스트</span>
+          <span class="pol-field-label" id="ready-meter-label">목소리 테스트</span>
           <div class="meter" role="meter" aria-labelledby="ready-meter-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="ready-meter-fill"></div><div id="ready-meter-threshold"></div></div>
         </div>
-        <p id="ready-mic-status" class="mic-status"></p>
-        <button id="ready-start" class="btn primary">출발! 🐾</button>
-        <button id="ready-settings" class="btn ghost">⚙️ 설정</button>
-        <button id="ready-back" class="btn ghost">← 처음으로</button>
+        <p id="ready-mic-status" class="mic-status" role="status"></p>
+        <button id="ready-start" class="pol-btn-primary pol-btn-lg">출발!</button>
+        <button id="ready-settings" class="pol-btn-ghost"><span aria-hidden="true">⚙︎</span> 설정</button>
+        <button id="ready-back" class="pol-btn-ghost">&larr; 처음으로</button>
       </div>
     </div>
 
     <!-- 설정 화면 -->
-    <div id="settings-screen" class="overlay hidden">
-      <div class="panel">
-        <h2>설정</h2>
+    <div id="settings-screen" class="pol-overlay hidden">
+      <div class="pol-dialog yg-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+        <h2 id="settings-title" class="yg-title">설정</h2>
         <label class="field">
-          <span>마이크 민감도</span>
+          <span class="pol-field-label">마이크 민감도</span>
           <input id="sensitivity" type="range" min="0" max="100" value="50" />
           <span id="sensitivity-val" class="val">50</span>
         </label>
-        <p class="hint">민감도가 높을수록 작은 소리에도 점프해요.</p>
+        <p class="yg-hint">민감도가 높을수록 작은 소리에도 점프해요.</p>
 
         <label class="toggle">
           <span>효과음</span>
@@ -95,29 +101,30 @@
         </label>
 
         <div class="meter-wrap">
-          <span class="meter-label" id="meter-label">지금 음량</span>
+          <span class="pol-field-label" id="meter-label">지금 음량</span>
           <div class="meter" role="meter" aria-labelledby="meter-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="meter-fill"></div><div id="meter-threshold"></div></div>
         </div>
-        <p id="mic-status" class="mic-status"></p>
+        <p id="mic-status" class="mic-status" role="status"></p>
 
-        <button id="settings-back" class="btn primary">돌아가기</button>
+        <button id="settings-back" class="pol-btn-primary">돌아가기</button>
       </div>
     </div>
 
     <!-- 게임 오버 -->
-    <div id="gameover-screen" class="overlay hidden">
-      <div class="panel">
-        <h2>게임 오버</h2>
-        <p class="result"><span id="final-score">0</span> m 달렸어요!</p>
+    <div id="gameover-screen" class="pol-overlay hidden">
+      <div class="pol-dialog yg-dialog" role="dialog" aria-modal="true" aria-labelledby="gameover-title">
+        <p class="pol-eyebrow yg-eyebrow">game over</p>
+        <h2 id="gameover-title" class="yg-title">게임 오버</h2>
+        <p class="result"><span id="final-score" class="result-num">0</span> m 달렸어요!</p>
         <p id="best-result" class="best"></p>
-        <button id="retry-btn" class="btn primary">다시 하기</button>
-        <button id="gameover-settings" class="btn ghost">⚙️ 설정</button>
-        <button id="home-btn" class="btn ghost">처음으로</button>
+        <button id="retry-btn" class="pol-btn-primary pol-btn-lg">다시 하기</button>
+        <button id="gameover-settings" class="pol-btn-ghost"><span aria-hidden="true">⚙︎</span> 설정</button>
+        <button id="home-btn" class="pol-btn-ghost">처음으로</button>
       </div>
     </div>
   </div>
 
-  <a class="pol-back-btn" href="https://games.cityzen.kr">&#8592; 게임 허브</a>
+  <a class="pol-back-btn" href="../">&#8592; 게임 허브</a>
 
   <script type="module" src="js/main.js"></script>
 </body>

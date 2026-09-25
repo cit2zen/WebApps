@@ -1,20 +1,18 @@
 // components/jarvis/HudOverlay.tsx
-// 오브 위에 겹치는 홀로그래픽 HUD: 회전 레티클 링 + 실시간 음성 파형(원형) + 코너 브래킷.
+// 오브 위에 겹치는 레티클(Polaroid): 금색 헤어라인 회전 링 + 실시간 음성 파형(원형) + 사진 모서리 크롭 마크.
 // 3D Canvas와 분리된 DOM 오버레이라 GPU 부담이 적고 선명하다. pointer-events 없음.
+// 색: DOM(SVG·크롭 마크)은 var(--gold-*) 토큰, 2D 캔버스 파형은 lib/palette.ts의 토큰 미러 hex.
 "use client";
 import { useEffect, useRef } from "react";
 import { useJarvisStore } from "@/lib/store";
-import { audio } from "@/lib/audioBus";
-
-const ACCENT: Record<string, string> = {
-  idle: "#3a8aa6", listening: "#5ef2ff", thinking: "#a98bff", speaking: "#b4f6ff",
-};
+import { audio, type Mode } from "@/lib/audioBus";
+import { MODE_ACCENT } from "@/lib/palette";
 
 export function HudOverlay() {
   const mode = useJarvisStore((s) => s.mode);
-  const accent = ACCENT[mode] ?? ACCENT.idle;
-  const accentRef = useRef(accent);
-  accentRef.current = accent;
+  const accent = MODE_ACCENT[mode as Mode] ?? MODE_ACCENT.idle;
+  const accentRef = useRef(accent.hex);
+  accentRef.current = accent.hex;
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -45,10 +43,10 @@ export function HudOverlay() {
       ctx!.save();
       ctx!.translate(cx, cy);
       ctx!.strokeStyle = accentRef.current;
-      ctx!.lineWidth = Math.max(1.4 * dpr, 1.6);
+      ctx!.lineWidth = Math.max(1.1 * dpr, 1.2);
       ctx!.lineCap = "round";
-      ctx!.globalAlpha = 0.85;
-      // 모든 막대를 단일 경로로 모아 한 번만 stroke (per-stroke shadowBlur는 치명적 비용 → 글로우는 CSS filter로)
+      ctx!.globalAlpha = 0.8;
+      // 모든 막대를 단일 경로로 모아 한 번만 stroke (per-stroke shadowBlur는 치명적 비용 — 밝은 배경이라 글로우 없음)
       ctx!.beginPath();
       for (let i = 0; i < bars; i++) {
         const a = (i / bars) * Math.PI * 2;
@@ -68,26 +66,29 @@ export function HudOverlay() {
   }, []);
 
   return (
-    <div className="jv-hud" aria-hidden="true" style={{ ["--hud" as any]: accent }}>
+    <div className="jv-reticle" aria-hidden="true" data-mode={mode} style={{ ["--hud" as any]: accent.token }}>
       <canvas ref={canvasRef} className="jv-hud-wave" />
       <svg className="jv-hud-svg" viewBox="0 0 200 200">
         {/* 바깥 회전 점선 링 */}
-        <circle className="jv-ring jv-ring-a" cx="100" cy="100" r="92" fill="none" stroke="var(--hud)" strokeWidth="0.6" strokeDasharray="2 6" />
+        <circle className="jv-ring jv-ring-a" cx="100" cy="100" r="92" fill="none" stroke="var(--hud)" strokeWidth="0.4" strokeDasharray="1.5 6" />
         {/* 호 세그먼트 링(반대 회전) */}
         <g className="jv-ring jv-ring-b">
-          <circle cx="100" cy="100" r="82" fill="none" stroke="var(--hud)" strokeWidth="1.2" strokeDasharray="40 220" strokeLinecap="round" opacity="0.9" />
-          <circle cx="100" cy="100" r="82" fill="none" stroke="var(--hud)" strokeWidth="1.2" strokeDasharray="18 90" strokeDashoffset="130" strokeLinecap="round" opacity="0.5" />
+          <circle cx="100" cy="100" r="82" fill="none" stroke="var(--hud)" strokeWidth="0.6" strokeDasharray="40 220" strokeLinecap="round" opacity="0.9" />
+          <circle cx="100" cy="100" r="82" fill="none" stroke="var(--hud)" strokeWidth="0.6" strokeDasharray="18 90" strokeDashoffset="130" strokeLinecap="round" opacity="0.5" />
         </g>
         {/* 눈금 링 */}
         <g className="jv-ring jv-ring-c" opacity="0.55">
           {Array.from({ length: 60 }).map((_, i) => (
-            <line key={i} x1="100" y1="14" x2="100" y2={i % 5 === 0 ? "20" : "17"} stroke="var(--hud)" strokeWidth="0.5"
+            <line key={i} x1="100" y1="14" x2="100" y2={i % 5 === 0 ? "20" : "17"} stroke="var(--hud)" strokeWidth="0.35"
               transform={`rotate(${i * 6} 100 100)`} />
           ))}
         </g>
       </svg>
-      <span className="jv-bracket jv-tl" /><span className="jv-bracket jv-tr" />
-      <span className="jv-bracket jv-bl" /><span className="jv-bracket jv-br" />
+      {/* 사진 모서리 크롭 마크 — 레티클 정사각형을 액자처럼 두른다 */}
+      <div className="jv-frame">
+        <span className="jv-bracket jv-tl" /><span className="jv-bracket jv-tr" />
+        <span className="jv-bracket jv-bl" /><span className="jv-bracket jv-br" />
+      </div>
     </div>
   );
 }

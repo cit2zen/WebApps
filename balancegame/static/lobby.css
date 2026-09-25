@@ -1,0 +1,227 @@
+/* 로비(셋 선택) + 강수 선택 모달 — lobby.html 전용. 색은 var()만, font-size는 var(--fs-*)만 */
+
+.lobby-wrap {
+  min-height: var(--page-h);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-7) var(--gutter) var(--space-8);
+}
+
+.lobby-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  justify-content: center;
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  max-width: 960px;
+}
+
+/* ── 셋 카드 묶음 (3장 캐스케이드) ── */
+.lset-group {
+  --lw: 180px;
+  position: relative;
+  width: var(--lw);
+  height: 290px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.lset-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--lw);
+  margin-left: calc(var(--lw) / -2);
+  margin-top: calc(var(--lw) / -2);
+  background: var(--bg-card);
+  padding: 8px 8px 30px;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--pol-ease), box-shadow var(--pol-ease);
+  will-change: transform;
+  display: flex;
+  flex-direction: column;
+}
+
+.lset-group .lset-card:nth-child(1) { transform: translate(-18px, -6px) rotate(-8deg); z-index: 1; }
+.lset-group .lset-card:nth-child(2) { transform: translate(4px, 10px) rotate(4deg); z-index: 2; }
+.lset-group .lset-card:nth-child(3) { transform: translate(14px, -4px) rotate(-2deg); z-index: 3; }
+
+.lset-group:hover .lset-card:nth-child(1),
+.lset-group:focus-visible .lset-card:nth-child(1) { transform: translate(-26px, -8px) rotate(-11deg); }
+.lset-group:hover .lset-card:nth-child(3),
+.lset-group:focus-visible .lset-card:nth-child(3) {
+  transform: translate(14px, -14px) rotate(-2deg);
+  box-shadow: var(--shadow-card-lift);
+}
+
+.lset-group:focus-visible {
+  outline: 2px solid var(--gold-mid);
+  outline-offset: 6px;
+  box-shadow: none;
+}
+
+.lset-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--cream-400);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lset-photo.cover-0 { background: var(--cover-0); }
+.lset-photo.cover-1 { background: var(--cover-1); }
+.lset-photo.cover-2 { background: var(--cover-2); }
+.lset-photo.cover-3 { background: var(--cover-3); }
+.lset-photo.cover-4 { background: var(--cover-4); }
+.lset-photo.cover-5 { background: var(--cover-5); }
+
+.lset-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lset-initial {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-synthesis: none;
+  font-weight: 300;
+  font-size: var(--fs-display);
+  line-height: 1;
+  color: var(--gold-dark);
+}
+
+.lset-deco { font-size: var(--fs-heading); opacity: 0.2; }
+
+.lset-q {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-synthesis: none;
+  font-size: var(--fs-md);
+  color: var(--ink-warm);
+  text-align: center;
+  margin-top: 10px;
+  padding: 0 4px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.lset-meta {
+  font-family: var(--font-label);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--gold-text);
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* ── 강수 선택 모달 (kit .pol-overlay + .pol-dialog) ── */
+.size-overlay {
+  display: flex; /* JS가 display:flex/none 토글 */
+  align-items: center;
+  justify-content: center;
+}
+
+.size-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+}
+.size-modal > * + * { margin-top: 0; }
+
+.size-modal-q {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-synthesis: none;
+  font-weight: 300;
+  font-size: var(--fs-title);
+  color: var(--ink-warm);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.size-modal-label {
+  font-family: var(--font-label);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--ink-muted);
+}
+
+.size-btns {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* 강수 = 미니 폴라로이드 */
+.size-btn {
+  width: 64px;
+  padding: 5px 5px 10px;
+  border: 0;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform var(--pol-ease), box-shadow var(--pol-ease);
+}
+.size-btn:nth-child(odd) { rotate: -2deg; }
+.size-btn:nth-child(even) { rotate: 1.5deg; }
+
+.size-btn:hover,
+.size-btn:focus-visible {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-card-lift);
+}
+.size-btn:focus-visible { box-shadow: var(--shadow-card-lift), var(--focus-ring); }
+.size-btn:active { transform: scale(0.97); }
+
+.size-btn .size-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--cream-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.size-btn .size-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: var(--fs-2xl);
+  line-height: 1;
+  color: var(--ink-warm);
+}
+
+.size-btn .size-label-text {
+  font-family: var(--font-label);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--ink-muted);
+  margin-top: 6px;
+}
+
+.size-unavail {
+  font-size: var(--fs-md);
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+.size-cancel { min-height: 40px; }
+
+@media (max-width: 640px) {
+  .lobby-groups { gap: var(--space-7) var(--space-5); padding: var(--space-4) 0; }
+  .lset-group { --lw: 140px; height: 250px; }
+  .lset-q { font-size: var(--fs-sm); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lset-card, .size-btn { transition: none; }
+}

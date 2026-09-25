@@ -1,4 +1,5 @@
 // 고양이 캐릭터: 점프 물리 + canvas 드로잉.
+import { PAL } from "./palette.js";
 export class Cat {
   constructor(groundY) {
     this.startX = 130;
@@ -58,13 +59,15 @@ export class Cat {
     const maxH = (this.maxJump * this.maxJump) / (2 * this.gravity);
     const airT = Math.max(0, Math.min(1, (this.groundY - this.h - y) / maxH));
     const shrink = 1 - 0.65 * airT;
-    ctx.fillStyle = `rgba(70,110,150,${(0.18 * (1 - 0.7 * airT)).toFixed(3)})`;
+    ctx.fillStyle = PAL.shadow;
+    ctx.globalAlpha = 0.18 * (1 - 0.7 * airT);
     ctx.beginPath();
     ctx.ellipse(cx, this.groundY - 2, w * 0.42 * shrink, 7 * shrink, 0, 0, Math.PI * 2);
     ctx.fill();
+    ctx.globalAlpha = 1;
 
-    const orange = "#ffb455";
-    const orangeDark = "#f59a31";
+    const orange = PAL.cat;
+    const orangeDark = PAL.catDark;
 
     // 꼬리 (살랑)
     ctx.strokeStyle = orange;
@@ -105,7 +108,7 @@ export class Cat {
     ctx.fillStyle = orange;
     ctx.fill();
     // 귀 안쪽
-    ctx.fillStyle = "#ffd9c2";
+    ctx.fillStyle = PAL.catEar;
     ctx.beginPath();
     ctx.moveTo(hcx - hr * 0.55, hcy - hr * 0.6);
     ctx.lineTo(hcx - hr * 0.32, hcy - hr * 1.05);
@@ -113,14 +116,16 @@ export class Cat {
     ctx.fill();
 
     // 볼 홍조
-    ctx.fillStyle = "rgba(255,140,160,0.55)";
+    ctx.fillStyle = PAL.catBlush;
+    ctx.globalAlpha = 0.28;
     ctx.beginPath();
     ctx.arc(hcx - hr * 0.6, hcy + hr * 0.25, 5, 0, Math.PI * 2);
     ctx.arc(hcx + hr * 0.6, hcy + hr * 0.25, 5, 0, Math.PI * 2);
     ctx.fill();
+    ctx.globalAlpha = 1;
 
     // 눈 (점프 중엔 ^^ 표정)
-    ctx.fillStyle = "#3a2a1a";
+    ctx.fillStyle = PAL.catEye;
     if (this.onGround) {
       ctx.beginPath();
       ctx.arc(hcx - hr * 0.35, hcy - hr * 0.05, 3.4, 0, Math.PI * 2);
@@ -128,7 +133,7 @@ export class Cat {
       ctx.fill();
     } else {
       ctx.lineWidth = 3;
-      ctx.strokeStyle = "#3a2a1a";
+      ctx.strokeStyle = PAL.catEye;
       ctx.beginPath();
       ctx.moveTo(hcx - hr * 0.5, hcy - hr * 0.02);
       ctx.lineTo(hcx - hr * 0.2, hcy - hr * 0.18);
@@ -138,7 +143,7 @@ export class Cat {
     }
 
     // 코
-    ctx.fillStyle = "#ff7a90";
+    ctx.fillStyle = PAL.catNose;
     ctx.beginPath();
     ctx.arc(hcx, hcy + hr * 0.22, 2.6, 0, Math.PI * 2);
     ctx.fill();

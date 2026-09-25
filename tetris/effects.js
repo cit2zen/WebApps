@@ -1,6 +1,7 @@
 // effects.js — particle bursts on line clears + floating score/combo text
 
 import { COLORS } from './piece.js';
+import { css } from './palette.js';
 
 const CELL = 28;
 const BOARD_W = 10 * CELL;
@@ -9,7 +10,7 @@ const BOARD_H = 20 * CELL;
 export function createEffects() {
   const particles = [];
   const texts = [];
-  let flash = 0; // white screen flash intensity 0..1
+  let flash = 0; // screen flash intensity 0..1 (paper-gold wash)
 
   function burst(rows, big) {
     for (const { y, cells } of rows) {
@@ -25,7 +26,7 @@ export function createEffects() {
             life: 1,
             decay: 0.0014 + Math.random() * 0.0012,
             size: 3 + Math.random() * 4,
-            color: c.light,
+            color: c.base,
           });
         }
       }
@@ -57,28 +58,28 @@ export function createEffects() {
   }
 
   function draw(ctx) {
+    ctx.save();
     if (flash > 0) {
-      ctx.fillStyle = `rgba(255,255,255,${flash * 0.28})`;
+      ctx.globalAlpha = flash * 0.32;
+      ctx.fillStyle = css('--tt-flash');
       ctx.fillRect(0, 0, BOARD_W, BOARD_H);
     }
-    ctx.save();
     for (const p of particles) {
       ctx.globalAlpha = Math.max(0, p.life);
       ctx.fillStyle = p.color;
-      ctx.shadowColor = p.color;
-      ctx.shadowBlur = 8;
       const s = p.size * p.life;
       ctx.fillRect(p.x - s / 2, p.y - s / 2, s, s);
     }
-    ctx.shadowBlur = 0;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round';
     for (const t of texts) {
       ctx.globalAlpha = Math.min(1, t.life * 1.6);
-      ctx.font = '700 24px "Space Mono", ui-monospace, monospace';
+      ctx.font = 'italic 400 28px Fraunces, "Noto Serif KR", serif';
+      ctx.strokeStyle = css('--tt-fx-halo');
+      ctx.lineWidth = 5;
+      ctx.strokeText(t.str, t.x, t.y);
       ctx.fillStyle = t.color;
-      ctx.shadowColor = t.color;
-      ctx.shadowBlur = 16;
       ctx.fillText(t.str, t.x, t.y);
     }
     ctx.restore();
