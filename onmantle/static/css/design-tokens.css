@@ -1,9 +1,22 @@
 /* SOURCE OF TRUTH: develop_web/design-system/ — 직접 수정 금지, develop_web/scripts/sync_design.py로 동기 */
+/* ═══════════════════════════════════════════
+   POLAROID EDITORIAL v2 — 디자인 토큰
+   hex 값은 이 파일에만 둔다. 앱 CSS는 var()로만 참조.
+   폰트 로드(정적 앱 <head>):
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,100..400&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500&family=Space+Mono&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+═══════════════════════════════════════════ */
 :root {
-  /* Backgrounds */
-  --bg-base:   #ece7dc;
-  --bg-warm:   #f5f0e8;
-  --bg-card:   #ffffff;
+  color-scheme: light;
+
+  /* Surfaces */
+  --bg-base: #ece7dc;
+  --bg-warm: #f5f0e8;
+  --bg-card: #ffffff;
+  --paper: #fdf9f0;
+  --bg-header: rgba(236, 231, 220, 0.82);
+  --bg-overlay: rgba(26, 16, 5, 0.42);
 
   /* Cream scale */
   --cream-100: #faf7f2;
@@ -12,32 +25,99 @@
   --cream-400: #e0d8cc;
   --cream-500: #d0c8b8;
 
-  /* Gold accent */
+  /* Gold — mid·light는 장식(선·점·배경) 전용 */
   --gold-light: #d4b87a;
-  --gold-mid:   #c0a060;
-  --gold-dark:  #9a7840;
+  --gold-mid: #c0a060;
+  --gold-dark: #9a7840; /* 대형 디스플레이 텍스트 전용 3.3:1 */
+  --gold-text: #7d5f28; /* 작은 골드 텍스트 4.8:1 */
+  --gold-glow: #e8c878;
 
   /* Ink */
-  --ink-warm:  #1a1005;
-  --ink-mid:   #4a3820;
-  --ink-light: #a09060;
+  --ink-warm: #1a1005;
+  --ink-mid: #4a3820;
+  --ink-muted: #6e5a38; /* 라벨·보조문구 5.3:1 */
+  --ink-light: #a09060; /* 장식 전용(대비 부족 — 텍스트 금지) */
+  --ink-brown: #3a2a1a;
 
-  /* Rule / divider */
+  /* Lines */
   --rule-color: rgba(192, 160, 96, 0.3);
+  --rule-strong: rgba(192, 160, 96, 0.6);
+  --ruled-line: rgba(184, 152, 90, 0.4);
+  --focus-ring: 0 0 0 3px rgba(192, 160, 96, 0.35);
+  --hairline-gold: linear-gradient(90deg, var(--gold-mid), rgba(192, 160, 96, 0));
+
+  /* Paper — 인화지 결(그레인)·조명 */
+  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.06 0 0 0 0 0.02 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --paper-light: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255, 252, 244, 0.7), rgba(255, 252, 244, 0));
+
+  /* Status */
+  --pol-ok: #5a7d45;
+  --pol-ok-soft: rgba(90, 125, 69, 0.08);
+  --pol-ok-line: rgba(90, 125, 69, 0.35);
+  --pol-danger: #b04030;
+  --pol-danger-soft: rgba(176, 64, 48, 0.06);
+  --pol-danger-line: rgba(176, 64, 48, 0.3);
+  --pol-info: #4a6a8a;
+  --pol-info-soft: rgba(74, 106, 138, 0.08);
 
   /* Shadows */
-  --shadow-card:      0 3px 12px rgba(0, 0, 0, 0.18);
-  --shadow-card-lift: 0 8px 24px rgba(0, 0, 0, 0.24);
+  --shadow-card: 0 3px 12px rgba(0, 0, 0, 0.18);
+  --shadow-card-lift: 0 14px 34px rgba(26, 16, 5, 0.22), 0 3px 8px rgba(26, 16, 5, 0.1);
   --shadow-card-open: 0 6px 20px rgba(0, 0, 0, 0.14);
+  --shadow-soft: 0 1px 2px rgba(26, 16, 5, 0.06), 0 4px 14px rgba(26, 16, 5, 0.08);
 
-  /* Typography */
-  --font-display: 'Fraunces', serif;
-  --font-mono:    'Space Mono', monospace;
+  /* Font roles — 한글은 절대 Space Mono로 렌더하지 않는다 */
+  --font-display: 'Fraunces', 'Noto Serif KR', serif;      /* 제목(라틴 italic, 한글 upright) */
+  --font-body: 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+  --font-label: 'Noto Sans KR', system-ui, sans-serif;      /* 한글 라벨·버튼·칩 */
+  --font-mono: 'Space Mono', ui-monospace, monospace;      /* 라틴·숫자 전용(URL·코드·번호) */
+  --font-mono-pol: var(--font-mono);
+  --font-hand: 'Nanum Pen Script', cursive;
+
+  /* Type scale — font-size는 이 토큰만 쓴다. 최소 11px */
+  --fs-2xs: 0.6875rem;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.8125rem;
+  --fs-md: 0.875rem;
+  --fs-base: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.375rem;
+  --fs-2xl: 1.5rem;
+  --fs-lead: clamp(1rem, 1.6vw, 1.125rem);
+  --fs-title: clamp(1.15rem, 2.4vw, 1.5rem);
+  --fs-heading: clamp(1.7rem, 4.4vw, 2.6rem);
+  --fs-display: clamp(2rem, 4.4vw, 3.2rem);
+  --fs-hero: clamp(2.6rem, 6.4vw, 5rem);
+
+  /* Spacing / layout */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --page-max: 1120px;
+  --measure: 760px;
+  --gutter: clamp(16px, 4vw, 48px);
+  --header-h: 60px;
+
+  /* Radius */
+  --r-xs: 2px;
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-pill: 999px;
+
+  /* Motion */
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 450ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --pol-ease: 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
   /* Polaroid card */
-  --pol-width:  160px;
-  --pol-pad:    5px 5px 24px 5px;
-
-  /* Interaction */
-  --pol-ease: 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --pol-width: 160px;
+  --pol-pad: 5px 5px 24px 5px;
 }
