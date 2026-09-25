@@ -53,7 +53,7 @@ export default function ResponseBlock({ nodeId, response, focusedNodeId, onFocus
         onClick={() => handleBlockClick('직관 요약')}
       >
         <div className={styles.label}>📊 직관 요약</div>
-        <div className={styles.body}>
+        <div className={`sa-prose ${styles.body}`}>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
@@ -105,7 +105,7 @@ export default function ResponseBlock({ nodeId, response, focusedNodeId, onFocus
         onClick={() => handleBlockClick('상세 설명')}
       >
         <div className={styles.label}>📖 상세 설명</div>
-        <div className={styles.body}>
+        <div className={`sa-prose ${styles.body}`}>
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {response.detailed}
           </ReactMarkdown>

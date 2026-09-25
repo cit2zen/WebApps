@@ -5,6 +5,18 @@ import type { SRSCard } from '@/lib/types'
 import styles from './page.module.css'
 import Link from 'next/link'
 
+function ReviewBar({ children }: { children?: React.ReactNode }) {
+  return (
+    <header className="pol-appbar">
+      <a className="pol-brand" href="https://cityzen.kr">cityzen</a>
+      <span className="pol-appbar-sep" aria-hidden="true" />
+      <Link href="/" className={`pol-appbar-title ${styles.appLink}`}>StudyAI</Link>
+      <span className="pol-badge">복습</span>
+      <div className="pol-appbar-end">{children}</div>
+    </header>
+  )
+}
+
 export default function ReviewPage() {
   const [cards, setCards]     = useState<SRSCard[]>([])
   const [current, setCurrent] = useState(0)
@@ -34,16 +46,26 @@ export default function ReviewPage() {
   }
 
   if (done) return (
-    <div className={styles.center}>
-      <div className={styles.doneMsg}>✅ 오늘의 복습 완료!</div>
-      <Link href="/" className={styles.backBtn}>← 학습으로 돌아가기</Link>
+    <div className={styles.page}>
+      <ReviewBar />
+      <main className={styles.center}>
+        <div className={styles.note}>
+          <div className={styles.doneMsg}>✅ 오늘의 복습 완료!</div>
+          <Link href="/" className="pol-btn-primary">← 학습으로 돌아가기</Link>
+        </div>
+      </main>
     </div>
   )
 
   if (cards.length === 0) return (
-    <div className={styles.center}>
-      <p className={styles.muted}>복습할 카드가 없습니다.</p>
-      <Link href="/" className={styles.backBtn}>← 돌아가기</Link>
+    <div className={styles.page}>
+      <ReviewBar />
+      <main className={styles.center}>
+        <div className={styles.note}>
+          <p className={styles.muted}>복습할 카드가 없습니다.</p>
+          <Link href="/" className="pol-btn-ghost">← 돌아가기</Link>
+        </div>
+      </main>
     </div>
   )
 
@@ -51,13 +73,14 @@ export default function ReviewPage() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <Link href="/" className={styles.backLink}>← StudyAI</Link>
+      <ReviewBar>
         <span className={styles.progress}>{current + 1} / {cards.length}</span>
-        <span className={styles.tag}>{card.category} › {card.topic}</span>
-      </header>
+      </ReviewBar>
 
-      <div className={styles.cardWrap}>
+      <main className={styles.cardWrap}>
+        <div className={styles.meta}>
+          <span className={`pol-badge ${styles.tag}`}>{card.category} › {card.topic}</span>
+        </div>
         <div className={`${styles.card} ${flipped ? styles.flipped : ''}`} onClick={() => setFlipped(true)}>
           <div className={styles.front}>
             <p className={styles.label}>질문</p>
@@ -74,13 +97,13 @@ export default function ReviewPage() {
 
         {flipped && (
           <div className={styles.ratings}>
-            <button className={styles.r1} onClick={() => rate(1)}>1 다시</button>
-            <button className={styles.r2} onClick={() => rate(2)}>2 어렵</button>
-            <button className={styles.r3} onClick={() => rate(3)}>3 보통</button>
-            <button className={styles.r4} onClick={() => rate(4)}>4 쉬움</button>
+            <button className={`pol-btn-ghost ${styles.rate} ${styles.r1}`} onClick={() => rate(1)}>1 다시</button>
+            <button className={`pol-btn-ghost ${styles.rate} ${styles.r2}`} onClick={() => rate(2)}>2 어렵</button>
+            <button className={`pol-btn-ghost ${styles.rate} ${styles.r3}`} onClick={() => rate(3)}>3 보통</button>
+            <button className={`pol-btn-ghost ${styles.rate} ${styles.r4}`} onClick={() => rate(4)}>4 쉬움</button>
           </div>
         )}
-      </div>
+      </main>
     </div>
   )
 }

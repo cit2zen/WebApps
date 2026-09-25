@@ -20,6 +20,7 @@ export default function Home() {
   const [panelExpanded, setPanelExpanded] = useState(false)
   const [showTree, setShowTree]         = useState(false)
   const [deepView, setDeepView]         = useState(false)
+  const [navOpen, setNavOpen]           = useState(false) // presentation only: mobile drawer
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -106,26 +107,42 @@ export default function Home() {
   return (
     <div className={styles.app}>
       {/* Top bar */}
-      <header className={styles.topbar}>
-        <span className={styles.logo}>🧠 StudyAI</span>
-        <div className={styles.viewToggle}>
-          <button className={`${styles.toggleBtn} ${!deepView ? styles.toggleActive : ''}`} onClick={() => setDeepView(false)}>
-            📖 답변 보기
-          </button>
-          <button className={`${styles.toggleBtn} ${deepView ? styles.toggleActive : ''}`} onClick={() => { setDeepView(true); setPanelExpanded(true) }}>
-            💬 추가 질문 전체 보기
-          </button>
+      <header className={`pol-appbar ${styles.topbar}`}>
+        <a className="pol-brand" href="https://cityzen.kr">cityzen</a>
+        <span className="pol-appbar-sep" aria-hidden="true" />
+        <span className="pol-appbar-title">StudyAI</span>
+        <button
+          type="button"
+          className={`pol-btn-ghost pol-btn-sm ${styles.navBtn}`}
+          aria-expanded={navOpen}
+          aria-controls="sa-nav"
+          onClick={() => setNavOpen(o => !o)}
+        >
+          ☰ 학습 기록
+        </button>
+        <div className={`pol-appbar-end ${styles.topEnd}`}>
+          <div className={`pol-seg ${styles.viewToggle}`} role="tablist" aria-label="보기 전환">
+            <button type="button" role="tab" aria-selected={!deepView} className={!deepView ? 'is-active' : ''} onClick={() => setDeepView(false)}>
+              📖 답변 보기
+            </button>
+            <button type="button" role="tab" aria-selected={deepView} className={deepView ? 'is-active' : ''} onClick={() => { setDeepView(true); setPanelExpanded(true) }}>
+              💬 추가 질문 전체 보기
+            </button>
+          </div>
         </div>
       </header>
 
       <div className={styles.body}>
-        {/* Left sidebar */}
-        <SessionSidebar
-          sessions={sessions}
-          activeId={activeSession?.id ?? null}
-          onSelect={id => { const s = sessions.find(s => s.id === id); if (s) loadSession(s) }}
-          onNew={handleNewSession}
-        />
+        {/* Left sidebar (drawer on narrow screens) */}
+        <div id="sa-nav" className={`${styles.nav} ${navOpen ? styles.navOpen : ''}`}>
+          <SessionSidebar
+            sessions={sessions}
+            activeId={activeSession?.id ?? null}
+            onSelect={id => { setNavOpen(false); const s = sessions.find(s => s.id === id); if (s) loadSession(s) }}
+            onNew={() => { setNavOpen(false); handleNewSession() }}
+          />
+        </div>
+        {navOpen && <div className={styles.scrim} onClick={() => setNavOpen(false)} aria-hidden="true" />}
 
         {/* Center: response blocks */}
         {!deepView && (
@@ -139,14 +156,14 @@ export default function Home() {
                   <span className={styles.curCrumb}>{currentNode.question.slice(0, 30)}</span>
                 </>
               )}
-              <button className={styles.treeBtn} onClick={() => setShowTree(true)}>🌲 트리 보기</button>
+              <button className={`pol-btn-ghost pol-btn-sm ${styles.treeBtn}`} onClick={() => setShowTree(true)}>🌲 트리 보기</button>
             </div>
 
             <div className={styles.scroll} ref={scrollRef}>
               {!activeSession && <p className={styles.hint}>왼쪽에서 주제를 선택하거나 새 주제를 시작하세요.</p>}
               {mainNodes.map(node => (
                 <div key={node.id}>
-                  <div className={styles.qLabel}>Q: {node.question}</div>
+                  <div className={styles.qLabel}><span className={styles.qMark}>Q.</span> {node.question}</div>
                   <ResponseBlock
                     nodeId={node.id}
                     response={node.response}
@@ -158,7 +175,7 @@ export default function Home() {
                   />
                 </div>
               ))}
-              {loading && <div className={styles.thinkingMsg}>🤔 생각 중...</div>}
+              {loading && <div className={styles.thinkingMsg}><span className={`pol-spinner ${styles.spinner}`} aria-hidden="true" />🤔 생각 중...</div>}
             </div>
 
             <div className={styles.inputArea}>
@@ -171,7 +188,7 @@ export default function Home() {
                   disabled={!activeSession || loading}
                   className={styles.input}
                 />
-                <button onClick={submitQuestion} disabled={!activeSession || loading} className={styles.sendBtn}>
+                <button onClick={submitQuestion} disabled={!activeSession || loading} className={`pol-btn-primary pol-btn-sm ${styles.sendBtn}`}>
                   {loading ? '...' : '전송'}
                 </button>
               </div>

@@ -94,8 +94,8 @@ export default function FollowUpPanel({ activeNodeId, activeThreadLabel, session
           <div className={styles.title}>💬 추가 질문</div>
         </div>
         <div className={styles.headerRight}>
-          {activeNodeId && <span className={styles.origin}>{activeThreadLabel}</span>}
-          <button className={styles.expandBtn} onClick={handleExpand}>{expanded ? '⤡' : '⤢'}</button>
+          {activeNodeId && <span className={`pol-badge ${styles.origin}`}>{activeThreadLabel}</span>}
+          <button className={`pol-btn-ghost pol-btn-icon ${styles.expandBtn}`} onClick={handleExpand} aria-label={expanded ? '패널 줄이기' : '패널 넓히기'}>{expanded ? '⤡' : '⤢'}</button>
         </div>
       </div>
 
@@ -121,7 +121,7 @@ export default function FollowUpPanel({ activeNodeId, activeThreadLabel, session
             </div>
           </div>
         ))}
-        {loading && <div className={styles.loading}>생각 중...</div>}
+        {loading && <div className={styles.loading}><span className={`pol-spinner ${styles.spinner}`} aria-hidden="true" />생각 중...</div>}
       </div>
 
       <div className={styles.inputWrap}>
@@ -131,9 +131,9 @@ export default function FollowUpPanel({ activeNodeId, activeThreadLabel, session
           onKeyDown={e => e.key === 'Enter' && !e.shiftKey && submit()}
           placeholder={activeNodeId ? '↩ 계속 추가 질문...' : '답변 블록을 클릭한 후 질문하세요'}
           disabled={!activeNodeId || loading}
-          className={styles.input}
+          className={`pol-input ${styles.input}`}
         />
-        <button onClick={submit} disabled={!activeNodeId || loading} className={styles.sendBtn}>↑</button>
+        <button onClick={submit} disabled={!activeNodeId || loading} className={`pol-btn-primary ${styles.sendBtn}`} aria-label="전송">↑</button>
       </div>
     </aside>
   )

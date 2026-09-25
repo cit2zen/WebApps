@@ -1,43 +1,40 @@
+/* WordHighlight — highlighter-pen mark on key terms (hover card: Tooltip.module.css) */
 .word {
   display: inline;
-  position: relative;
-  background: #1a3a5a;
-  border: 1px solid #2a5a8a;
-  border-radius: 3px;
-  padding: 1px 5px;
-  color: #7cb9e8;
+  padding: 0 2px;
+  color: var(--ink-warm);
+  background: linear-gradient(transparent 60%, var(--gold-light) 60%);
+  border-radius: var(--r-xs);
   cursor: pointer;
 }
-.word:hover .tooltip { display: block; }
-.tooltip {
-  display: none;
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: #0d1a2a;
-  border: 1px solid #2a4a6a;
-  border-radius: 8px;
-  padding: 10px 12px;
-  width: 210px;
-  font-size: 12px;
-  color: #ccc;
-  line-height: 1.5;
-  z-index: 50;
-  white-space: normal;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.6);
-}
-.tooltip strong { color: #7cb9e8; display: block; margin-bottom: 4px; }
-.tooltip p { margin: 4px 0; font-size: 11px; }
-.formula { color: #f0c07e; font-size: 11px; display: block; margin-top: 4px; }
-.more {
+.word:hover { background: linear-gradient(transparent 25%, var(--gold-light) 25%); }
+.formula {
   display: block;
   margin-top: 6px;
-  color: #4af;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-synthesis: none;
+  font-size: var(--fs-sm);
+  color: var(--gold-text);
+}
+.more {
+  display: block;
+  margin-top: var(--space-2);
+  padding: 4px 0;
   background: none;
   border: none;
-  font-size: 10px;
-  cursor: pointer;
-  padding: 0;
+  font-family: var(--font-label);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--gold-text);
   text-align: left;
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.more:hover { color: var(--ink-warm); }
+
+@media (max-width: 900px) {
+  .more { min-height: 40px; }
 }

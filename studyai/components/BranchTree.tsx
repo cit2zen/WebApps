@@ -42,11 +42,11 @@ export default function BranchTree({ tree, onSelect, onClose }: Props) {
   }
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={`pol-overlay ${styles.overlay}`} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
         <div className={styles.top}>
           🌲 대화 트리
-          <button className={styles.close} onClick={onClose}>✕</button>
+          <button className={`pol-btn-ghost pol-btn-icon ${styles.close}`} onClick={onClose} aria-label="닫기">✕</button>
         </div>
         <div className={styles.cols}>
           {colPath.map((col, ci) => (
@@ -66,12 +66,12 @@ export default function BranchTree({ tree, onSelect, onClose }: Props) {
             </div>
           ))}
           {selected && (
-            <div className={styles.col} style={{ flex: 1 }}>
+            <div className={`${styles.col} ${styles.colWide}`}>
               <div className={styles.colLabel}>현재 위치</div>
               <p className={styles.preview}>
                 {colPath[colPath.length - 1]?.nodes.find(n => n.node.id === selected)?.node.question}
               </p>
-              <button className={styles.goBtn} onClick={() => selectAndClose(selected)}>이 위치로 이동 →</button>
+              <button className={`pol-btn-primary pol-btn-sm ${styles.goBtn}`} onClick={() => selectAndClose(selected)}>이 위치로 이동 →</button>
             </div>
           )}
         </div>

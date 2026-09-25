@@ -1,15 +1,82 @@
-.overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 100; display: flex; align-items: center; justify-content: center; }
-.modal { background: #161b22; border: 1px solid #21262d; border-radius: 12px; width: 700px; max-height: 80vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,.8); }
-.top { padding: 14px 16px; border-bottom: 1px solid #21262d; font-size: 13px; color: #7cb9e8; display: flex; justify-content: space-between; align-items: center; }
-.close { background: none; border: none; color: #555; cursor: pointer; font-size: 16px; }
-.close:hover { color: #aaa; }
-.cols { display: flex; flex: 1; overflow: hidden; height: 320px; }
-.col { min-width: 145px; border-right: 1px solid #21262d; overflow-y: auto; padding: 8px; }
-.colLabel { font-size: 9px; color: #555; margin-bottom: 6px; padding: 0 4px; text-transform: uppercase; letter-spacing: .5px; }
-.node { display: flex; justify-content: space-between; align-items: center; width: 100%; text-align: left; padding: 5px 8px; border-radius: 5px; cursor: pointer; font-size: 11px; color: #888; margin-bottom: 2px; background: none; border: none; }
-.node:hover { background: #1a2a3a; color: #aaa; }
-.node.cur { background: #1a3a5a; color: #4af; }
-.q { flex: 1; }
-.arr { color: #444; font-size: 9px; }
-.preview { padding: 12px; font-size: 11px; color: #aaa; line-height: 1.6; }
-.goBtn { margin: 0 12px; background: #1a3a5a; border: none; border-radius: 5px; color: #7cb9e8; padding: 6px 12px; cursor: pointer; font-size: 11px; }
+/* BranchTree — conversation tree dialog (overlay base = .pol-overlay) */
+.overlay.overlay { z-index: 200; }
+.modal {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 760px);
+  max-height: 80dvh;
+  overflow: hidden;
+  background: var(--bg-card);
+  border-radius: var(--r-xs);
+  box-shadow: var(--shadow-card-lift);
+  rotate: -0.3deg;
+}
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--rule-color);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-synthesis: none;
+  font-weight: 400;
+  font-size: var(--fs-xl);
+  line-height: 1.2;
+  color: var(--ink-warm);
+}
+.top .close { flex-shrink: 0; width: 40px; height: 40px; padding: 0; font-size: var(--fs-base); }
+.cols { display: flex; flex: 1; min-height: 0; height: 340px; overflow-x: auto; }
+.col {
+  flex-shrink: 0;
+  min-width: 170px;
+  padding: var(--space-3) var(--space-2);
+  border-right: 1px solid var(--rule-color);
+  overflow-y: auto;
+}
+.col:last-child { border-right: 0; }
+.colWide { flex: 1; min-width: 200px; }
+.colLabel {
+  margin-bottom: var(--space-2);
+  padding: 0 var(--space-2);
+  font-family: var(--font-label);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--gold-text);
+}
+.node {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  margin-bottom: 2px;
+  padding: 8px 10px;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: var(--r-xs);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  color: var(--ink-mid);
+  transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+.node:hover { background: var(--cream-100); color: var(--ink-warm); }
+.node.cur { background: var(--cream-200); color: var(--ink-warm); box-shadow: inset 2px 0 0 var(--gold-mid); }
+.q { flex: 1; min-width: 0; word-break: keep-all; overflow-wrap: anywhere; }
+.arr { flex-shrink: 0; font-size: var(--fs-md); color: var(--gold-mid); }
+.preview { padding: var(--space-2); font-family: var(--font-body); font-size: var(--fs-md); line-height: 1.65; color: var(--ink-mid); word-break: keep-all; overflow-wrap: anywhere; }
+.col .goBtn { margin: var(--space-2) var(--space-2) 0; }
+
+@media (max-width: 640px) {
+  .modal { max-height: calc(100dvh - 2 * var(--gutter)); rotate: 0deg; }
+  .top { padding-left: var(--space-4); }
+  .cols { flex-direction: column; height: auto; overflow-x: hidden; overflow-y: auto; }
+  .col, .colWide { flex: none; min-width: 0; max-height: 40dvh; border-right: 0; border-bottom: 1px solid var(--rule-color); }
+  .col:last-child { border-bottom: 0; }
+  .node { min-height: 40px; }
+  .col .goBtn { min-height: 40px; margin-bottom: var(--space-2); }
+}
