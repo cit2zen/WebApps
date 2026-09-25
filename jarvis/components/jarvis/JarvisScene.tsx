@@ -1,21 +1,36 @@
 // components/jarvis/JarvisScene.tsx
 "use client";
-import { Vector2 } from "three";
-import { Canvas } from "@react-three/fiber";
-import { EffectComposer, Bloom, Vignette, ChromaticAberration, Noise } from "@react-three/postprocessing";
-
-// 안정적인 정적 인스턴스(렌더마다 재생성 방지)
-const CA_OFFSET = new Vector2(0.0007, 0.0009);
-import { useMemo } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
+import { useEffect, useMemo } from "react";
 import { Orb } from "./Orb";
 import { Nebula } from "./Nebula";
 
-// 저사양/모바일·prefers-reduced-motion에서 dpr·파티클·Bloom·포스트를 낮춰
-// 발열·프레임드랍·배터리 소모를 줄인다(성능 겸 접근성).
+// Polaroid Editorial: 캔버스는 투명(alpha) — 배경은 CSS의 인화지 크림(--bg-base)·조명(--paper-light)·결(.pol-body)이
+// 그대로 비친다. 발광 후처리(Bloom·ChromaticAberration·Noise)는 밝은 배경에서 탁해지므로 쓰지 않고,
+// 비네팅은 CSS(.jv-stage::after)에서 따뜻한 잉크 톤으로 옅게 준다.
+// 오브를 살짝 위로(LIFT_PER_Z·z) 올려 하단 상태/자막 영역과 겹침을 줄인다 — DOM 레티클(.jv-reticle)도 같은 비율로 올림.
+const BASE_Z = 6;
+const LIFT_PER_Z = 0.35 / BASE_Z; // 카메라 거리 z에서 뷰포트 높이의 6.25% (fov 50) — .jv-reticle의 inset-bottom 12.5%와 짝
+
+// 세로 화면(휴대폰)에서는 레티클이 vmin(=폭) 기준이라 고정 거리 카메라로는 오브가 파형 링·크롭 마크를 넘친다.
+// 화면비에 따라 카메라를 물려 오브가 레티클 액자 안에 들어오게 한다(가로 화면은 기존과 동일).
+function CameraRig() {
+  const camera = useThree((s) => s.camera);
+  const { width, height } = useThree((s) => s.size);
+  useEffect(() => {
+    if (!width || !height) return;
+    const z = BASE_Z * Math.max(1, (0.85 * height) / width);
+    camera.position.set(0, -LIFT_PER_Z * z, z);
+    camera.updateMatrixWorld();
+  }, [camera, width, height]);
+  return null;
+}
+
+// 저사양/모바일·prefers-reduced-motion에서 dpr·파티클을 낮춰 발열·프레임드랍·배터리 소모를 줄인다(성능 겸 접근성).
 function useQuality() {
   return useMemo(() => {
     if (typeof window === "undefined") {
-      return { dpr: [1, 2] as [number, number], particles: 3000, bloom: 0.9, reduced: false, lite: false };
+      return { dpr: [1, 2] as [number, number], particles: 3000, reduced: false, lite: false };
     }
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
     const narrow = window.matchMedia?.("(max-width: 820px)").matches ?? false;
@@ -24,7 +39,6 @@ function useQuality() {
     return {
       dpr: (lite ? [1, 1.25] : [1, 1.5]) as [number, number],
       particles: lite ? 1000 : 2600,
-      bloom: lite ? 0.6 : 0.9,
       reduced,
       lite,
     };
@@ -33,26 +47,15 @@ function useQuality() {
 
 export default function JarvisScene() {
   const q = useQuality();
-  // EffectComposer 자식은 Element 배열만 허용(boolean 불가) → 조건부로 배열 구성.
-  const effects = [
-    <Bloom key="bloom" mipmapBlur intensity={q.bloom} luminanceThreshold={0.65} luminanceSmoothing={0.3} />,
-  ];
-  if (!q.lite) effects.push(<ChromaticAberration key="ca" offset={CA_OFFSET} />);
-  effects.push(<Vignette key="vig" eskil={false} offset={0.22} darkness={0.8} />);
-  if (!q.lite) effects.push(<Noise key="noise" premultiply opacity={0.035} />);
   return (
     <Canvas
       dpr={q.dpr}
-      gl={{ antialias: q.dpr[1] >= 2, powerPreference: "high-performance" }}
-      camera={{ position: [0, 0, 6], fov: 50 }}
+      gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+      camera={{ position: [0, -LIFT_PER_Z * BASE_Z, BASE_Z], fov: 50 }}
     >
-      <color attach="background" args={["#06060b"]} />
-      <ambientLight intensity={0.3} />
-      <pointLight position={[5, 5, 5]} intensity={1.5} />
+      <CameraRig />
       <Orb reduced={q.reduced} />
       <Nebula count={q.particles} reduced={q.reduced} />
-      {/* multisampling 0 — 일부 ANGLE/AMD 드라이버에서 MSAA+포스트가 깜빡임 유발 → 끔 */}
-      <EffectComposer multisampling={0}>{effects}</EffectComposer>
     </Canvas>
   );
 }

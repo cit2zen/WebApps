@@ -5,21 +5,19 @@ import { useMemo, useRef } from "react";
 import { extend, useFrame, type ThreeElement } from "@react-three/fiber";
 import { shaderMaterial } from "@react-three/drei";
 import { audio, STATE } from "@/lib/audioBus";
+import { DUST_TONES, SPECK_INK } from "@/lib/palette";
 
-// 상태별 네뷸라 색(cityzen Neon · 오브와 동일 팔레트): idle 딤시안 / listening 시안 / thinking 바이올렛 / speaking 시안화이트
-const NEBULA_COLORS = [
-  new THREE.Color("#2f7d97"),
-  new THREE.Color("#5ef2ff"),
-  new THREE.Color("#a98bff"),
-  new THREE.Color("#9ceaff"),
-];
+// 금가루 + 잉크 점(Polaroid): 밝은 인화지 배경이라 가산 발광 대신 NormalBlending으로 또렷한 입자.
+// 상태별 금가루 톤은 lib/palette.ts(DUST_TONES, 토큰 미러), 잉크 점은 SPECK_INK 공통.
+const DUST = DUST_TONES.map((c) => new THREE.Color(c));
+const INK = new THREE.Color(SPECK_INK);
 
 const NebulaMaterial = shaderMaterial(
-  { uTime: 0, uAmp: 0, uState: 0, uMotion: 1, uColor: new THREE.Color("#5ef2ff") },
+  { uTime: 0, uAmp: 0, uState: 0, uMotion: 1, uColor: DUST[0].clone(), uInk: INK.clone() },
   /* glsl */ `
     uniform float uTime, uAmp, uState, uMotion;
     attribute vec3 aDir; attribute float aRadius; attribute float aSeed;
-    varying float vGlow;
+    varying float vAlpha; varying float vKind;
     void main(){
       float t = uTime + aSeed * 6.2831;
       float spin = t * (0.2 + uState * 0.25) * uMotion;     // thinking일수록 빠르게 공전(reduced-motion 시 정지)
@@ -28,19 +26,21 @@ const NebulaMaterial = shaderMaterial(
       float converge = mix(1.0, 0.5, step(0.5, uState) * step(uState, 1.5)); // listening 응축
       float r = aRadius * converge * (1.0 + uAmp * 0.8) + sin(t*2.0)*0.05;
       vec3 pos = d * r;
-      vGlow = 0.4 + uAmp;
+      vKind = step(0.74, fract(aSeed * 7.13));               // 약 26%는 잉크 점, 나머지는 금가루
+      vAlpha = clamp(0.42 + uState * 0.08 + uAmp * 0.45, 0.0, 0.95);
       vec4 mv = modelViewMatrix * vec4(pos,1.0);
-      gl_PointSize = clamp((1.0 + uAmp * 5.0) * (26.0 / -mv.z), 1.0, 10.0);
+      gl_PointSize = clamp((0.9 + uAmp * 3.0) * (22.0 / -mv.z) * mix(1.0, 0.75, vKind), 1.0, 6.0);
       gl_Position = projectionMatrix * mv;
     }`,
   /* glsl */ `
-    uniform vec3 uColor; varying float vGlow;
+    uniform vec3 uColor, uInk; varying float vAlpha; varying float vKind;
     void main(){
       vec2 uv = gl_PointCoord - 0.5;
       float dd = length(uv);
       if (dd > 0.5) discard;
-      float alpha = smoothstep(0.5, 0.0, dd);
-      gl_FragColor = vec4(uColor * vGlow * 1.3, alpha);
+      float alpha = smoothstep(0.5, 0.22, dd) * vAlpha;
+      gl_FragColor = vec4(mix(uColor, uInk, vKind), alpha);
+      #include <colorspace_fragment>
     }`
 );
 extend({ NebulaMaterial });
@@ -50,7 +50,7 @@ declare module "@react-three/fiber" {
 
 export function Nebula({ count = 4000, reduced = false }: { count?: number; reduced?: boolean }) {
   const mat = useRef<any>(null!);
-  const color = useMemo(() => new THREE.Color("#5ef2ff"), []);
+  const color = useMemo(() => DUST[0].clone(), []);
   const { positions, dirs, radii, seeds } = useMemo(() => {
     const positions = new Float32Array(count * 3);
     const dirs = new Float32Array(count * 3);
@@ -75,7 +75,7 @@ export function Nebula({ count = 4000, reduced = false }: { count?: number; redu
     mat.current.uniforms.uAmp.value = THREE.MathUtils.lerp(mat.current.uniforms.uAmp.value, audio.amplitude, 0.2);
     mat.current.uniforms.uState.value = STATE.current;
     mat.current.uniforms.uMotion.value = reduced ? 0 : 1; // reduced-motion 시 공전 정지, 색전이만 유지
-    color.lerp(NEBULA_COLORS[STATE.current] ?? NEBULA_COLORS[0], 1 - Math.pow(0.02, delta));
+    color.lerp(DUST[STATE.current] ?? DUST[0], 1 - Math.pow(0.02, delta));
     mat.current.uniforms.uColor.value.copy(color);
   });
 
@@ -87,7 +87,7 @@ export function Nebula({ count = 4000, reduced = false }: { count?: number; redu
         <bufferAttribute attach="attributes-aRadius" args={[radii, 1]} />
         <bufferAttribute attach="attributes-aSeed" args={[seeds, 1]} />
       </bufferGeometry>
-      <nebulaMaterial ref={mat} transparent depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
+      <nebulaMaterial ref={mat} transparent depthWrite={false} toneMapped={false} />
     </points>
   );
 }
