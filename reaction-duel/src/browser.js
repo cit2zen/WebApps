@@ -48,6 +48,7 @@
     zones.forEach((zone) => {
       const view = viewFor(zone.dataset.player);
       zone.dataset.outcome = view.outcome;
+      zone.dataset.reason = state.result ? state.result.reason : ""; // 표시 전용: 반칙패 구역 색 구분
       zone.querySelector(".state-word").textContent = view.word;
       zone.querySelector(".result-detail").textContent = view.detail;
       const button = zone.querySelector(".round-action");

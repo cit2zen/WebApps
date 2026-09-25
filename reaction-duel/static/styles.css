@@ -1,28 +1,189 @@
-:root { font-family: Impact, Haettenschweiler, "Arial Narrow Bold", system-ui, sans-serif; color: #17100e; }
+/* reaction-duel — Polaroid Editorial v2 (킷: ../design-tokens.css · typography · polaroid · pol-ui)
+   두 구역 = 마주 보는 두 장의 인화지. 대기 = 크림 종이 · 신호 = 잉크로 반전(가장 큰 명도 대비) · 반칙패 = --pol-danger.
+   신호 반전에는 transition을 두지 않는다(반응 측정 지연 방지). */
 * { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; background: #17100e; }
+body { min-width: 320px; font-synthesis: none; }
 button { font: inherit; }
-#game { min-height: 100dvh; display: grid; grid-template-rows: 1fr 6px 1fr; overflow: hidden; }
-.player-zone { min-height: 0; display: grid; place-items: center; touch-action: manipulation; user-select: none; padding: 1.5rem; }
-.player-zone[data-player="p1"] { background: #f04444; }
-.player-zone[data-player="p2"] { background: #f6ab38; }
+
+/* ── 로비 ── */
+.pol-back-btn { display: inline-flex; align-items: center; min-height: 40px; } /* 킷 알약 터치 40px 보정 */
+#lobby { overflow-y: auto; justify-content: safe center; }
+.lp-top { fill: var(--cream-300); }
+.lp-bot { fill: var(--ink-warm); }
+.lp-seam { stroke: var(--gold-mid); stroke-width: 1.5; }
+.lp-dot-top { fill: none; stroke: var(--ink-mid); stroke-width: 2; }
+.lp-dot-bot { fill: var(--bg-card); }
+.lp-bolt { fill: var(--gold-mid); stroke: var(--bg-card); stroke-width: 1.5; stroke-linejoin: round; }
+.pol-ldesc b { font-weight: 700; color: var(--ink-warm); }
+.pol-lhelp { margin: 0; }
+.pol-lhelp .pol-kbd { margin: 0 2px; }
+
+/* ── 대결 아레나 ── */
+#game { min-height: 100dvh; display: grid; grid-template-rows: 1fr auto 1fr; overflow: hidden; }
+.player-zone {
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--space-5);
+  border: 10px solid var(--bg-card);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  color: var(--ink-warm);
+}
+/* 각자 자기 아래쪽에 인화지 여백(1P는 180° 회전된 시점) */
+.player-zone[data-player="p1"] { background: var(--cream-200); border-top-width: 28px; border-bottom-width: 0; }
+.player-zone[data-player="p2"] { background: var(--cream-300); border-bottom-width: 28px; border-top-width: 0; }
 .zone-content { width: min(100%, 34rem); text-align: center; }
 .player-zone[data-player="p1"] .zone-content { transform: rotate(180deg); }
-.player-label { margin: 0 0 .3rem; font: 700 clamp(.75rem, 2vw, 1rem)/1 system-ui, sans-serif; letter-spacing: .08em; }
-.state-word { margin: 0; font-size: clamp(3.75rem, 15vw, 8rem); letter-spacing: -.065em; line-height: .85; }
-.result-detail { min-height: 1.5rem; margin: .7rem 0 1.1rem; font: 600 clamp(1rem, 3vw, 1.4rem)/1.1 system-ui, sans-serif; }
-.round-action { min-width: 11rem; min-height: 3rem; border: 3px solid #17100e; border-radius: 0; color: #fff8e8; background: #17100e; padding: .55rem 1rem; cursor: pointer; font-size: 1.15rem; }
-.round-action:focus-visible { outline: 4px solid #fff8e8; outline-offset: 4px; }
+
+.player-label {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-mono); /* "1P · W" — 라틴만 */
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: var(--ink-muted);
+}
+.state-word {
+  margin: 0;
+  font-family: var(--font-display); /* 한글 → Noto Serif KR upright */
+  font-style: italic;
+  font-weight: 500;
+  font-size: var(--fs-hero);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  word-break: keep-all;
+}
+.result-detail {
+  min-height: 1.5em;
+  margin: var(--space-3) 0 var(--space-4);
+  font-family: var(--font-label);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ink-mid);
+  font-variant-numeric: tabular-nums;
+}
+.round-action { min-width: 11rem; min-height: 48px; }
 .round-action[hidden] { display: none; }
-.center-seam { z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: .75rem; background: #17100e; color: #fff8e8; padding: 0 .8rem; font: 700 .65rem/1 system-ui, sans-serif; letter-spacing: .06em; }
-.stats-panel { position: fixed; right: .75rem; bottom: .75rem; max-width: min(18rem, 45vw); color: #fff8e8; font: 500 .7rem/1.3 system-ui, sans-serif; text-align: right; pointer-events: none; }
-.stats-panel p { margin: 0; }.stats-panel strong { display: inline-block; margin-left: .4rem; }.stats-panel ol { margin: .35rem 0 0; padding: 0; list-style: none; opacity: .8; }
-.rotate-hint { display: none; position: fixed; bottom: .6rem; left: .75rem; color: #fff8e8; font: 600 .7rem/1 system-ui, sans-serif; }
-#game[data-state="waiting"] .state-word { font-size: clamp(2.8rem, 11vw, 6rem); }
-#game[data-state="signal"] .player-zone { background: #fff8e8; }
-#game[data-state="signal"] .state-word { font-size: clamp(5rem, 20vw, 10rem); }
-.player-zone[data-outcome="win"] { background: #ddf04a !important; animation: result-pop .24s ease-out; }
-.player-zone[data-outcome="loss"] { background: #34302e !important; color: #fff8e8; animation: result-pop .24s ease-out; }
-@keyframes result-pop { from { transform: scale(.96); } to { transform: scale(1); } }
-@media (max-height: 480px) { .rotate-hint { display: block; }.state-word { font-size: clamp(2.8rem, 10vw, 5rem); }.result-detail { margin: .3rem 0 .5rem; }.round-action { min-height: 44px; } }
+
+/* 대기: 크림 종이 그대로, 글자만 한 톤 낮춤 */
+#game[data-state="waiting"] .state-word { font-size: var(--fs-display); color: var(--ink-mid); }
+#game[data-state="waiting"] .result-detail { color: var(--ink-muted); }
+
+/* 신호: 두 구역 모두 잉크로 반전 — 흰 테두리 속 검은 사진 */
+#game[data-state="signal"] .player-zone { background: var(--ink-warm); color: var(--bg-card); }
+#game[data-state="signal"] .player-label { color: var(--cream-400); }
+#game[data-state="signal"] .result-detail { color: var(--cream-300); } /* gold-light는 장식 전용 → 잉크 위 글자는 크림 */
+
+/* 결과: 승자 = 금테 흰 인화지 · 패자 = 바랜 크림 · 반칙패 = 벽돌 적색 */
+.player-zone[data-outcome="win"] { background: var(--bg-card); border-color: var(--gold-light); animation: result-pop 0.24s ease-out; }
+.player-zone[data-outcome="win"] .result-detail { color: var(--gold-text); }
+.player-zone[data-outcome="loss"] { background: var(--cream-400); animation: result-pop 0.24s ease-out; }
+.player-zone[data-outcome="loss"] .state-word { color: var(--ink-mid); }
+.player-zone[data-outcome="loss"][data-reason="false-start"] { background: var(--pol-danger); color: var(--bg-card); }
+.player-zone[data-outcome="loss"][data-reason="false-start"] .state-word { color: var(--bg-card); }
+.player-zone[data-outcome="loss"][data-reason="false-start"] .player-label,
+.player-zone[data-outcome="loss"][data-reason="false-start"] .result-detail { color: var(--cream-200); }
+@keyframes result-pop { from { transform: scale(0.97); } to { transform: scale(1); } }
+
+/* ── 가운데 띠: 라운드 · 로비 · 최근 기록 ── */
+.center-seam {
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 48px;
+  padding: 0 var(--space-4);
+  background: var(--bg-card);
+  border-block: 1px solid var(--rule-color);
+}
+#round-count, #latest-time {
+  flex: 1 1 0;
+  font-family: var(--font-mono); /* "ROUND 3" · "241 ms" — 라틴·숫자만 */
+  font-size: var(--fs-xs);
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+#latest-time { text-align: right; color: var(--gold-text); }
+#game:has([data-reason="false-start"]) #latest-time { color: var(--pol-danger); }
+.seam-btn {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  font-family: var(--font-label);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--ink-mid);
+  background: transparent;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+.seam-btn:hover { border-color: var(--gold-mid); background: var(--cream-100); color: var(--ink-warm); }
+#game[data-state="waiting"] .seam-btn,
+#game[data-state="signal"] .seam-btn { visibility: hidden; }
+
+/* ── 기록 메모 · 가로 안내 ── */
+.stats-panel {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 3;
+  max-width: min(18rem, 45vw);
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-label);
+  font-size: var(--fs-xs);
+  line-height: 1.45;
+  color: var(--ink-muted);
+  text-align: right;
+  background: var(--bg-card);
+  border-radius: var(--r-xs);
+  box-shadow: var(--shadow-soft);
+  rotate: 1deg;
+  pointer-events: none;
+}
+.stats-panel p { margin: 0; }
+.stats-panel strong { display: inline-block; margin-left: var(--space-1); font-weight: 600; color: var(--ink-warm); font-variant-numeric: tabular-nums; }
+.stats-panel ol { margin: var(--space-1) 0 0; padding: 0; list-style: none; }
+.stats-panel ol:empty { display: none; }
+.rotate-hint {
+  display: none;
+  position: fixed;
+  bottom: var(--space-2);
+  left: var(--space-3);
+  z-index: 3;
+  margin: 0;
+  padding: 4px 10px;
+  font-family: var(--font-label);
+  font-size: var(--fs-xs);
+  color: var(--ink-mid);
+  background: var(--bg-card);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-soft);
+  pointer-events: none; /* 2P 구역 모서리 터치를 가로채지 않게 */
+}
+
+@media (max-width: 640px) {
+  .player-zone { padding: var(--space-4); }
+  .stats-panel li:nth-child(n + 4) { display: none; }
+}
+@media (max-height: 520px) {
+  #lobby { gap: var(--space-3); }
+  #lobby .pol-lcard { display: none; }
+}
+@media (max-height: 480px) {
+  .rotate-hint { display: block; }
+  .player-zone { padding: var(--space-2); border-width: 6px; }
+  .player-zone[data-player="p1"] { border-top-width: 14px; border-bottom-width: 0; }
+  .player-zone[data-player="p2"] { border-bottom-width: 14px; border-top-width: 0; }
+  .state-word, #game[data-state="waiting"] .state-word { font-size: var(--fs-display); }
+  .result-detail { margin: var(--space-1) 0 var(--space-2); }
+  .round-action { min-height: 44px; }
+}
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
