@@ -36,21 +36,21 @@ export function initSettings() {
   setBgmVolume(s.bgm / 100);
 
   document.body.insertAdjacentHTML("beforeend", `
-    <button class="gear" id="gear" aria-label="설정">⚙</button>
-    <div class="panel" id="panel" hidden>
-      <h3>설정</h3>
+    <button class="gear pol-btn-ghost" id="gear" aria-label="설정" title="설정"><span aria-hidden="true">⚙</span></button>
+    <div class="panel pol-panel" id="panel" role="dialog" aria-label="설정" hidden>
+      <h3 class="t-title">설정</h3>
       <div class="panel__group">
-        <label>보드 테마</label>
+        <span class="pol-field-label">보드 테마</span>
         <div class="swatches">
-          ${THEMES.map((t) => `<button class="sw sw--${t.id}" data-theme="${t.id}">${t.label}</button>`).join("")}
+          ${THEMES.map((t) => `<button type="button" class="sw sw--${t.id}" data-theme="${t.id}">${t.label}</button>`).join("")}
         </div>
       </div>
       <div class="panel__group">
-        <label>효과음 <span id="sfxVal">${s.sfx}</span></label>
+        <label class="pol-field-label" for="sfxRange">효과음 <span id="sfxVal">${s.sfx}</span></label>
         <input type="range" id="sfxRange" min="0" max="100" value="${s.sfx}" />
       </div>
       <div class="panel__group">
-        <label>배경음악</label>
+        <label class="pol-field-label" for="bgmRange">배경음악</label>
         <input type="range" id="bgmRange" min="0" max="100" value="${s.bgm}" />
       </div>
     </div>
