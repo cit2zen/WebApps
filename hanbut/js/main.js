@@ -12,6 +12,8 @@ import * as fx from './fx.js';
 import * as fxClear from './fx_clear.js';
 import * as audio from './audio.js';
 import { installHook } from './debug.js';
+import * as daily from './daily.js';
+import * as share from './share.js';
 import { setText } from './strings.js';
 
 const $ = id => document.getElementById(id);
@@ -33,6 +35,7 @@ function showBootError(key, obj) {
   if (!el) return;
   setText(el, key, obj); el.hidden = false;
 }
+function hideLobbyMsg() { const el = $('lobby-msg'); if (el) el.hidden = true; }
 
 // 오버레이 닫기 = 각 소유 모듈의 페이드 닫기(hud.hidePause·cards.hideResult·cards.hidePackDone)
 function closeOverlays(keep) {
@@ -54,7 +57,9 @@ function wire() {
   const remain = () => hud.setRemain(v().remain);
   game.on('state', onState);
   game.on('levelIn', e => {
-    hud.slideIn(e.dir); hud.setLevelLabel(Math.ceil(e.L / 10), e.L);
+    hud.slideIn(e.dir);
+    if (e.mode === 'daily') setText($('lvl-label'), 'dailyLabel', { md: daily.mdOf(e.ymd) });   // 오늘의 한붓
+    else hud.setLevelLabel(Math.ceil(e.L / 10), e.L);
     call(hud, 'setFirstRun', e.L === 1 && game.progress().maxClearedLevel === 0);   // 최초 L1: ⏸만 표시
     remain(); hud.setStreak(v().streak); call(render, 'resize');
   });
@@ -62,7 +67,10 @@ function wire() {
   game.on('pop', e => { call(fx, 'inkAbsorb', e.cell); call(audio, 'pop', e.idx); remain(); });
   game.on('cut', e => { call(fx, 'inkAbsorb', e.to); remain(); });
   game.on('reset', () => { call(fx, 'inkAbsorb', v().head); remain(); });
-  game.on('invalid', e => { call(fx, 'pulseRing', e.cell); call(fxClear, 'shake', board); });   // 규칙 5: 격자 ±8px 흔들림 + S 맥동(막힘음은 막다른 길 전용)
+  game.on('invalid', e => {   // 규칙 5: 격자 ±8px 흔들림 + S 맥동 / 경유점 순서 위반('wp')은 시도 칸 붉은 맥동만(규칙 6)
+    call(fx, 'pulseRing', e.cell, e.reason);
+    if (e.reason !== 'wp') call(fxClear, 'shake', board);
+  });
   game.on('deadend', e => { call(fx, 'dangerPulse', v().head, e.remain); call(audio, 'blocked'); call(audio, 'vibrate', 30); call(hud, 'shakeRemain'); });
   game.on('hint', e => {
     if (e.cells) call(fx, 'hintDots', e.cells);
@@ -83,6 +91,7 @@ function frame(now) {
   game.tick(dt);
   fx.tick(dt);
   hud.tick(dt);
+  share.tick(dt);                                         // 로비 토스트 수명(rAF dt)
   if (!play.hidden) render.draw(game.view(), fx.list());  // idle(로비)은 draw 생략
   requestAnimationFrame(frame);
 }
@@ -131,6 +140,7 @@ async function boot() {
   hud.init({ dispatch, clock });
   cards.init({ dispatch, levels: list });
   lobby.init({ dispatch, store, levels: list, onWipe: p => game.setProgress(p) });   // 진행 초기화 → game 메모리도 교체
+  daily.initDaily({ dispatch, showError: showBootError, hideError: hideLobbyMsg });   // 오늘의 한붓(첫 탭에 지연 fetch)
   wire();
   // ⑥ 로비
   play.hidden = true; lobbyEl.hidden = false;

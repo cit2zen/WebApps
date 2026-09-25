@@ -125,6 +125,30 @@ h1, h2, p { margin: 0; }
   .app { max-width: 480px; }
 }
 
+/* 포스트MVP 로비: 오늘의 한붓 버튼 · 완료 팩 공유 버튼 · 로비 토스트(수명은 share.tick rAF dt) */
+#btn-daily.hb-daily { margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 10px; }   /* id로 .hb-btn(display·margin) 덮어쓰기 */
+.hb-daily.is-done { border-color: var(--cream-400); }
+.hb-daily .daily-stat { font-family: var(--font-mono); font-style: normal; color: var(--gold-mid); }
+.hb-daily[aria-busy="true"] { opacity: 0.6; }
+/* 팩 카드: 정본 cascade/pyramid는 3장 전용(nth-child 1~3) → 팩 4~12는 가로 스크롤 행(전 폭 공통, 기울기만 유지) */
+#packs.pol-group, #packs.pol-group.open {
+  display: flex; flex-direction: row; justify-content: flex-start; gap: 12px; min-height: auto; max-width: 100%;
+  overflow-x: auto; padding: 12px 16px 16px; scroll-snap-type: x proximity; --pol-width: 96px; cursor: default;
+  scrollbar-width: thin; scrollbar-color: var(--cream-400) transparent;
+}
+#packs.pol-group .pol-card { position: relative; left: auto; top: auto; margin: 0; flex: 0 0 auto; scroll-snap-align: center; }
+#packs.pol-group .pol-card:nth-child(odd), #packs.pol-group.open .pol-card:nth-child(odd) { transform: rotate(-2deg); }
+#packs.pol-group .pol-card:nth-child(even), #packs.pol-group.open .pol-card:nth-child(even) { transform: rotate(2deg); }
+.pack-share {
+  position: absolute; top: 2px; right: 2px; min-width: 40px; height: 32px; padding: 0 6px;
+  font-family: var(--font-mono); font-size: 11px; color: var(--ink-warm);
+  background: var(--bg-card); border: 1px solid var(--gold-mid); cursor: pointer;
+}
+#lobby-toast {
+  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+  padding: 8px 16px; background: var(--bg-card); color: var(--ink-warm); box-shadow: var(--shadow-card); z-index: 40;
+}
+
 /* reduced-motion: CSS 전환·키프레임 차단(캔버스 효과는 fx.js/fx_clear.js REDUCED 분기).
    #btn-reset 링(--p)은 진행 표시라 유지 — 롱프레스 판정 시각 피드백 */
 @media (prefers-reduced-motion: reduce) {

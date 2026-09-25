@@ -33,6 +33,15 @@ export const STR = Object.freeze({
   packDoneCaption: '팩 {k} · {s}/30',
   wipeConfirm: '한 번 더 누르면 초기화',
   daily: '오늘의 한붓',
+  dailyDone: '오늘 완료',
+  dailyLabel: '오늘의 한붓 · {md}',
+  polNumDaily: '№ {md} — {w}×{h}',
+  nextLobby: '탭하여 로비로',
+  share: '공유',
+  shareAria: '팩 {k} 공유',
+  shareText: '한붓 팩 {k} {score}/30 ★ https://games.cityzen.kr/hanbut/',
+  copied: '복사됨',
+  shareFail: '공유할 수 없어요',
 });
 
 // 포스트MVP 팩 캡션(§5·§9 h) — 기본 빈 배열, index = pack − 1. 로비는 문자열일 때만 그린다.

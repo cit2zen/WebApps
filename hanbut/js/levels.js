@@ -3,6 +3,14 @@
 // DOM 접근 없음 — 표시(STR.loadError / STR.dataError)는 main.js가 반환값으로 처리.
 
 export const FORMAT = 'hanbut-levels/1';
+// 7×7 해금 게이트(§9 f): kind 'levels'는 pack ≤ MAX_PACK만 플레이어에게 노출(파일은 120레벨 전부 유지·전부 검증).
+// 실기기 테스트 통과 후 이 값 하나만 12로 올리면 해금된다.
+export const MAX_PACK = 4;
+
+/** 노출 레벨 목록 — levels: pack ≤ MAX_PACK(배열 앞부분, L 오름차순) / daily: 전부. */
+export function playable(levels, kind = 'levels', maxPack = MAX_PACK) {
+  return kind === 'levels' ? levels.filter(lv => lv.pack <= maxPack) : levels;
+}
 
 let lastJson = null;       // 마지막 loadLevels 원본(테스트 훅 validateLevels() 인자 생략 시 사용)
 let lastKind = 'levels';
@@ -114,7 +122,7 @@ export function validateLevels(json = lastJson, kind = lastKind) {
   return { ok: errors.length === 0, errors, id };
 }
 
-/** fetch + 파싱 + 검증 → { ok, levels, json, error, id, errors }.
+/** fetch + 파싱 + 검증 → { ok, levels, json, error, id, errors }. levels = playable()(게이트 적용), 검증은 파일 전체.
  *  error: null | 'loadError'(fetch 실패·JSON 파싱 실패·규칙 0) | 'dataError'(규칙 1~9, id = 'L{n}'/'D{i}').
  *  throw 하지 않는다. 실패 시 levels = null(진입 차단). */
 export async function loadLevels(url = './levels.json', kind = 'levels') {
@@ -141,5 +149,5 @@ export async function loadLevels(url = './levels.json', kind = 'levels') {
     }
     return { ok: false, levels: null, json, error: 'dataError', id: v.id, errors: v.errors };
   }
-  return { ok: true, levels: json.levels, json, error: null, id: null, errors: [] };
+  return { ok: true, levels: playable(json.levels, kind), json, error: null, id: null, errors: [] };
 }

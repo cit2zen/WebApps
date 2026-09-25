@@ -2,6 +2,8 @@
 import { setText, setRaw, PACK_CAPTIONS } from './strings.js';
 import * as render from './render.js';
 import { el, ensure, cssVar, setStars, openOverlay, closeOverlay, REDUCED_UI } from './cards.js';
+import { renderDaily } from './daily.js';
+import { shareBtn } from './share.js';
 
 const $ = (id) => document.getElementById(id);
 let dispatch = () => false;
@@ -60,7 +62,7 @@ export function init(opts) {
 }
 
 // ── 렌더 ──
-export function renderLobby() { renderContinue(); renderPackCards(); renderChips(selected); renderBest(); }
+export function renderLobby() { renderContinue(); renderDaily(); renderPackCards(); renderChips(selected); renderBest(); }
 export function renderContinue() {
   const b = $('btn-continue');
   if (!b) return;
@@ -94,6 +96,7 @@ export function renderPackCards() {
     const cap = card.appendChild(el('div', 'pol-caption'));
     if (locked) setText(cap, 'packLocked');
     else setText(cap, 'packScore', { s: packScore(p, k) });
+    if (!locked && p.maxClearedLevel >= 10 * k) card.appendChild(shareBtn(k, packScore(p, k)));   // 완료 팩(10/10) 공유 §9 g
     card.addEventListener('click', () => onPackTap(k, card, locked));
     card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); } });
     g.appendChild(card);
@@ -173,7 +176,7 @@ export function wipe() {
 function openSheetEl(o) {
   if (!o || openSheet) return;
   openSheet = o;
-  for (const id of ['packs', 'lvl-panel', 'btn-continue']) if ($(id)) $(id).style.pointerEvents = 'none';
+  for (const id of ['packs', 'lvl-panel', 'btn-continue', 'btn-daily']) if ($(id)) $(id).style.pointerEvents = 'none';
   if (o.id === 'help') drawHelpCard(o);
   openOverlay(o);
   const close = o.querySelector('#btn-help-close, #btn-settings-close');
@@ -182,7 +185,7 @@ function openSheetEl(o) {
 export function closeSheet() {
   if (!openSheet) return;
   const o = openSheet; openSheet = null;
-  for (const id of ['packs', 'lvl-panel', 'btn-continue']) if ($(id)) $(id).style.pointerEvents = '';
+  for (const id of ['packs', 'lvl-panel', 'btn-continue', 'btn-daily']) if ($(id)) $(id).style.pointerEvents = '';
   if (o.id === 'settings') setWipeLabel(false);
   closeOverlay(o);
 }

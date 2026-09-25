@@ -1,6 +1,7 @@
 // cards.js — 결과 카드(#result, 정지 카드 변형 포함)·팩 완료 카드(#packdone) + 공용 DOM 헬퍼
 // 텍스트는 strings.js setText/setRaw 단일 경로. 타이머는 오버레이 transitionend 폴백 110ms만.
 import { setText, setRaw } from './strings.js';
+import { mdOf } from './daily.js';
 import * as render from './render.js';
 
 export const REDUCED_UI = typeof matchMedia === 'function'
@@ -99,8 +100,9 @@ export function fillResult(res) {
   const snap = render.snapshot && render.snapshot();
   if (snap) ctx.drawImage(snap, 0, 0, cv.width, cv.height);
   const num = ensure(card, '.pol-num', 'div', 'pol-num');
-  const lv = levelOf(res.L);
-  if (lv) setText(num, 'polNumLevel', { nn: nn(res.L), w: lv.w, h: lv.h });
+  const lv = res.daily ? null : levelOf(res.L);
+  if (res.daily) setText(num, 'polNumDaily', { md: mdOf(res.ymd), w: res.w, h: res.h });   // 오늘의 한붓
+  else if (lv) setText(num, 'polNumLevel', { nn: nn(res.L), w: lv.w, h: lv.h });
   else setText(num, 'level', { n: res.L });
   const cap = ensure(card, '.pol-caption', 'div', 'pol-caption t-title');
   setStars(cap, res.stars);
@@ -109,11 +111,11 @@ export function fillResult(res) {
 
   const badge = document.getElementById('result-streak');
   if (badge) {
-    badge.hidden = !(res.streak >= 2);
-    if (res.streak >= 2) setText(badge, 'streak', { n: res.streak });
+    badge.hidden = !!res.daily || !(res.streak >= 2);
+    if (!badge.hidden) setText(badge, 'streak', { n: res.streak });
   }
   const next = ensure(resultEl, '.result-next', 'p', 'result-next t-caption');
-  setText(next, 'next');
+  setText(next, res.daily ? 'nextLobby' : 'next');
   next.hidden = isPauseCard;
   const go = document.getElementById('btn-go');
   const row = go && go.parentElement !== resultEl ? go.parentElement : null;

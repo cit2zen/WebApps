@@ -4,10 +4,11 @@ import * as M from './moves.js';
 import * as S from './score.js';
 import { hint as solveHint } from './solver.js';
 import * as store from './store.js';
+import { dayIndex, recordDaily } from './daily.js';
 
 const DUR = { level_in: 300, clearing: 350, result: 900, pack_done: 1200 };
 const ALLOW = {
-  idle: ['enter', 'key'], level_in: [], clearing: [], pack_done: [],
+  idle: ['enter', 'enterDaily', 'key'], level_in: [], clearing: [], pack_done: [],
   playing: ['down', 'move', 'up', 'push', 'pop', 'cut', 'reset', 'hint', 'pause', 'key'],
   paused: ['resume', 'lobby', 'key'],
   result: ['skip', 'next', 'prev', 'lobby', 'key'],
@@ -26,9 +27,10 @@ export function createGame(levelsIn, progressIn) {
   let state = 'idle', pendingTo = null, pendL = 0, pendDir = 'r', elapsed = 0, shutter = false;
   let lv = null, g = null, st = M.createMoveState(), t = 0, idleMs = 0;
   let hintReady = false, ghost = false, hintUsed = false, res = null;
+  let mode = 'levels', dm = null;                     // 'daily': dm = { level, i, ymd } — 본편 진행 불변
   const reduced = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
   const hs = {};
-  const V = { state, L: 0, n: 0, len: 0, head: -1, path: [], u: 0, rewindSegments: 0, resets: 0, hintUsed: false,
+  const V = { state, mode, L: 0, n: 0, len: 0, head: -1, path: [], u: 0, rewindSegments: 0, resets: 0, hintUsed: false,
     deadEnds: 0, t: 0, streak: 0, remain: 0, hintReady: false, ghost: false, reduced, level: null, visited: null };
 
   function on(type, fn) { (hs[type] || (hs[type] = [])).push(fn); return () => off(type, fn); }
@@ -50,9 +52,9 @@ export function createGame(levelsIn, progressIn) {
     state = to; elapsed = 0;
     emit('state', { from, to });
     if (to === 'level_in') {
-      lv = levels[pendL - 1]; g = createGrid(lv); st = M.createMoveState();
+      lv = mode === 'daily' ? dm.level : levels[pendL - 1]; g = createGrid(lv); st = M.createMoveState();
       t = 0; idleMs = 0; hintReady = false; hintUsed = false; res = null; setGhost(false);
-      emit('levelIn', { L: pendL, dir: pendDir });
+      emit('levelIn', { L: pendL, dir: pendDir, mode, ymd: dm && mode === 'daily' ? dm.ymd : null });
     } else if (to === 'playing') updateGhost();
     else if (to === 'result') emit('result', res);
     else if (to === 'pack_done') { shutter = false; emit('packDone', { k: S.packOf(lv.L), score: S.packScore(prog.stars, S.packOf(lv.L)) }); }
@@ -61,6 +63,7 @@ export function createGame(levelsIn, progressIn) {
 
   // result 이후 진행: 팩 끝 → pack_done, 다음 레벨 → level_in, 마지막 → idle
   function advance() {
+    if (mode === 'daily') return go('idle');                             // 데일리 결과 → 로비
     if (res && res.packEnd) return go('pack_done');
     if (lv.L < levels.length) return go('level_in', lv.L + 1, 'r');
     return go('idle');
@@ -90,10 +93,12 @@ export function createGame(levelsIn, progressIn) {
 
   function clear() {
     const u = S.computeU(st.rewindSegments, st.resets), s = S.starsFor(u, hintUsed), L = lv.L;
-    prog = S.applyClear(prog, L, s);
-    try { store.saveProgress(prog); } catch (e) { /* 저장 실패는 진행 유지 */ }
-    try { store.appendLog(S.logEntry(L, t, u, s)); } catch (e) { /* 무시 */ }
-    res = { L, stars: s, u, streak: prog.streak, hintUsed, pauseCard: S.isPauseCard(L), packEnd: S.isPackEnd(L) };
+    if (mode === 'daily') res = recordDaily(dm, lv, s, u, hintUsed, prog.streak); else {   // 데일리 = hanbut:daily만
+      prog = S.applyClear(prog, L, s);
+      try { store.saveProgress(prog); } catch (e) { /* 저장 실패는 진행 유지 */ }
+      try { store.appendLog(S.logEntry(L, t, u, s)); } catch (e) { /* 무시 */ }
+      res = { L, stars: s, u, streak: prog.streak, hintUsed, pauseCard: S.isPauseCard(L), packEnd: S.isPackEnd(L) };
+    }
     go('clearing'); setGhost(false);
     emit('clear', { path: g.path });
   }
@@ -117,7 +122,14 @@ export function createGame(levelsIn, progressIn) {
   function enter(L, force) {
     if (!Number.isInteger(L) || L < 1 || L > levels.length) return false;
     if (!force && L > prog.maxClearedLevel + 1) return false;            // 규칙 13
-    return go('level_in', L, 'r');
+    mode = 'levels'; return go('level_in', L, 'r');
+  }
+
+  // 오늘의 한붓: 로드·검증된 데일리 레벨 객체로 진입(i·ymd 생략 시 오늘 §5 색인)
+  function enterDaily(a) {
+    const l = a.level; if (!l || !Array.isArray(l.sol) || !Number.isInteger(l.w) || !Number.isInteger(l.h)) return false;
+    const d = dayIndex(); mode = 'daily'; dm = { level: l, i: Number.isInteger(a.i) ? a.i : d.i, ymd: typeof a.ymd === 'string' ? a.ymd : d.ymd };
+    return go('level_in', 0, 'r');
   }
 
   function key(a) {
@@ -144,6 +156,7 @@ export function createGame(levelsIn, progressIn) {
     if (!ALLOW[s].includes(ty)) return false;
     switch (ty) {
       case 'enter': return enter(action.L, !!action.force);
+      case 'enterDaily': return enterDaily(action);
       case 'down': return input(M.down(g, st, action.cell));
       case 'move': return input(M.move(g, st, action.cells));
       case 'up': M.up(g, st); return true;
@@ -164,11 +177,11 @@ export function createGame(levelsIn, progressIn) {
   }
 
   function view() {
-    V.state = state; V.level = lv; V.reduced = reduced; V.streak = prog.streak;
+    V.state = state; V.mode = mode; V.level = lv; V.reduced = reduced; V.streak = prog.streak;
     V.hintReady = hintReady; V.ghost = ghost; V.hintUsed = hintUsed; V.t = t;
     V.rewindSegments = st.rewindSegments; V.resets = st.resets; V.deadEnds = st.deadEnds;
     V.u = S.computeU(st.rewindSegments, st.resets);
-    V.L = lv ? lv.L : 0; V.n = g ? g.n : 0; V.len = g ? g.len : 0; V.head = g ? g.head : -1;
+    V.L = (lv && lv.L) || 0; V.n = g ? g.n : 0; V.len = g ? g.len : 0; V.head = g ? g.head : -1;
     V.path = g ? g.path : V.path; V.remain = g ? g.remain() : 0; V.visited = g ? g.visited : null;
     return V;
   }
@@ -182,6 +195,6 @@ export function createGame(levelsIn, progressIn) {
     dispatch, tick, view, on, off,
     enter: (L, force = true) => (cur() === 'idle' ? enter(L, force) : false),   // 테스트 훅용: 잠금 무시
     state: () => state, pending: () => pendingTo, level: () => lv, grid: () => g,
-    progress: () => prog, setProgress, result: () => res,
+    progress: () => prog, setProgress, result: () => res, mode: () => mode,
   };
 }

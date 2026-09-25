@@ -70,15 +70,18 @@ export class Grid {
     return -1;
   }
 
-  // 규칙 1·2·6: 머리칸 인접·열린·미방문·벽 미통과 + 경유점 순서·E는 마지막 칸만
-  canPush(c) {
-    if (!this.inBounds(c) || !this.open[c] || this.visited[c]) return false;
-    if (!this.adjacent(this.head, c)) return false;
+  // 규칙 1·2·5·6: push 불가 사유 → null(가능) | 'cell'(밖·구멍·방문) | 'far'(비인접) | 'wall' | 'wp'(경유점 순서) | 'end'(E 조기 진입)
+  whyNot(c) {
+    if (!this.inBounds(c) || !this.open[c] || this.visited[c]) return 'cell';
+    const h = this.head, ra = (h / this.w) | 0, rb = (c / this.w) | 0;
+    if (Math.abs(ra - rb) + Math.abs((h % this.w) - (c % this.w)) !== 1) return 'far';
+    if (this.wallSet.has(wallKey(h, c))) return 'wall';
     const o = this.wpOrder[c];
-    if (o >= 0 && o !== this.wpNext) return false;
-    if (c === this.end && this.len + 1 !== this.n) return false;
-    return true;
+    if (o >= 0 && o !== this.wpNext) return 'wp';
+    if (c === this.end && this.len + 1 !== this.n) return 'end';
+    return null;
   }
+  canPush(c) { return this.whyNot(c) === null; }
 
   movable(head = this.head) {
     if (head !== this.head) {

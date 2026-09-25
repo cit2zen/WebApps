@@ -87,6 +87,9 @@ const danger = { t0: 0, dur: 600, draw(c, L) {
   const v = L.view; if (!v) return;
   drawDanger(c, L, v.head, REDUCED ? 0.6 : 0.6 * (1 - ((now - this.t0) % 200) / 200));
 } };
+const wpAlert = { t0: 0, dur: 200, cell: -1, draw(c, L) {   // 규칙 6 경유점 순서 위반: 시도 칸 붉은 맥동 1회
+  if (this.cell >= 0) drawDanger(c, L, this.cell, REDUCED ? 0.6 : 0.6 * (1 - Math.min(1, (now - this.t0) / 200)));
+} };
 active.push(pulse, ghost);
 
 function removeAt(i) { for (let j = i; j < active.length - 1; j++) active[j] = active[j + 1]; active.length--; }
@@ -115,7 +118,9 @@ export function add(k, p) {
     case 'push': ink.ink = 1; ink.p = 0; start(ink, 90); break;
     case 'pop': ink.ink = -1; ink.p = 0; ink.cell = p && p.cell != null ? p.cell : -1; start(ink, 70); break;
     case 'cut': case 'reset': drop(ink); drop(hint); break;
-    case 'invalid': fastUntil = now + 1200; start(inval, 1200); break;
+    case 'invalid':
+      if (p && p.reason === 'wp') { wpAlert.cell = p.cell; start(wpAlert, 200); break; }
+      fastUntil = now + 1200; start(inval, 1200); break;
     case 'deadend': start(danger, 600); break;
     case 'hint':
       hint.back = p && p.backCell != null ? p.backCell : -1;
@@ -130,7 +135,7 @@ export const handle = add;
 // main.js 배선용 이름(§5 효과명): 이벤트 → 효과 시작
 export function inkFill() { add('push'); }
 export function inkAbsorb(cell) { add('pop', { cell: cell == null ? -1 : cell }); }
-export function pulseRing() { add('invalid'); }    // 무효 터치: len 1 → S 0.6s×2 · len ≥ 2 → 헤일로 0.6s×2
+export function pulseRing(cell, reason) { add('invalid', { cell, reason }); }   // reason 'wp' = 붉은 맥동 1회(규칙 6)    // 무효 터치: len 1 → S 0.6s×2 · len ≥ 2 → 헤일로 0.6s×2
 export function dangerPulse() { add('deadend'); }
 export function hintDots(cells) { add('hint', { cells }); }
 export function hintRing(cell) { add('hint', { backCell: cell }); }

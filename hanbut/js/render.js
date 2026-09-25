@@ -1,6 +1,7 @@
 // render.js — #board 캔버스: 토큰 캐시 T · 레이아웃 · 정적 레이어 · 잉크 · 헤일로 · 썸네일/스냅샷.
 // fx를 import하지 않는다 — 효과는 draw(view, effects)의 인자로 받아 e.draw(ctx, layout) 호출.
 import * as rng from './rng.js';
+import { drawMarks } from './render_marks.js';   // 포스트MVP 표식(waypointNum·endMark) — 200줄 분리
 
 const R = () => (rng.next || rng.random || rng.rand || Math.random)();
 const NAMES = ['--bg-base', '--bg-card', '--cream-100', '--cream-200', '--cream-400', '--cream-500',
@@ -61,7 +62,7 @@ function cellPath(c, G, i) {
   rrect(c, x + 1, y + 1, G.cell - 2, G.cell - 2, Math.min(4, G.cell * 0.1));
 }
 
-// ── 정적 드로잉 6: openCell · hole · wall · inkPath · halo · waypointNum ──
+// ── 드로잉: openCell · hole · wall · inkPath · halo (+ render_marks: waypointNum · endMark) ──
 function openCell(c, G, i) {
   cellPath(c, G, i);
   c.fillStyle = T.cream100; c.fill(); c.strokeStyle = T.cream400; c.lineWidth = 1; c.stroke(); L.calls += 2;
@@ -118,13 +119,8 @@ function halo(c, head) {                          // --hb-halo(α 내장) → 't
   }
   c.fillStyle = g; c.fillRect(x - r, y - r, 2 * r, 2 * r); L.calls++;
 }
-function waypointNum(c, G, i, num) {              // 포스트MVP 경유점 번호
-  c.fillStyle = T.inkWarm; c.textAlign = 'center'; c.textBaseline = 'middle';
-  c.font = `${Math.round(G.cell * 0.32)}px ${T.fontMono}`;
-  c.fillText(String(num), cx(G, i), cy(G, i)); L.calls++;
-}
 
-// 프레임 렌더: 정적 drawImage 1 → 방문 칸 → 잉크 → 헤일로 → (경유점) → 효과.
+// 프레임 렌더: 정적 drawImage 1 → 방문 칸 → 잉크 → 헤일로 → (E·경유점 표식) → 효과.
 export function draw(view, effects) {
   if (!getBoard() || !ctx || !view || !view.level) return;
   if (!T.bgBase) readTokens();
@@ -143,8 +139,7 @@ export function draw(view, effects) {
   }
   inkPath(ctx, L, view.path, view.len, p, ac, ap);
   if (view.len > 0) halo(ctx, view.head);
-  const wp = view.level.waypoints;
-  if (wp) for (let j = 0; j < wp.length; j++) waypointNum(ctx, L, wp[j], j + 1);
+  drawMarks(ctx, L, T, view.level, view.path, view.len);
   if (effects) for (let i = 0; i < effects.length; i++) {
     effects[i].draw(ctx, L);
     ctx.globalAlpha = 1; ctx.setTransform(L.dpr, 0, 0, L.dpr, 0, 0);
@@ -184,6 +179,7 @@ export function drawStatic(canvas, lv, path, size) {
   c.fillStyle = T.cream200; c.fillRect(0, 0, size, size);
   paintCells(c, lv, G);
   if (path && path.length) inkPath(c, G, path, path.length, 1, -1, 0);
+  drawMarks(c, G, T, lv, path, path ? path.length : 0);
   L.calls = keep;
   return canvas;
 }
