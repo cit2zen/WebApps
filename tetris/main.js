@@ -8,6 +8,7 @@ import { render } from './render.js';
 import { createInput } from './input.js';
 import { createAudio } from './audio.js';
 import { createEffects } from './effects.js';
+import { css } from './palette.js';
 
 const boardEl = document.getElementById('board');
 const ctx = boardEl.getContext('2d');
@@ -22,6 +23,8 @@ const volSfx = document.getElementById('vol-sfx');
 const boardOverlay = document.getElementById('board-overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const overlayStats = document.getElementById('overlay-stats');
+const overlayScore = document.getElementById('overlay-score');
+const overlayLines = document.getElementById('overlay-lines');
 const overlayHelp = document.getElementById('overlay-help');
 const overlayAction = document.getElementById('overlay-action');
 const touchpad = document.getElementById('touchpad');
@@ -46,7 +49,7 @@ function handleEvents() {
       case 'harddrop': audio.sfx('harddrop'); break;
       case 'levelup':
         audio.sfx('levelup');
-        effects.text(`LEVEL ${e.level}`, '#a5f3fc');
+        effects.text(`LEVEL ${e.level}`, css('--tt-fx-level'));
         document.body.dataset.level = ((e.level - 1) % 6) + 1;
         // 7레벨 이후엔 색 순환이 반복돼 진행감이 사라지므로,
         // 누적 레벨에 비례한 연속 hue 회전으로 정체감을 없앤다.
@@ -60,10 +63,10 @@ function handleEvents() {
         if (e.rows && e.rows.length) effects.burst(e.rows, big);
         const label = clearLabel(e.n, e.tspin);
         if (label) {
-          const colors = { TETRIS: '#22d3ee' };
-          effects.text(label, e.tspin !== 'none' ? '#f0abfc' : (colors[label] || '#fde68a'));
+          const colors = { TETRIS: css('--tt-fx-tetris') };
+          effects.text(label, e.tspin !== 'none' ? css('--tt-fx-tspin') : (colors[label] || css('--tt-fx-clear')));
         }
-        if (e.gained) effects.text(`+${e.gained}`, '#fef9c3');
+        if (e.gained) effects.text(`+${e.gained}`, css('--tt-fx-score'));
         break;
       }
     }
@@ -116,7 +119,8 @@ function syncOverlay() {
 }
 
 function showFinalStats() {
-  overlayStats.textContent = `SCORE ${game.score.toLocaleString()} · LINES ${game.lines}`;
+  overlayScore.textContent = game.score.toLocaleString();
+  overlayLines.textContent = game.lines;
   overlayStats.hidden = false;
   overlayHelp.hidden = true;
 }

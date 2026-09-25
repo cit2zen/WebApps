@@ -4,28 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>TETRIS — 테트리스</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2306060b'/%3E%3Crect x='6' y='6' width='8' height='8' fill='%235ef2ff'/%3E%3Crect x='14' y='6' width='8' height='8' fill='%23ff4fc8'/%3E%3Crect x='14' y='14' width='8' height='8' fill='%23a98bff'/%3E%3Crect x='14' y='22' width='8' height='8' fill='%2339ff96'/%3E%3C/svg%3E" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='3' fill='%23ece7dc'/%3E%3Crect x='6' y='6' width='8' height='8' fill='%233f7f86'/%3E%3Crect x='14' y='6' width='8' height='8' fill='%23b04030'/%3E%3Crect x='14' y='14' width='8' height='8' fill='%23c9a24a'/%3E%3Crect x='14' y='22' width='8' height='8' fill='%235a7d45'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,100..400&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500&family=Space+Mono&family=Nanum+Pen+Script&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../design-tokens.css" />
   <link rel="stylesheet" href="../typography.css" />
   <link rel="stylesheet" href="../polaroid.css" />
+  <link rel="stylesheet" href="../pol-ui.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body data-level="1">
-  <div class="scanlines" aria-hidden="true"></div>
+<body class="pol-body" data-level="1">
   <main class="game">
     <aside class="panel panel--left">
-      <h1 class="logo">TETRIS</h1>
+      <h1 class="logo">tetris</h1>
       <section class="box hold-box">
-        <h2>HOLD · 홀드</h2>
+        <h2 class="box-title"><span class="lbl-en">HOLD · </span>홀드</h2>
         <canvas id="hold" width="118" height="90" role="img" aria-label="홀드한 조각"></canvas>
       </section>
       <section class="box stats">
-        <div><span>SCORE · 점수</span><strong id="score" aria-live="polite">0</strong></div>
-        <div><span>LINES · 줄</span><strong id="lines" aria-live="polite">0</strong></div>
-        <div><span>LEVEL · 레벨</span><strong id="level" aria-live="polite">1</strong></div>
+        <div class="stat"><span class="pol-hud-label"><span class="lbl-en">SCORE · </span>점수</span><strong id="score" class="pol-hud-value" aria-live="polite">0</strong></div>
+        <div class="stat"><span class="pol-hud-label"><span class="lbl-en">LINES · </span>줄</span><strong id="lines" class="pol-hud-value" aria-live="polite">0</strong></div>
+        <div class="stat"><span class="pol-hud-label"><span class="lbl-en">LEVEL · </span>레벨</span><strong id="level" class="pol-hud-value" aria-live="polite">1</strong></div>
       </section>
     </aside>
 
@@ -35,14 +35,28 @@
       <div class="board-overlay pol-lobby" id="board-overlay" hidden>
         <span class="pol-ovtitle" id="overlay-title" aria-live="polite"></span>
         <div class="pol-lcard">
-          <div class="pol-lphoto" style="background:linear-gradient(145deg,#4a6ab0,#1a2a60)"></div>
+          <div class="pol-lphoto" aria-hidden="true">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <rect class="lp-bg" width="100" height="100" />
+              <g class="lp-cells">
+                <rect class="lp-t" x="29" y="8" width="14" height="14" /><rect class="lp-t" x="43" y="8" width="14" height="14" /><rect class="lp-t" x="57" y="8" width="14" height="14" /><rect class="lp-t" x="43" y="22" width="14" height="14" />
+                <rect class="lp-l" x="8" y="36" width="14" height="14" /><rect class="lp-l" x="8" y="50" width="14" height="14" /><rect class="lp-l" x="8" y="64" width="14" height="14" /><rect class="lp-l" x="22" y="64" width="14" height="14" />
+                <rect class="lp-s" x="36" y="64" width="14" height="14" /><rect class="lp-s" x="50" y="64" width="14" height="14" /><rect class="lp-s" x="50" y="50" width="14" height="14" /><rect class="lp-s" x="64" y="50" width="14" height="14" />
+                <rect class="lp-o" x="64" y="64" width="14" height="14" /><rect class="lp-o" x="78" y="64" width="14" height="14" /><rect class="lp-o" x="64" y="78" width="14" height="14" /><rect class="lp-o" x="78" y="78" width="14" height="14" />
+                <rect class="lp-i" x="8" y="78" width="14" height="14" /><rect class="lp-i" x="22" y="78" width="14" height="14" /><rect class="lp-i" x="36" y="78" width="14" height="14" /><rect class="lp-i" x="50" y="78" width="14" height="14" />
+              </g>
+            </svg>
+          </div>
           <span class="pol-lnum">cityzen</span>
           <span class="pol-ltag">tetris</span>
         </div>
         <h2 class="pol-ltitle">tetris</h2>
         <p class="pol-ldesc">쌓고, 지워라.</p>
-        <p class="pol-lstats" id="overlay-stats" hidden></p>
-        <p class="pol-lhelp" id="overlay-help">←→ 이동 · ↑/X 회전 · Space 하드드롭 · C 홀드 · P 일시정지<br />모바일: 스와이프 이동 · 탭 회전 · 아래로 쓸어 하드드롭</p>
+        <dl class="pol-lstats" id="overlay-stats" hidden>
+          <div class="pol-lstat"><dt>점수</dt><dd id="overlay-score">0</dd></div>
+          <div class="pol-lstat"><dt>줄</dt><dd id="overlay-lines">0</dd></div>
+        </dl>
+        <p class="pol-lhelp" id="overlay-help"><span class="lh">←→ 이동</span> · <span class="lh">↑/X 회전</span> · <span class="lh">Space 하드드롭</span> · <span class="lh">C 홀드</span> · <span class="lh">P 일시정지</span><br /><span class="lh">모바일:</span> <span class="lh">스와이프 이동</span> · <span class="lh">탭 회전</span> · <span class="lh">아래로 쓸어 하드드롭</span></p>
         <button type="button" class="pol-lbtn" id="overlay-action">시작하기</button>
         <span class="pol-llabel">cityzen &middot; Game - Puzzle</span>
       </div>
@@ -50,25 +64,25 @@
 
     <aside class="panel panel--right">
       <section class="box">
-        <h2>NEXT · 다음</h2>
+        <h2 class="box-title"><span class="lbl-en">NEXT · </span>다음</h2>
         <canvas id="next" width="118" height="210" role="img" aria-label="다음에 나올 조각"></canvas>
       </section>
       <section class="box help">
-        <h2>CONTROLS · 조작</h2>
+        <h2 class="box-title"><span class="lbl-en">CONTROLS · </span>조작</h2>
         <ul>
-          <li><kbd>←</kbd><kbd>→</kbd><i>이동</i></li>
-          <li><kbd>↓</kbd><i>소프트 드롭</i></li>
-          <li><kbd>↑</kbd><kbd>X</kbd><i>회전</i></li>
-          <li><kbd>Z</kbd><i>역회전</i></li>
-          <li><kbd>Space</kbd><i>하드 드롭</i></li>
-          <li><kbd>C</kbd><i>홀드</i></li>
-          <li><kbd>P</kbd><i>일시정지</i></li>
-          <li><kbd>R</kbd><i>재시작</i></li>
-          <li><kbd>M</kbd><i>음소거</i></li>
+          <li><kbd class="pol-kbd">←</kbd><kbd class="pol-kbd">→</kbd><i>이동</i></li>
+          <li><kbd class="pol-kbd">↓</kbd><i>소프트 드롭</i></li>
+          <li><kbd class="pol-kbd">↑</kbd><kbd class="pol-kbd">X</kbd><i>회전</i></li>
+          <li><kbd class="pol-kbd">Z</kbd><i>역회전</i></li>
+          <li><kbd class="pol-kbd">Space</kbd><i>하드 드롭</i></li>
+          <li><kbd class="pol-kbd">C</kbd><i>홀드</i></li>
+          <li><kbd class="pol-kbd">P</kbd><i>일시정지</i></li>
+          <li><kbd class="pol-kbd">R</kbd><i>재시작</i></li>
+          <li><kbd class="pol-kbd">M</kbd><i>음소거</i></li>
         </ul>
       </section>
       <section class="box volume">
-        <h2>VOLUME · 음량</h2>
+        <h2 class="box-title"><span class="lbl-en">VOLUME · </span>음량</h2>
         <label class="vol-row" for="vol-music">
           <span>BGM</span>
           <input id="vol-music" type="range" min="0" max="100" value="50" aria-label="배경음 음량" />
@@ -78,7 +92,7 @@
           <input id="vol-sfx" type="range" min="0" max="100" value="70" aria-label="효과음 음량" />
         </label>
       </section>
-      <button id="mute" class="mute">♪ ON</button>
+      <button id="mute" class="mute pol-btn-ghost pol-btn-sm" type="button">♪ ON</button>
     </aside>
   </main>
 
@@ -94,7 +108,7 @@
     <button type="button" class="tp-btn tp-btn--sys" data-act="mute" aria-label="음소거">🔇</button>
   </nav>
 
+  <a class="pol-back-btn" href="../">&#8592; 게임 허브</a>
   <script type="module" src="main.js"></script>
-  <a class="pol-back-btn" href="https://games.cityzen.kr">&#8592; 게임 허브</a>
 </body>
 </html>

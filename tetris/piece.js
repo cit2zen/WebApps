@@ -1,5 +1,6 @@
 // piece.js — tetromino definitions + SRS rotation/wall-kick data
 
+import { css } from './palette.js';
 export const COLS = 10;
 export const ROWS = 20;
 
@@ -49,15 +50,20 @@ export const SHAPES = {
   ],
 };
 
-// vivid neon palette per type: base fill, light highlight, glow color
+// Polaroid palette per type (style.css --tt-*): base fill, light highlight, glow = dark shade
+const tone = (k) => ({
+  get base() { return css(`--tt-${k}`); },
+  get light() { return css(`--tt-${k}-light`); },
+  get glow() { return css(`--tt-${k}-dark`); },
+});
 export const COLORS = {
-  I: { base: '#22d3ee', light: '#cffafe', glow: '#06b6d4' },
-  O: { base: '#facc15', light: '#fef9c3', glow: '#eab308' },
-  T: { base: '#d946ef', light: '#fae8ff', glow: '#c026d3' },
-  S: { base: '#22c55e', light: '#dcfce7', glow: '#16a34a' },
-  Z: { base: '#f43f5e', light: '#ffe4e6', glow: '#e11d48' },
-  J: { base: '#3b82f6', light: '#dbeafe', glow: '#2563eb' },
-  L: { base: '#fb923c', light: '#ffedd5', glow: '#f97316' },
+  I: tone('i'),
+  O: tone('o'),
+  T: tone('t'),
+  S: tone('s'),
+  Z: tone('z'),
+  J: tone('j'),
+  L: tone('l'),
 };
 
 export const TYPES = ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
