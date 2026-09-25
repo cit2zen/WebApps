@@ -1,5 +1,6 @@
 import { Entity } from "./entity.js";
 import { DIR } from "./input.js";
+import { css } from "./palette.js";
 
 export class Pacman extends Entity {
   constructor(maze, input) {
@@ -51,14 +52,19 @@ export class Pacman extends Entity {
     ctx.save();
     ctx.translate(px, py);
     ctx.rotate(angle);
-    ctx.fillStyle = "#ffe600";
-    ctx.shadowColor = "#ffd000";
-    ctx.shadowBlur = tile * 0.6;
+    ctx.fillStyle = css("--pm-pac");
+    ctx.shadowColor = css("--pm-shadow");
+    ctx.shadowBlur = tile * 0.25;
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.arc(0, 0, r, open, Math.PI * 2 - open);
     ctx.closePath();
     ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = css("--pm-outline");
+    ctx.lineWidth = Math.max(1, tile * 0.07);
+    ctx.lineJoin = "round";
+    ctx.stroke();
     ctx.restore();
     ctx.shadowBlur = 0;
   }

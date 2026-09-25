@@ -1,5 +1,6 @@
 // 28x31 클래식 팩맨 미로.
 // 기호: # 벽, . 점, o 파워펠릿, ' ' 통로(점 없음), - 유령집 문
+import { css } from "./palette.js";
 export const COLS = 28;
 export const ROWS = 31;
 
@@ -96,41 +97,52 @@ export class Maze {
   }
 
   draw(ctx, tile, frame) {
-    const wallColor = "#18e0ff";
+    const wall = css("--pm-wall");
+    const wallLine = css("--pm-wall-line");
+    const door = css("--pm-door");
+    const pellet = css("--pm-pellet");
+    const power = css("--pm-power");
+    // 그리기 전용: 벽 덩어리는 한 면으로 칠하고, 통로와 맞닿은 가장자리에만 선을 긋는다
+    const solid = (cc, rr) => rr < 0 || rr >= ROWS || cc < 0 || cc >= COLS || this.grid[rr][cc] === T.WALL;
+    const lw = Math.max(1.5, tile * 0.12);
+    const h = lw / 2;
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
         const t = this.grid[r][c];
         const x = c * tile;
         const y = r * tile;
         if (t === T.WALL) {
-          ctx.fillStyle = "rgba(10,20,60,0.6)";
+          ctx.fillStyle = wall;
           ctx.fillRect(x, y, tile, tile);
-          ctx.strokeStyle = wallColor;
-          ctx.lineWidth = Math.max(1.5, tile * 0.12);
-          ctx.shadowColor = wallColor;
-          ctx.shadowBlur = tile * 0.45;
-          ctx.strokeRect(x + tile * 0.18, y + tile * 0.18, tile * 0.64, tile * 0.64);
-          ctx.shadowBlur = 0;
+          ctx.strokeStyle = wallLine;
+          ctx.lineWidth = lw;
+          ctx.lineCap = "butt";
+          ctx.beginPath();
+          if (!solid(c, r - 1)) { ctx.moveTo(x, y + h); ctx.lineTo(x + tile, y + h); }
+          if (!solid(c, r + 1)) { ctx.moveTo(x, y + tile - h); ctx.lineTo(x + tile, y + tile - h); }
+          if (!solid(c - 1, r)) { ctx.moveTo(x + h, y); ctx.lineTo(x + h, y + tile); }
+          if (!solid(c + 1, r)) { ctx.moveTo(x + tile - h, y); ctx.lineTo(x + tile - h, y + tile); }
+          ctx.stroke();
+          // 안쪽 모서리(대각선만 통로) 이음새 메우기
+          ctx.fillStyle = wallLine;
+          if (solid(c, r - 1) && solid(c - 1, r) && !solid(c - 1, r - 1)) ctx.fillRect(x, y, lw, lw);
+          if (solid(c, r - 1) && solid(c + 1, r) && !solid(c + 1, r - 1)) ctx.fillRect(x + tile - lw, y, lw, lw);
+          if (solid(c, r + 1) && solid(c - 1, r) && !solid(c - 1, r + 1)) ctx.fillRect(x, y + tile - lw, lw, lw);
+          if (solid(c, r + 1) && solid(c + 1, r) && !solid(c + 1, r + 1)) ctx.fillRect(x + tile - lw, y + tile - lw, lw, lw);
         } else if (t === T.DOOR) {
-          ctx.fillStyle = "#ff5bd1";
-          ctx.shadowColor = "#ff5bd1";
-          ctx.shadowBlur = tile * 0.4;
+          ctx.fillStyle = door;
           ctx.fillRect(x, y + tile * 0.42, tile, tile * 0.16);
-          ctx.shadowBlur = 0;
         } else if (t === T.PELLET) {
-          ctx.fillStyle = "#ffe9c7";
+          ctx.fillStyle = pellet;
           ctx.beginPath();
           ctx.arc(x + tile / 2, y + tile / 2, Math.max(1.2, tile * 0.1), 0, Math.PI * 2);
           ctx.fill();
         } else if (t === T.POWER) {
           const pulse = 0.5 + 0.5 * Math.sin(frame * 0.15);
-          ctx.fillStyle = "#fff";
-          ctx.shadowColor = "#fff";
-          ctx.shadowBlur = tile * (0.4 + pulse * 0.5);
+          ctx.fillStyle = power;
           ctx.beginPath();
-          ctx.arc(x + tile / 2, y + tile / 2, tile * (0.26 + pulse * 0.06), 0, Math.PI * 2);
+          ctx.arc(x + tile / 2, y + tile / 2, tile * (0.24 + pulse * 0.06), 0, Math.PI * 2);
           ctx.fill();
-          ctx.shadowBlur = 0;
         }
       }
     }

@@ -4,42 +4,43 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>PAC-MAN</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23ffe600'/%3E%3Cpath d='M16 16 L31 7 A15 15 0 0 1 31 25 Z' fill='%23000'/%3E%3C/svg%3E" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 16 L28.5 9 A14 14 0 1 0 28.5 23 Z' fill='%23c0a060' stroke='%231a1005' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,100..700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,100..400&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500&family=Space+Mono&family=Nanum+Pen+Script&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../design-tokens.css" />
   <link rel="stylesheet" href="../typography.css" />
   <link rel="stylesheet" href="../polaroid.css" />
+  <link rel="stylesheet" href="../pol-ui.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="pol-body">
   <div id="game-wrap">
-    <button id="settings-btn" aria-label="설정">⚙</button>
-    <header id="hud">
-      <div class="hud-block">
-        <span class="hud-label">SCORE · 점수</span>
-        <span id="score" class="hud-value" aria-live="polite">0</span>
+    <header id="hud" class="pol-hud">
+      <div class="pol-hud-item">
+        <span class="pol-hud-label"><span class="lbl-en">SCORE · </span>점수</span>
+        <span id="score" class="pol-hud-value" aria-live="polite">0</span>
       </div>
-      <div class="hud-block">
-        <span class="hud-label">HIGH · 최고</span>
-        <span id="high" class="hud-value">0</span>
+      <div class="pol-hud-item">
+        <span class="pol-hud-label"><span class="lbl-en">HIGH · </span>최고</span>
+        <span id="high" class="pol-hud-value">0</span>
       </div>
-      <div class="hud-block">
-        <span class="hud-label">LIVES · 목숨</span>
-        <span id="lives" class="hud-value" aria-label="남은 목숨"></span>
+      <div class="pol-hud-item">
+        <span class="pol-hud-label"><span class="lbl-en">LIVES · </span>목숨</span>
+        <span id="lives" class="pol-hud-value" aria-label="남은 목숨"></span>
       </div>
-      <div class="hud-block">
-        <span class="hud-label">LEVEL · 레벨</span>
-        <span id="level" class="hud-value" aria-live="polite">1</span>
+      <div class="pol-hud-item">
+        <span class="pol-hud-label"><span class="lbl-en">LEVEL · </span>레벨</span>
+        <span id="level" class="pol-hud-value" aria-live="polite">1</span>
       </div>
+      <button id="settings-btn" class="pol-btn-ghost pol-btn-icon" type="button" aria-label="설정">⚙</button>
     </header>
 
     <div id="stage">
       <canvas id="board" role="img" aria-label="팩맨 미로 게임 보드"></canvas>
       <!-- 인게임 상태 오버레이 (READY!/PAUSED) — 반투명, 미로·HUD가 비쳐 보임 -->
       <div id="overlay" class="overlay hidden">
-        <p id="overlay-msg" class="overlay-msg" aria-live="polite"></p>
+        <p id="overlay-msg" class="overlay-msg t-title" aria-live="polite"></p>
       </div>
     </div>
   </div>
@@ -80,24 +81,24 @@
     <span class="pol-llabel">cityzen &middot; Game - Arcade</span>
   </div>
 
-  <div id="settings" class="settings hidden">
-    <div class="settings-card">
-      <h2>설정</h2>
+  <div id="settings" class="settings pol-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="settings-card pol-dialog">
+      <h2 id="settings-title" class="settings-title">설정</h2>
       <label class="slider-row">
-        <span>배경음</span>
+        <span class="pol-field-label">배경음</span>
         <input id="bgm-vol" type="range" min="0" max="1" step="0.01" />
         <output id="bgm-out">35%</output>
       </label>
       <label class="slider-row">
-        <span>효과음</span>
+        <span class="pol-field-label">효과음</span>
         <input id="sfx-vol" type="range" min="0" max="1" step="0.01" />
         <output id="sfx-out">60%</output>
       </label>
-      <button id="settings-close">닫기</button>
+      <button id="settings-close" class="pol-btn-primary" type="button">닫기</button>
     </div>
   </div>
 
+  <a class="pol-back-btn" href="../">&#8592; 게임 허브</a>
   <script type="module" src="src/main.js"></script>
-  <a class="pol-back-btn" href="https://games.cityzen.kr">&#8592; 게임 허브</a>
 </body>
 </html>

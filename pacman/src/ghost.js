@@ -1,6 +1,7 @@
 import { Entity } from "./entity.js";
 import { DIR } from "./input.js";
 import { COLS, ROWS } from "./maze.js";
+import { css } from "./palette.js";
 
 const EXIT = { x: 13, y: 11 };  // 유령집 문 위
 const HOME = { x: 13, y: 14 };  // 유령집 내부 복귀 지점
@@ -203,11 +204,11 @@ export class Ghost extends Entity {
     if (this.state !== "eaten") {
       let body = this.color;
       if (this.scared) {
-        body = this._flashHigh && Math.floor(frame * 0.2) % 2 === 0 ? "#ffffff" : "#2244ff";
+        body = this._flashHigh && Math.floor(frame * 0.2) % 2 === 0 ? css("--pm-fright-flash") : css("--pm-fright");
       }
       ctx.fillStyle = body;
-      ctx.shadowColor = body;
-      ctx.shadowBlur = tile * 0.5;
+      ctx.shadowColor = css("--pm-shadow");
+      ctx.shadowBlur = tile * 0.25;
       ctx.beginPath();
       ctx.arc(px, py - r * 0.1, r, Math.PI, 0);
       ctx.lineTo(px + r, py + r * 0.8);
@@ -230,11 +231,15 @@ export class Ghost extends Entity {
     const ex = look.x * r * 0.18;
     const ey = look.y * r * 0.18;
     for (const sx of [-0.32, 0.32]) {
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = css("--pm-eye");
       ctx.beginPath();
       ctx.arc(px + sx * r, py - r * 0.18, r * 0.24, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = this.scared && this.state !== "eaten" ? "#2244ff" : "#1133cc";
+      // 종이 바닥 위에서도 눈(먹힌 상태)이 보이도록 잉크 테두리
+      ctx.strokeStyle = css("--pm-outline");
+      ctx.lineWidth = Math.max(1, r * 0.08);
+      ctx.stroke();
+      ctx.fillStyle = this.scared && this.state !== "eaten" ? css("--pm-fright") : css("--pm-pupil");
       ctx.beginPath();
       ctx.arc(px + sx * r + ex, py - r * 0.18 + ey, r * 0.12, 0, Math.PI * 2);
       ctx.fill();

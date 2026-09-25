@@ -5,6 +5,7 @@ import { Input, DIR } from "./input.js";
 import { Hud } from "./hud.js";
 import { Audio } from "./audio.js";
 import { Settings } from "./settings.js";
+import { css } from "./palette.js";
 
 const SCHEDULE = [
   { mode: "scatter", t: 7000 },
@@ -75,10 +76,10 @@ class Game {
 
   _makeGhosts() {
     return [
-      new Ghost(this.maze, "blinky", { x: 13, y: 11, color: "#ff2b4e", corner: { x: 26, y: 0 }, releaseDelay: 0, state: "out" }),
-      new Ghost(this.maze, "pinky", { x: 13, y: 14, color: "#ff5bd1", corner: { x: 1, y: 0 }, releaseDelay: 1200, state: "house" }),
-      new Ghost(this.maze, "inky", { x: 11, y: 14, color: "#18e0ff", corner: { x: 26, y: 30 }, releaseDelay: 5000, state: "house" }),
-      new Ghost(this.maze, "clyde", { x: 15, y: 14, color: "#ffb347", corner: { x: 1, y: 30 }, releaseDelay: 9000, state: "house" }),
+      new Ghost(this.maze, "blinky", { x: 13, y: 11, color: css("--pm-blinky"), corner: { x: 26, y: 0 }, releaseDelay: 0, state: "out" }),
+      new Ghost(this.maze, "pinky", { x: 13, y: 14, color: css("--pm-pinky"), corner: { x: 1, y: 0 }, releaseDelay: 1200, state: "house" }),
+      new Ghost(this.maze, "inky", { x: 11, y: 14, color: css("--pm-inky"), corner: { x: 26, y: 30 }, releaseDelay: 5000, state: "house" }),
+      new Ghost(this.maze, "clyde", { x: 15, y: 14, color: css("--pm-clyde"), corner: { x: 1, y: 30 }, releaseDelay: 9000, state: "house" }),
     ];
   }
 
