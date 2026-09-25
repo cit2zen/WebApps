@@ -1,55 +1,91 @@
 /* SOURCE OF TRUTH: develop_web/design-system/ — 직접 수정 금지, develop_web/scripts/sync_design.py로 동기 */
-/* Requires design-tokens.css */
-/* Requires Fraunces + Space Mono loaded via <link> or next/font */
+/* Requires design-tokens.css (+ 폰트 링크는 design-tokens.css 머리말 참조) */
 
-.t-display {
+.t-display,
+.t-title,
+.t-caption,
+.t-num {
   font-family: var(--font-display);
   font-style: italic;
+  font-synthesis: none; /* 한글은 가짜 기울임 없이 Noto Serif KR upright */
+}
+
+.t-display {
   font-weight: 300;
-  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  font-size: var(--fs-display);
   color: var(--ink-warm);
-  line-height: 1.0;
+  line-height: 1.05;
 }
 
 .t-title {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 200;
-  font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+  font-weight: 300;
+  font-size: var(--fs-title);
   color: var(--ink-warm);
-  line-height: 1.1;
+  line-height: 1.15;
+}
+
+.t-lead {
+  font-family: var(--font-body);
+  font-size: var(--fs-lead);
+  color: var(--ink-mid);
+  line-height: 1.7;
 }
 
 .t-body {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 200;
-  font-size: 0.9rem;
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
   color: var(--ink-mid);
+  line-height: 1.7;
+}
+
+.t-small {
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  color: var(--ink-muted);
   line-height: 1.6;
 }
 
 .t-caption {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 200;
-  font-size: 0.7rem;
-  color: var(--gold-mid);
-  letter-spacing: 0.03em;
+  font-weight: 300;
+  font-size: var(--fs-sm);
+  color: var(--ink-muted);
+  letter-spacing: 0.01em;
 }
 
 .t-num {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 100;
-  font-size: 0.65rem;
-  color: var(--gold-mid);
+  font-weight: 300;
+  font-size: var(--fs-lg);
+  color: var(--gold-text);
 }
 
+/* 한글 라벨 — Noto Sans KR, 대문자·넓은 자간 없음 */
 .t-label {
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  color: var(--ink-light);
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-family: var(--font-label);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--ink-muted);
+  letter-spacing: 0.03em;
 }
+/* 라틴·숫자 전용 라벨 (예: "© 2026 CITYZEN", "01") */
+.t-label.is-mono,
+.t-mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+}
+.t-label.is-mono { text-transform: uppercase; font-weight: 400; }
+
+.t-hand {
+  font-family: var(--font-hand);
+  font-size: var(--fs-xl);
+  color: var(--ink-mid);
+  line-height: 1.2;
+}
+
+.link-gold {
+  color: var(--gold-text);
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+.link-gold:hover { color: var(--ink-warm); text-decoration-color: var(--gold-mid); }
