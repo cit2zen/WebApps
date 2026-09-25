@@ -77,14 +77,7 @@ const score = new Score();
 let weaponNameEl = document.getElementById('weaponname');
 if (!weaponNameEl) {
   weaponNameEl = document.createElement('div');
-  weaponNameEl.id = 'weaponname';
-  weaponNameEl.style.cssText = [
-    'position:fixed', 'bottom:72px', 'right:18px',
-    'color:#ffcc44', 'font-family:monospace', 'font-size:13px',
-    'letter-spacing:0.12em', 'font-weight:bold',
-    'text-shadow:0 0 6px #ff8800,0 1px 2px #000',
-    'pointer-events:none', 'user-select:none',
-  ].join(';');
+  weaponNameEl.id = 'weaponname'; // 모양은 style.css #weaponname (Polaroid 종이 칩)
   (document.getElementById('hud') ?? document.body).appendChild(weaponNameEl);
 }
 
@@ -92,27 +85,11 @@ if (!weaponNameEl) {
 let bossHpEl = document.getElementById('bosshp');
 if (!bossHpEl) {
   bossHpEl = document.createElement('div');
-  bossHpEl.id = 'bosshp';
-  bossHpEl.style.cssText = [
-    'position:fixed', 'bottom:56px', 'left:50%', 'transform:translateX(-50%)',
-    'width:320px', 'height:14px',
-    'background:rgba(0,0,0,0.65)', 'border:1px solid #880000',
-    'display:none', 'pointer-events:none', 'z-index:100',
-  ].join(';');
+  bossHpEl.id = 'bosshp'; // 모양은 style.css #bosshp* (기본 display:none, 아래 로직이 인라인으로 토글)
   const bossHpFill = document.createElement('div');
   bossHpFill.id = 'bosshp-fill';
-  bossHpFill.style.cssText = [
-    'height:100%', 'width:100%',
-    'background:linear-gradient(90deg,#cc0000,#ff4400)',
-    'transition:width 0.1s',
-  ].join(';');
   const bossHpLabel = document.createElement('div');
   bossHpLabel.id = 'bosshp-label';
-  bossHpLabel.style.cssText = [
-    'position:absolute', 'top:0', 'left:0', 'right:0', 'text-align:center',
-    'color:#ffcccc', 'font-family:monospace', 'font-size:11px', 'line-height:14px',
-    'letter-spacing:0.1em', 'font-weight:bold',
-  ].join(';');
   bossHpLabel.textContent = 'WARLORD';
   bossHpEl.appendChild(bossHpFill);
   bossHpEl.appendChild(bossHpLabel);

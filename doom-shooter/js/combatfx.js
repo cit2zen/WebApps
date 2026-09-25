@@ -58,7 +58,7 @@ export class CombatFX {
     ]) {
       const seg = document.createElement('div');
       css(seg, {
-        position: 'absolute', background: '#fff',
+        position: 'absolute', background: 'var(--paper)',
         left: dx, top: dy, width: w, height: h,
       });
       this._hitEl.appendChild(seg);
@@ -72,7 +72,7 @@ export class CombatFX {
       marginLeft: '-40px', marginTop: '-40px',
       borderRadius: '50%',
       border: '3px solid transparent',
-      borderTopColor: '#ff2222',
+      borderTopColor: 'var(--pol-danger)',
       opacity: '0',
       transformOrigin: '50% 50%',
     });
@@ -120,7 +120,7 @@ export class CombatFX {
   // ----------------------------------------------------------------
   hitMarker(kill = false) {
     this._hitTimer = kill ? 0.22 : 0.12;
-    const color = kill ? '#ff4422' : '#ffffff';
+    const color = kill ? 'var(--pol-danger)' : 'var(--paper)';
     const size = kill ? '28px' : '20px';
     css(this._hitEl, {
       opacity: '1',
@@ -151,14 +151,10 @@ export class CombatFX {
   damageNumber(pos, n) {
     const el = mkEl('div', null, {
       left: '-9999px', top: '-9999px',
-      color: '#ffcc00',
-      fontSize: '15px',
-      fontFamily: 'monospace',
-      fontWeight: 'bold',
-      textShadow: '0 0 4px #000, 0 0 2px #000',
       userSelect: 'none',
       transition: 'none',
     });
+    el.className = 'dmg-num'; // 글꼴·색은 style.css .dmg-num (Polaroid 토큰)
     el.textContent = String(Math.round(n));
     this._dmgNumsEl.appendChild(el);
     this._dmgNums.push({ pos: pos.clone(), el, life: 1.2, rise: 0 });

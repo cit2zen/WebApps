@@ -4,12 +4,29 @@ import { CELL } from './maps.js';
 const MAP_CELL = 4; // pixels per grid cell on the minimap canvas
 const CANVAS_SIZE = 150;
 
-const TYPE_COLORS = {
-  imp: '#ff4444',
-  caster: '#44ffff',
-  charger: '#ff8800',
-  boss: '#ff44ff',
+// 색은 Polaroid 토큰(design-tokens.css + style.css :root)에서 읽는다 — hex 하드코딩 금지
+const TYPE_TOKENS = {
+  imp: '--pol-danger',
+  caster: '--pol-info',
+  charger: '--doom-amber',
+  boss: '--doom-plum',
 };
+let _pal = null;
+function palette() {
+  if (_pal) return _pal;
+  const cs = getComputedStyle(document.documentElement);
+  const t = (name) => cs.getPropertyValue(name).trim();
+  const p = {
+    wall: t('--ink-light'),
+    floor: t('--cream-300'),
+    exit: t('--pol-ok'),
+    player: t('--ink-warm'),
+    enemy: t('--pol-danger'),
+    type: Object.fromEntries(Object.entries(TYPE_TOKENS).map(([k, v]) => [k, t(v)])),
+  };
+  if (p.wall) _pal = p; // 스타일시트 로드 전이면 다음 프레임에 다시 읽음
+  return p;
+}
 
 export class MiniMap {
   constructor() {
@@ -48,6 +65,7 @@ export class MiniMap {
     const offZ = Math.floor((CANVAS_SIZE - ch) / 2);
 
     ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    const pal = palette();
 
     // draw grid cells
     for (let r = 0; r < rows; r++) {
@@ -57,9 +75,9 @@ export class MiniMap {
         const px = offX + c * MAP_CELL;
         const pz = offZ + r * MAP_CELL;
         if (level.isWall(wx, wz)) {
-          ctx.fillStyle = 'rgba(180,180,200,0.7)';
+          ctx.fillStyle = pal.wall;
         } else {
-          ctx.fillStyle = 'rgba(40,40,50,0.5)';
+          ctx.fillStyle = pal.floor;
         }
         ctx.fillRect(px, pz, MAP_CELL, MAP_CELL);
       }
@@ -70,7 +88,7 @@ export class MiniMap {
       const { r, c } = level.exitCell;
       const px = offX + c * MAP_CELL;
       const pz = offZ + r * MAP_CELL;
-      ctx.fillStyle = '#44ff88';
+      ctx.fillStyle = pal.exit;
       ctx.fillRect(px, pz, MAP_CELL, MAP_CELL);
     }
 
@@ -86,7 +104,7 @@ export class MiniMap {
         const ez = pos.z;
         const px = offX + ((ex - minX) / CELL) * MAP_CELL + MAP_CELL / 2;
         const pz = offZ + ((ez - minZ) / CELL) * MAP_CELL + MAP_CELL / 2;
-        const color = TYPE_COLORS[e.type] || '#ff4444';
+        const color = pal.type[e.type] || pal.enemy;
         ctx.fillStyle = color;
         ctx.beginPath();
         ctx.arc(px, pz, 2.5, 0, Math.PI * 2);
@@ -105,7 +123,7 @@ export class MiniMap {
       ctx.save();
       ctx.translate(px, pz);
       ctx.rotate(angle);
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = pal.player;
       ctx.beginPath();
       ctx.moveTo(0, -arrowLen);
       ctx.lineTo(arrowW, arrowLen * 0.4);
