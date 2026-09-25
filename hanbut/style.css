@@ -1,8 +1,8 @@
 [hidden] { display: none !important; }
 
-/* hanbut 공통 — 로컬 토큰(--hb-*, 정본 design-tokens.css에 없는 값만) */
+/* hanbut 공통 — 로컬 토큰(--hb-*, 정본 design-tokens.css에 없는 값만 · 팔레트 파생). render.js가 --hb-alert/halo/ghost를 캔버스 색으로 읽음 */
 :root {
-  --hb-alert: #b8452e;
+  --hb-alert: var(--pol-danger);
   --hb-overlay: rgba(236, 231, 220, 0.92);
   --hb-overlay-soft: rgba(236, 231, 220, 0.88);
   --hb-halo: rgba(212, 184, 122, 0.25);
@@ -16,7 +16,8 @@ html, body {
   height: 100%;
   background: var(--bg-base);
   color: var(--ink-warm);
-  font-family: var(--font-display);
+  font-family: var(--font-body);
+  font-synthesis: none; /* 한글은 Noto Serif/Sans KR upright — 가짜 기울임·굵기 없음(상속) */
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
 }
@@ -27,6 +28,8 @@ body {
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
 }
+/* 플레이 중엔 킷 .pol-body의 상단 조명(--paper-light)을 끔 — #board 캔버스가 --bg-base로 불투명 채색하므로 경계 띠가 생김. 결(::after)은 유지 */
+body.pol-body:has(#play:not([hidden])) { background: var(--bg-base); }
 
 button {
   font: inherit;
@@ -84,7 +87,7 @@ h1, h2, p { margin: 0; }
   padding: 0;
   border: 0;
   background: transparent;
-  font-size: 24px;
+  font-size: var(--fs-2xl); /* 글리프(⏸ ? ⚙) */
   line-height: 1;
   text-decoration: none;
   user-select: none;
@@ -128,17 +131,17 @@ h1, h2, p { margin: 0; }
 /* 포스트MVP 로비: 오늘의 한붓 버튼 · 완료 팩 공유 버튼 · 로비 토스트(수명은 share.tick rAF dt) */
 #btn-daily.hb-daily { margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 10px; }   /* id로 .hb-btn(display·margin) 덮어쓰기 */
 .hb-daily.is-done { border-color: var(--cream-400); }
-.hb-daily .daily-stat { font-family: var(--font-mono); font-style: normal; color: var(--gold-mid); }
+.hb-daily .daily-stat { font-family: var(--font-label); font-style: normal; font-size: var(--fs-sm); font-weight: 500; letter-spacing: 0.02em; color: var(--gold-text); }
 .hb-daily[aria-busy="true"] { opacity: 0.6; }
 .pack-share {
-  position: absolute; top: 2px; right: 2px; min-width: 40px; height: 32px; padding: 0 6px;
-  font-family: var(--font-mono); font-size: 11px; color: var(--ink-warm);
-  background: var(--bg-card); border: 1px solid var(--gold-mid); cursor: pointer;
+  position: absolute; top: 4px; right: 4px; min-width: 40px; height: 28px; padding: 0 8px;
+  font-family: var(--font-label); font-style: normal; font-size: var(--fs-2xs); font-weight: 600; letter-spacing: 0.02em;
+  color: var(--ink-warm); background: var(--bg-card); border: 1px solid var(--rule-strong); border-radius: var(--r-pill);
+  box-shadow: var(--shadow-soft); cursor: pointer;
 }
-#lobby-toast {
-  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%);
-  padding: 8px 16px; background: var(--bg-card); color: var(--ink-warm); box-shadow: var(--shadow-card); z-index: 40;
-}
+.pack-share::after { content: ''; position: absolute; inset: -6px -2px; } /* 히트 영역 40px */
+.pack-share:hover { border-color: var(--gold-mid); }
+#lobby-toast { bottom: calc(var(--space-6) + env(safe-area-inset-bottom)); white-space: nowrap; } /* 모양은 킷 .pol-toast */
 
 /* reduced-motion: CSS 전환·키프레임 차단(캔버스 효과는 fx.js/fx_clear.js REDUCED 분기).
    #btn-reset 링(--p)은 진행 표시라 유지 — 롱프레스 판정 시각 피드백 */

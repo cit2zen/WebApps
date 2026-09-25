@@ -7,19 +7,20 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%8D%EF%B8%8F%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,100..400&family=Space+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,100..400&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500&family=Space+Mono&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../design-tokens.css">
   <link rel="stylesheet" href="../typography.css">
   <link rel="stylesheet" href="../polaroid.css">
+  <link rel="stylesheet" href="../pol-ui.css">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="play.css">
   <link rel="stylesheet" href="lobby.css">
 </head>
-<body>
+<body class="pol-body">
   <!-- 로비 (idle) — Polaroid -->
   <section id="lobby" aria-label="로비">
     <header class="lb-top">
-      <a id="btn-hub" class="icon-btn t-caption" href="../" aria-label="허브로">← 허브</a>
+      <a id="btn-hub" class="pol-back-btn" href="../">← 게임 허브</a>
       <span class="lb-spacer"></span>
       <button id="btn-help" class="icon-btn" type="button" aria-label="도움말">?</button>
       <button id="btn-settings" class="icon-btn" type="button" aria-label="설정">⚙</button>
@@ -29,14 +30,14 @@
       <p class="t-caption">엄지 하나로 긋는 한붓그리기</p>
     </div>
     <div class="lb-continue">
-      <button id="btn-continue" class="hb-btn" type="button">시작하기</button>
+      <button id="btn-continue" class="hb-btn hb-primary" type="button">시작하기</button>
       <button id="btn-daily" class="hb-btn hb-daily" type="button"><span class="daily-name">오늘의 한붓</span><span class="daily-stat t-caption" hidden></span></button>
       <p id="lobby-msg" class="t-caption" role="alert" hidden></p>
     </div>
     <div id="packs" class="pol-group" aria-label="팩"></div>
     <div id="lvl-panel" aria-label="레벨" hidden></div>
     <p id="best" class="t-label" hidden></p>
-    <p id="lobby-toast" class="t-caption" role="status" hidden></p>
+    <p id="lobby-toast" class="pol-toast" role="status" hidden></p>
   </section>
 
   <!-- 플레이 (level_in · playing · clearing) — 인게임 크롬 -->
@@ -63,7 +64,7 @@
   <!-- 일시정지 (paused) — 인게임, z 10 -->
   <div id="overlay-pause" class="hb-overlay" role="dialog" aria-modal="true" aria-label="일시정지" hidden>
     <h2 class="pause-title">일시정지</h2>
-    <button id="btn-resume" class="hb-wide" type="button">계속</button>
+    <button id="btn-resume" class="hb-wide hb-primary" type="button">계속</button>
     <button id="btn-lobby" class="hb-wide" type="button">로비</button>
     <div class="pause-toggles">
       <button id="tg-sound-p" class="hb-toggle" type="button" aria-pressed="true">소리</button>
