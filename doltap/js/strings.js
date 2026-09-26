@@ -1,0 +1,50 @@
+// js/strings.js — §5 strings.js 전문 + §6 추가 키. {x}는 dom.fmt 치환 자리. 충돌 시 §4 문구가 정본
+export default {
+  version: 1,
+  boot: { loading: "돌 고르는 중…" },
+  lobby: { todayTitle: "오늘의 돌탑 #{n}", todayDate: "{m}월 {d}일", todayTries: "공식 도전 {k}/3",
+    todayDone: "오늘 기록 {H}cm · 연습만 남았어요", preLaunch: "10월 1일 #1 시작 · D-{dd}",
+    practiceTitle: "연습", practiceToday: "오늘 돌 연습", practicePast: "지난 날짜",
+    practiceRandom: "랜덤", recordTitle: "기록", friendBadge: "친구 기록 {F}cm에 도전",
+    pastItem: "{m}월 {d}일 · #{n}", sound: "소리 켜기/끄기",
+    // §6 추가
+    subtitle: "#{n} · {m}월 {d}일 · {trail}", friendPast: "친구 {md} 돌탑 {F}cm · 연습 도전",
+    pastBadge: "{m}월 {d}일 돌탑 · 연습으로 도전", todayChip: "도전 {k}/3 · 탭해서 시작",
+    todayDoneChip: "오늘 기록 {H}cm · 3/3", practiceCaption: "연습 — 지난 날·랜덤",
+    recordCaption: "기록 — 최고 {best}cm", recordNone: "기록 — 아직 없음",
+    footer1: "🔥연속 {s}일 · 최고 {best}cm", footer2: "매일 0시(KST) 새 돌 24개", close: "닫기" },
+  hud: { skip: "건너뛰기", hold: "버티기 {t}", milestone: "{h}cm",
+    flagBest: "내 최고", flagToday: "오늘 최고", flagFriend: "친구 {F}cm",
+    rotCw: "시계 방향 15도", rotCcw: "반시계 방향 15도", pause: "일시정지",
+    // §6 추가
+    skipConfirm: "한 번 더", cancelHint: "여기서 떼면 취소", portrait: "세로로 돌려 주세요",
+    subFriend: "친구 {F}", subBest: "최고 {best}" },
+  pause: { title: "잠깐 쉬는 중", resume: "계속", toLobby: "로비로", leaveWarn: "공식 도전 1회가 사라져요",
+    leaveOk: "나가기", leaveCancel: "취소", sound: "소리", hand: "손잡이", handRight: "오른손", handLeft: "왼손",
+    // §6 추가
+    status: "{H}cm · {placed}/24", help: "도움말", settings: "설정" },
+  settings: { vibe: "진동", on: "켬", off: "끔", tutReset: "손가락 안내 다시 보기" },
+  toast: { noTries: "오늘 공식 도전을 다 썼어요 · 연습으로 쌓아요",
+    preLaunch: "10월 1일에 #1이 열려요 · 연습으로 쌓아요", tutReset: "다음 판에 안내가 나와요" },
+  result: { beatFriend: "넘었다!", newBest: "새 최고", stats: "남은 돌 {left}/24 · 퍼펙트 {p}",
+    shareBest: "오늘 최고 {H}cm 공유", share: "공유", retry: "다시 쌓기", lobby: "로비",
+    physicsNote: "물리는 매번 조금씩 달라요", copied: "복사했어요", copyFallback: "길게 눌러 복사하세요",
+    practiceNote: "연습 판은 기록에 남지 않아요",
+    // §6 추가
+    header: "돌탑 #{n} 결과", headerPractice: "돌탑 연습", sub: "({left}/24) · {grade}",
+    shareNote: "공유는 오늘 최고 {H}cm 판으로 나가요", retryLeft: "공식 {r}회 남음",
+    retryPracticeToday: "오늘 돌 연습", retryPractice: "연습", selectAll: "전체 선택",
+    snapshotAlt: "완성한 돌탑" },
+  record: { today: "오늘 기록", best: "최고 기록", streak: "연속", maxStreak: "최장 연속",
+    empty: "아직 쌓은 돌탑이 없어요",
+    // §6 추가
+    bestLine: "최고 기록 {x}cm", streakLine: "현재 연속 {s}일", maxLine: "최장 연속 {s}일",
+    noStore: "이 브라우저에서는 기록이 저장되지 않아요", todayLine: "오늘 {H}cm ({left}/24) · 도전 {k}/3",
+    todayNone: "오늘 기록 없음" },
+  error: { load: "돌을 불러오지 못했어요", retry: "다시 시도", hint: "인터넷 연결을 확인하고 다시 시도해 주세요" },
+  help: ["끌어서 맞추고, 떼면 쿵", "↺↻ 15°씩 돌려 평평한 면을 아래로 · 건너뛰기는 두 번 탭(한 판 1회)", "촛불 3개 · 3초 버티면 높이가 기록"],
+  helpKeys: "←→ 이동 · ↑/X·Z 회전 · Space 낙하",
+  grade: ["돌 하나 얹었다", "산길 초입", "암자 앞 돌탑", "큰스님도 끄덕", "산신령도 놀람"],
+  share: { head: "돌탑 #{n} 🪨 {H}cm ({left}/24)", headPractice: "돌탑 연습 🪨 {H}cm ({left}/24)",
+    streak: "🔥연속 {s}일 · 도전 {k}/3" }
+};

@@ -1,4 +1,4 @@
-// js/daily.js — KST 날짜·회차·데일리 세트(규칙 1·16). 순수 함수만(URL 파라미터 parseParams는 2단계에서 추가)
+// js/daily.js — KST 날짜·회차·URL 파라미터·데일리 세트(규칙 1·16·17). DOM 없음(parseParams 기본 인자만 location 참조)
 import { generate } from './stones.js';
 import { fnv } from './rng.js';
 
@@ -38,6 +38,17 @@ export function nOf(day) { return Math.round((toUTC(day) - toUTC(LAUNCH)) / DAY_
 
 // 출시 전 카운트다운 D-n(= 10월 1일까지 남은 일수). nOf(day) ≤ 0일 때만 의미가 있다
 export function dDay(day) { return 1 - nOf(day); }
+
+// ?c= : /^\d{1,5}$/ → parseInt → 0~99990 clamp → c/10 cm.  ?d= : 형식+왕복 검증, 오늘이면 공식·과거면 연습·미래/오류는 무시
+export function parseParams(search = globalThis.location ? globalThis.location.search : '', today = todayKST()) {
+  const q = new URLSearchParams(search);
+  const cs = q.get('c'), ds = q.get('d');
+  let friendC = null;
+  if (cs !== null && /^\d{1,5}$/.test(cs)) friendC = Math.min(99990, Math.max(0, parseInt(cs, 10)));
+  let day = today, past = false;
+  if (ds !== null && isDay(ds) && ds <= today) { day = ds; past = ds < today; }
+  return { day, past, friendC, friendH: friendC === null ? null : friendC / 10 };
+}
 
 export function daily(day = todayKST()) {
   return generate(fnv(day), day, nOf(day));
