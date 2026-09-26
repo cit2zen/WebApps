@@ -92,3 +92,35 @@ html, body { margin: 0; background: var(--bg-base); }
 /* 터치 타깃 48 (공유 기본값 pol-btn 42.8·pol-chip 36.8 덮어쓰기) */
 .pol-btn-primary, .pol-btn-ghost, .pol-chip, .pol-seg > button { min-height: 48px; }
 .pol-btn-icon { width: 48px; height: 48px; padding: 0; }
+
+/* ── 6단계 보충(lobby·dialogs·result). T4a 훅(.sub-row·.foot·.sticker·.share-note.off·.retry-row·.retry-label)은 위 규칙을 쓴다 ── */
+.pol-photo { position: relative; }
+.pol-photo canvas, .pol-photo img { display: block; width: 100%; height: 100%; }
+#lobby .sub-row { font-family: var(--font-label); color: var(--ink-muted); }
+#lobby .foot p { margin: 0; line-height: 32px; }
+.pol-chip.gold { border-color: var(--gold-mid); }
+.today-chip { position: absolute; left: 6px; bottom: 6px; pointer-events: none; max-width: calc(100% - 12px);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+span.pol-chip { min-height: 0; }                            /* 누를 수 없는 표시용 칩(오늘 칩·배지 스티커·친구 배지)은 터치 48 제외 */
+.chips7 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.chips7 .pol-chip { padding: 4px 6px; min-height: 48px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.chips7 .md { font-size: var(--fs-sm); }
+.chips7 .nn { font-size: var(--fs-2xs); }
+.set-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pol-seg > [aria-pressed="true"] { background: var(--bg-card); color: var(--ink-warm); box-shadow: var(--shadow-soft); }
+.help-card.pol-card { margin: 0 auto; }
+.help-card .pol-caption { white-space: pre-line; min-height: 54px; }
+.help-dots { display: flex; justify-content: center; gap: 8px; height: 8px; }
+.help-dots .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cream-300); }
+.help-dots .dot.on { background: var(--gold-mid); }
+.help-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pause-row { display: grid; grid-template-columns: 1fr 1fr 48px; gap: 8px; }
+.danger { color: var(--pol-danger); }
+.pol-dialog > .pol-btn-ghost, .pol-dialog > .pol-btn-primary { display: flex; width: 100%; justify-content: center; }
+#result .sticker { display: flex; gap: 4px; pointer-events: none; }
+#result .share-note, #result .retry-label { margin: 0; pointer-events: none; }
+#result { padding-left: 16px; padding-right: 16px; }       /* 버튼 줄 폭 390: 175 · 360: 160(§4 S10) */
+#result .pol-appbar { margin: 0 -16px; }
+#result .retry-label { width: calc(50% - 4px); text-align: center; }   /* `다시 쌓기` 열 아래, `로비` 열 아래는 비움 */
+#result .share-btn { width: 100%; }
+.copy-hint { font-size: var(--fs-sm); color: var(--ink-muted); }

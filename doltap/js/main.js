@@ -1,13 +1,15 @@
 // main.js — 완성 2차: boot(Matter 5000ms 폴링 + content Promise.all → S1) → 화면 라우팅, rAF 고정 스텝 루프(start/stop),
-// resize 재그리기, 입력(input·keys)·visibilitychange 배선
+// resize 재그리기, 입력(input·keys)·visibilitychange 배선 + 6단계 로비·대화상자·결과 mount와 UI 콜백(cb)·game 훅
 import * as game from './game.js';
 import * as input from './input.js';
 import * as keys from './keys.js';
-import { install } from './debug.js';
+import { install, pickSet } from './debug.js';
 import { loadTheme, safeTop } from './theme.js';
 import * as contentMod from './content.js';
 import { h } from './dom.js';
-import strings from './strings.js';
+import * as lobby from './lobby.js';
+import * as dialogs from './dialogs.js';
+import * as result from './result.js';
 
 // STEP=1000/60, MAX=4 (§2 규칙 4), speed = main 지역 배율(기본 1). debug는 loop.setSpeed(m)로만 바꾼다
 const STEP = 1000 / 60, MAX = 4;
@@ -52,22 +54,6 @@ function route(state) {
   }
 }
 
-function paintBoot() {
-  const el = document.getElementById('boot');
-  if (!el) return;
-  const stones = h('div', { class: 'boot-stones', 'aria-hidden': 'true' });
-  for (let i = 0; i < 3; i++) stones.appendChild(h('span', { class: 'boot-stone' }));
-  el.replaceChildren(h('div', { class: 'pol-brand' }, '돌탑'), stones, h('p', { class: 'boot-msg' }, strings.boot.loading));
-}
-
-function paintError() {
-  const el = document.getElementById('error');
-  if (!el) return;
-  const btn = h('button', { class: 'pol-btn-primary', type: 'button' }, strings.error.retry);
-  btn.addEventListener('click', () => location.reload());
-  el.replaceChildren(h('h1', { class: 'err-title' }, strings.error.load), h('p', { class: 'err-hint' }, strings.error.hint), btn);
-}
-
 function stageCanvas() {
   let cv = document.getElementById('stage');
   if (!cv) {
@@ -76,6 +62,31 @@ function stageCanvas() {
   }
   return cv;
 }
+
+// ── v6: 화면 내용 채우기 + UI 콜백(cb). 표시 전환은 frame의 route(game.state())가 맡고 여기서는 즉시 1회 반영한다 ──
+function showLobby() {
+  dialogs.closeAll(); game.setScreen('lobby'); lobby.show(content);
+  route(game.state()); loop.start();              // S9a 나가기는 일시정지(loop.stop) 상태에서 온다
+}
+function showResult() { dialogs.closeAll(); result.show({ ...game.summary(), content }); route(game.state()); }
+let lastOpt = {};
+const cb = {
+  onStart(mode, o = {}) {                         // o = {day?, seed?, friendCm?}
+    lastOpt = o; dialogs.closeAll();
+    const p = pickSet(mode, o);                   // official 다운그레이드·random 시드(C v4 pickSet)
+    game.start(p.mode, p.set, { friendCm: o.friendCm ?? null });
+    route(game.state());                          // #game을 바로 보여 준다(뒤따르는 S2→S7 토스트가 #game에 붙도록)
+  },
+  onResume() { game.resume(); },                  // v5 resume이 loop.start()로 last·acc를 다시 잡는다
+  onLeave() { game.leave(); showLobby(); },
+  onShare() { return result.share(); },
+  onRetry() {                                     // 같은 모드·같은 날짜(랜덤은 같은 시드)·같은 친구 기록
+    const s = game.summary(), o = { day: s.set.day, friendCm: lastOpt.friendCm ?? null };
+    if (s.mode === 'random') o.seed = s.set.seed;
+    cb.onStart(s.mode, o);
+  },
+  onSetting(field, v) { game.setting(field, v); },
+};
 
 // defer 순서상 이미 결정됐지만, rAF로 window.Matter를 최대 ms 동안 폴링한다
 function waitMatter(ms) {
@@ -109,7 +120,7 @@ function onVisibility() {
 
 async function boot() {
   install({ game, loop });
-  paintBoot();
+  lobby.showBoot();
   route('boot');
   loadTheme();
   game.init(stageCanvas(), { loop, markAim: input.markAim });
@@ -117,7 +128,7 @@ async function boot() {
   const [ok, c] = await Promise.all([waitMatter(5000), contentMod.load()]);
   content = c;
   if (!ok) {
-    paintError();
+    lobby.showError();
     game.setScreen('error');
     route('error');
     return;
@@ -128,11 +139,18 @@ async function boot() {
   });
   keys.init({ getEnv: () => ({ state: game.state(), dialog: game.dialogTop() }), onAction: game.onAction });
   document.addEventListener('visibilitychange', onVisibility);
-  game.setScreen('lobby');
-  route('lobby');
-  game.hook('lobby');
-  loop.start();
+  showLobby();
 }
 
+lobby.mount(cb); dialogs.mount(cb); result.mount(cb);
+game.setHooks({
+  today: () => lobby.activateToday(performance.now()),
+  share: () => result.share(), retry: () => cb.onRetry(),
+  closeTop: dialogs.closeTop,
+  dialogTop: () => (dialogs.topId() === 'dlg-pause' ? 'S9' : dialogs.topId()),
+  pause: info => dialogs.openPause(info), resume: () => dialogs.closePause(),
+  result: () => showResult(), lobby: () => { if (game.state() === 'lobby') lobby.show(content); },
+  shareText: result.shareText, forceShare: result.forceShare,
+});
 addEventListener('resize', onResize);
 boot();

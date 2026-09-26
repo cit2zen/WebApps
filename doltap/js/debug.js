@@ -173,6 +173,9 @@ export function install({ game = null, loop = null } = {}) {
     resume: () => stageRefs.game.resume(),
     audio: () => stageRefs.game.audioState(),
     mute: b => stageRefs.game.setMute(!!b),
+    // 6단계(v6): result.js 값은 main이 game.setHooks로 넣은 훅을 거친다(debug는 result를 import하지 않는다, §6)
+    shareText: () => stageRefs.game.hook('shareText') ?? '',
+    forceShare: m => stageRefs.game.hook('forceShare', m) ?? null,
   };
   Object.defineProperty(window, '__doltap', {
     value: Object.freeze(api), writable: false, configurable: false, enumerable: false,

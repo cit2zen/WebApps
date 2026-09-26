@@ -13,14 +13,14 @@ import * as hud from './hud.js';
 import * as audio from './audio.js';
 import { wire } from './wire.js';
 import { hookDrop, view } from './gametest.js';
-export { view, layout, height, seed, stats, aimTo, dropNow, skipNow, aimInfo, lastDropRaw } from './gametest.js';
+export { view, layout, height, seed, stats, aimTo, dropNow, skipNow, aimInfo, lastDropRaw, summary, setting } from './gametest.js';
 
 const PLAY = ['aim', 'drop', 'settle', 'hold'];
 const DROP_GUARD = 150, SKIP_MS = 400;
 let screen = 'boot', W = null, R = null, set = null, mode = null, L = null, cam = null;
 let H = 0, maxH = 0, skyCm = 0, t = 0, final = false, texSeed = null;
 let guides = [], unstable = new Set(), prev = new Map(), ray = null, rayKey = '';
-let paused = false, opts = {}, hooks = {}, aimT = -Infinity, tapT = -Infinity;
+let paused = false, opts = {}, hooks = {}, aimT = -Infinity, tapT = -Infinity, commit = null;   // commit = 공식 판 commitResult 반환값(v6)
 let loop = { start() {}, stop() {}, active: () => false }, markAim = () => {};
 const stepMs = [], dts = [];
 const push = (a, v) => { a.push(v); if (a.length > 60) a.shift(); };
@@ -46,7 +46,7 @@ export const hudEl = name => hud.el(name);
 export const cancelHint = on => hud.cancelHint(on);
 export const audioState = () => audio.state();
 // gametest.js 전용 접근자(원시값은 호출 시점 값)
-export const run = () => ({ R, W, set, L, cam, mode, H, stepMs, dts });
+export const run = () => ({ R, W, set, L, cam, mode, H, stepMs, dts, opts, commit });
 
 // 판 정리. 일시정지 중이던 판을 떠나면 멈춘 루프를 다시 돌려 main의 라우팅이 이어지게 한다
 function teardown() { if (W) W.destroy(); W = R = set = null; if (paused) { paused = false; loop.start(); } }
@@ -89,7 +89,7 @@ function onAim() { aimT = performance.now(); tapT = -Infinity; hud.skipArm(null)
 function onDone() {
   screen = 'result';
   const res = R.result();
-  if (mode === 'official') storage.commitResult(set.day, res);
+  commit = mode === 'official' ? storage.commitResult(set.day, res) : null;
   hook('result', { res, mode, day: set.day, set });
 }
 
@@ -99,7 +99,7 @@ export function start(m, s, o = {}) {
   teardown();
   if (texSeed !== s.seed) { clearTextures(); texSeed = s.seed; }   // 질감 캐시 키 = seed:i → 세트가 바뀌면 비운다
   const st = storage.load(), friend = Number.isFinite(o.friendCm) ? o.friendCm : null;
-  mode = m; set = s; opts = o;
+  mode = m; set = s; opts = o; commit = null;
   W = createWorld(); hookDrop(W);
   R = createRun(s, { mode: m, W });
   H = 0; maxH = 0; skyCm = 0; t = 0; final = false;
@@ -162,12 +162,19 @@ export function frame(dt, now) {
 }
 
 // 일시정지 = loop.stop()(마지막 프레임 유지), 재개 = loop.start()(last=now·acc=0), 가로에서는 재개 거부
-export function pause() { if (running()) { paused = true; loop.stop(); hook('pause'); } return state(); }
+export function pause() {
+  if (!running()) return state();
+  const v = R.view(); paused = true; loop.stop();      // placed = 놓은 돌(건너뛴 1개 제외) · needConfirm = 공식 판 첫 낙하 뒤
+  hook('pause', { H: v.H, placed: v.slot - 1 - (v.skipUsed ? 1 : 0), needConfirm: mode === 'official' && !!R.lastDrop() });
+  return state();
+}
 export function resume() {
   if (paused && !(L && L.landscape)) { paused = false; audio.resume(); hook('resume'); loop.start(); }
   return state();
 }
 export function onHidden() { pause(); audio.suspend(); }       // visible에서 자동 재개 없음
+// ── 6단계: S9a 나가기·결과 로비 = 판 폐기(저장 없음, tries 유지). S5/🔊/M 설정(setting)·S10 요약(summary)은 gametest.js ──
+export const leave = () => setScreen('lobby');
 export function setMute(b) { const r = audio.mute(b); storage.set('sound', !b); return r; }
 
 function skipTap(at) {                                  // 400ms 안 2탭 → core skip, 아니면 금색 확인

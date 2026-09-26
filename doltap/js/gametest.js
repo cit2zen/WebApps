@@ -1,8 +1,11 @@
-// gametest.js — game.js 200줄 분할(레지스트리 E-1 승인): __doltap 훅 지원 + input 조준 정보.
+// gametest.js — game.js 200줄 분할(레지스트리 E-1 승인): __doltap 훅 지원 + input 조준 정보 + S10 요약·설정 적용(summary·setting, v6).
 // game.js만 import하고 game.js가 그대로 re-export한다(외부 API는 game.*). 상태는 game.run() 접근자로만 읽는다
 import { run, state, dispatch } from './game.js';
 import * as scene from './scene.js';
 import * as fx from './fx.js';
+import * as storage from './storage.js';
+import * as audio from './audio.js';
+import * as hud from './hud.js';
 
 let last = null;
 const sum = a => a.reduce((x, y) => x + y, 0);
@@ -68,4 +71,20 @@ export function skipNow() {
 export function aimInfo() {
   const { R, L } = run(), on = state() === 'aim';
   return { on, x: on ? R.view().aim.x : 195, k: L ? L.k : 1, ox: L ? L.ox : 0 };
+}
+
+// ── 6단계: S10 요약(main showResult·onRetry가 'result' 상태에서 부른다). commit·opts는 game의 onDone·start가 보관한 값(E19) ──
+// run = R.result()(기록된 판: left는 결과 기준, view().left처럼 낙하 중인 돌을 세지 않는다)
+export function summary() {
+  const { R, set, mode, opts, commit } = run(), res = R.result();
+  const rec = storage.load().days[set.day] || { tries: 0, best: null }, fc = opts.friendCm ?? null;
+  return { run: res, set, mode, tries: rec.tries || 0, streak: storage.displayStreak(),
+    best: mode === 'official' ? rec.best : null, newBest: !!(commit && commit.newBest),
+    beatFriend: fc != null && res.c > Math.round(fc * 10), bodies: R.view().bodies };
+}
+// S5·🔊 설정 저장 + 즉시 적용(game.js 200줄 예산 → 여기, game.setting으로 re-export)
+export function setting(field, v) {
+  storage.set(field, v);
+  if (field === 'sound') audio.mute(!v); else if (field === 'hand') hud.setHand(v);
+  return v;
 }

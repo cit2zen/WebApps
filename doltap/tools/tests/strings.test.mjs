@@ -28,7 +28,7 @@ const VARS = { n: 1, m: 10, d: 1, k: 2, H: '148.5', dd: 5, F: '148.5', t: 3, h: 
   s: 1, best: '148.5', trail: '달빛암 앞 돌길', md: '10월 1일', placed: 12, grade: '산길 초입', r: 1 };
 
 test('최상위 네임스페이스', () => {
-  assert.deepEqual(Object.keys(S).sort(), ['boot', 'error', 'grade', 'help', 'helpKeys', 'hud', 'lobby', 'pause',
+  assert.deepEqual(Object.keys(S).sort(), ['boot', 'error', 'grade', 'help', 'helpKeys', 'helpNav', 'hud', 'lobby', 'pause',
     'record', 'result', 'settings', 'share', 'toast', 'version'].sort());
   assert.equal(S.version, 1);
 });

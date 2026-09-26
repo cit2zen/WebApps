@@ -139,3 +139,10 @@ export function cancelHint(on) {
 export function poll(now) {
   if (armT != null && now - armT >= SKIP_MS) skipArm(null);
 }
+
+// S5 손잡이 즉시 적용(+T6). 5단계 DOM 계약의 #hud에 T4a 훅 .hand-l을 토글한다(다음 판은 hud.reset({hand})가 같은 일을 한다)
+export function setHand(v) {
+  const root = document.getElementById('hud');
+  if (root) root.classList.toggle('hand-l', v === 'L');
+  return v;
+}

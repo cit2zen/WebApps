@@ -44,6 +44,7 @@ export default {
   error: { load: "돌을 불러오지 못했어요", retry: "다시 시도", hint: "인터넷 연결을 확인하고 다시 시도해 주세요" },
   help: ["끌어서 맞추고, 떼면 쿵", "↺↻ 15°씩 돌려 평평한 면을 아래로 · 건너뛰기는 두 번 탭(한 판 1회)", "촛불 3개 · 3초 버티면 높이가 기록"],
   helpKeys: "←→ 이동 · ↑/X·Z 회전 · Space 낙하",
+  helpNav: { prev: "이전", next: "다음" },
   grade: ["돌 하나 얹었다", "산길 초입", "암자 앞 돌탑", "큰스님도 끄덕", "산신령도 놀람"],
   share: { head: "돌탑 #{n} 🪨 {H}cm ({left}/24)", headPractice: "돌탑 연습 🪨 {H}cm ({left}/24)",
     streak: "🔥연속 {s}일 · 도전 {k}/3" }
