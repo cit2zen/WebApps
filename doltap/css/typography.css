@@ -1,0 +1,91 @@
+/* SOURCE OF TRUTH: develop_web/design-system/ — 직접 수정 금지, develop_web/scripts/sync_design.py로 동기 */
+/* Requires design-tokens.css (+ 폰트 링크는 design-tokens.css 머리말 참조) */
+
+.t-display,
+.t-title,
+.t-caption,
+.t-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-synthesis: none; /* 한글은 가짜 기울임 없이 Noto Serif KR upright */
+}
+
+.t-display {
+  font-weight: 300;
+  font-size: var(--fs-display);
+  color: var(--ink-warm);
+  line-height: 1.05;
+}
+
+.t-title {
+  font-weight: 300;
+  font-size: var(--fs-title);
+  color: var(--ink-warm);
+  line-height: 1.15;
+}
+
+.t-lead {
+  font-family: var(--font-body);
+  font-size: var(--fs-lead);
+  color: var(--ink-mid);
+  line-height: 1.7;
+}
+
+.t-body {
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  color: var(--ink-mid);
+  line-height: 1.7;
+}
+
+.t-small {
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+
+.t-caption {
+  font-weight: 300;
+  font-size: var(--fs-sm);
+  color: var(--ink-muted);
+  letter-spacing: 0.01em;
+}
+
+.t-num {
+  font-weight: 300;
+  font-size: var(--fs-lg);
+  color: var(--gold-text);
+}
+
+/* 한글 라벨 — Noto Sans KR, 대문자·넓은 자간 없음 */
+.t-label {
+  font-family: var(--font-label);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--ink-muted);
+  letter-spacing: 0.03em;
+}
+/* 라틴·숫자 전용 라벨 (예: "© 2026 CITYZEN", "01") */
+.t-label.is-mono,
+.t-mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+}
+.t-label.is-mono { text-transform: uppercase; font-weight: 400; }
+
+.t-hand {
+  font-family: var(--font-hand);
+  font-size: var(--fs-xl);
+  color: var(--ink-mid);
+  line-height: 1.2;
+}
+
+.link-gold {
+  color: var(--gold-text);
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+.link-gold:hover { color: var(--ink-warm); text-decoration-color: var(--gold-mid); }

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>돌탑</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪨</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,100..400&family=Space+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/design-tokens.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/polaroid.css">
+  <style>
+    body { margin: 0; min-height: 100vh; background: var(--bg-base); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; }
+    .lobby-actions { display: flex; gap: 1rem; }
+    .btn-start { font-family: var(--font-display); font-style: italic; font-size: 1.1rem; color: var(--ink-warm); background: var(--bg-card); border: 1px solid var(--gold-mid); padding: 0.7rem 2.2rem; cursor: pointer; box-shadow: var(--shadow-card); }
+    .btn-start:hover { box-shadow: var(--shadow-lift); }
+  </style>
+</head>
+<body>
+  <h1 class="t-display">돌탑</h1>
+  <p class="t-caption">오늘의 돌 24개, 무너지지 않게 높이 쌓기</p>
+
+  <div class="pol-group" id="intro-cards">
+    <div class="pol-card"><div class="pol-photo"></div><div class="pol-caption">오늘의 돌</div></div>
+    <div class="pol-card"><div class="pol-photo"></div><div class="pol-caption">끌고 · 돌리고 · 놓기</div></div>
+    <div class="pol-card"><div class="pol-photo"></div><div class="pol-caption">높이 공유</div></div>
+  </div>
+
+  <div class="lobby-actions">
+    <button class="btn-start" id="start">시작하기</button>
+  </div>
+
+  <script>
+    document.getElementById('intro-cards').addEventListener('click', e => e.currentTarget.classList.toggle('open'));
+    document.getElementById('start').addEventListener('click', () => {
+      // TODO: 앱 진입점
+      console.log('start: doltap');
+    });
+  </script>
+</body>
+</html>
