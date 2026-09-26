@@ -1,6 +1,6 @@
 // texture.js — 돌 질감 오프스크린 캐시(§5 에셋 표, §6 분할 예비안: render.js에서 분리)
 import { mulberry32 } from './rng.js';
-import { col, shade, cacheSize } from './theme.js';
+import { col, shade, cacheSize, hexRgb } from './theme.js';
 
 export const TONE = {
   'stone-gray-l': '--doltap-stone-gray', 'stone-gray-d': '--doltap-stone-gray-dk',
@@ -78,7 +78,7 @@ export function texture(seed, s, cs) {
   g.fillStyle = col('--doltap-moss');
   for (const m of moss) disc(g, m.x, m.y, m.r);
   edges(g, V, n => n > 0.3, shade(base, 14), 2 / cs);        // 윗가장자리 1px 하이라이트(클립으로 절반)
-  edges(g, V, n => n < -0.3, 'rgba(26,16,5,0.28)', 6 / cs);  // 아래 그림자 3px
+  edges(g, V, n => n < -0.3, `rgba(${hexRgb(col('--ink-warm'))}, 0.28)`, 6 / cs);  // 아래 그림자 3px(--ink-warm α.28)
   g.restore();
   g.strokeStyle = col('--ink-warm');
   g.lineWidth = 1.2;
