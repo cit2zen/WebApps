@@ -60,13 +60,13 @@ def serve(port):
 
 
 @contextlib.contextmanager
-def page_session(port=8790, viewport=(390, 844), path="/doltap/", query=""):
+def page_session(port=8790, viewport=(390, 844), path="/doltap/", query="", has_touch=False):
     if query and not query.startswith("?"):
         query = "?" + query
     with serve(port), sync_playwright() as pw:
         browser = pw.chromium.launch()
         try:
-            page = browser.new_page(viewport={"width": viewport[0], "height": viewport[1]})
+            page = browser.new_page(viewport={"width": viewport[0], "height": viewport[1]}, has_touch=has_touch)
             errors = []
             page.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
             page.on("pageerror", lambda e: errors.append(str(e)))

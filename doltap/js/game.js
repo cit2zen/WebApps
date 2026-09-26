@@ -1,41 +1,68 @@
-// game.js — 앱 컨트롤러 4단계 최소판: start·step·frame + fx·flags·카메라 배선 (hud·audio·input·저장은 5단계)
+// game.js — 앱 컨트롤러: start·step·frame + fx·flags·카메라 + 일시정지·onAction 번역·결과 저장·훅 (§6 game.js)
+// core 이벤트 구독(R.on)은 wire.js 한곳, 테스트 훅 지원(view·layout·height·seed·stats·aimTo·dropNow·…)은 gametest.js
 import { createWorld } from './physics.js';
 import { createRun } from './core.js';
 import { todayKST } from './daily.js';
-import { load } from './storage.js';
+import * as storage from './storage.js';
 import { clearTextures } from './render.js';
 import * as camera from './camera.js';
 import * as scene from './scene.js';
 import * as flags from './flags.js';
 import * as fx from './fx.js';
+import * as hud from './hud.js';
+import * as audio from './audio.js';
+import { wire } from './wire.js';
+import { hookDrop, view } from './gametest.js';
+export { view, layout, height, seed, stats, aimTo, dropNow, skipNow, aimInfo, lastDropRaw } from './gametest.js';
 
 const PLAY = ['aim', 'drop', 'settle', 'hold'];
+const DROP_GUARD = 150, SKIP_MS = 400;
 let screen = 'boot', W = null, R = null, set = null, mode = null, L = null, cam = null;
-let H = 0, maxH = 0, skyCm = 0, t = 0, final = false;
+let H = 0, maxH = 0, skyCm = 0, t = 0, final = false, texSeed = null;
 let guides = [], unstable = new Set(), prev = new Map(), ray = null, rayKey = '';
+let paused = false, opts = {}, hooks = {}, aimT = -Infinity, tapT = -Infinity;
+let loop = { start() {}, stop() {}, active: () => false }, markAim = () => {};
 const stepMs = [], dts = [];
 const push = (a, v) => { a.push(v); if (a.length > 60) a.shift(); };
-const sum = a => a.reduce((x, y) => x + y, 0);
 
-export function init(canvas) { scene.attach(canvas); }
+export function init(canvas, o = {}) {                  // o = {loop, markAim}: main 부트에서 1회
+  scene.attach(canvas);
+  if (o.loop) loop = o.loop;
+  if (o.markAim) markAim = o.markAim;
+  hud.mount({ onAction }); audio.mute(!storage.load().sound); audio.armUnlock(document);
+}
 // main의 resize·부트에서 호출: camera.layout(§4 식) 재계산 → 카메라에 새 L 전달 + canvas backing 재설정
 export function resize(w, h, safeTop) {
   L = camera.layout(w, h, safeTop);
   if (cam) cam.setLayout(L); else cam = camera.createCamera(L);
   scene.resize(w, h);
+  hud.portrait(L.landscape && screen === 'play');      // 가로 화면 오버레이 + 일시정지
+  if (L.landscape) pause();
 }
-export function setScreen(s) { screen = s; }
+export const setHooks = h => { hooks = { ...hooks, ...h }; };
+export const hook = (name, ...a) => (hooks[name] ? hooks[name](...a) : undefined);
+export const dialogTop = () => hook('dialogTop') || null;
+export const hudEl = name => hud.el(name);
+export const cancelHint = on => hud.cancelHint(on);
+export const audioState = () => audio.state();
+// gametest.js 전용 접근자(원시값은 호출 시점 값)
+export const run = () => ({ R, W, set, L, cam, mode, H, stepMs, dts });
+
+// 판 정리. 일시정지 중이던 판을 떠나면 멈춘 루프를 다시 돌려 main의 라우팅이 이어지게 한다
+function teardown() { if (W) W.destroy(); W = R = set = null; if (paused) { paused = false; loop.start(); } }
+export function setScreen(s) { if (s !== 'result') teardown(); screen = s; }
 const coreState = () => (R ? R.view().state : null);
 export function state() {
   if (screen !== 'play') return screen;
+  if (paused) return 'paused';
   const s = coreState();
   return s === 'done' ? 'result' : s;
 }
-export const running = () => screen === 'play' && PLAY.includes(coreState());
+export const running = () => screen === 'play' && !paused && PLAY.includes(coreState());
 
 // friendCm: 유한한 양수만 깃발이 된다(flags가 toFixed를 부른다)
 function guidesFor(s, friendCm) {
-  const S = load(), g = [];
+  const S = storage.load(), g = [];
   if (S.bestEver > 0) g.push({ kind: 'best', cm: S.bestEver });
   const d = s.day === todayKST() && S.days && S.days[s.day];
   if (d && d.best && d.best.H > 0) g.push({ kind: 'today', cm: d.best.H });
@@ -50,36 +77,42 @@ function burstAt(kind, slot) {
   fx.burst(kind, b.x, kind === 'dust' ? b.y - s.r * s.s : b.y + s.r * s.s * 0.5);
 }
 
-// core 이벤트 구독은 여기 한곳뿐. 5단계(T5b)가 이 블록을 통째로 wire.js로 옮긴다(레지스트리 E-1)
-function subscribe(run) {
-  run.on('height', e => {
-    H = e.H;
-    cam.setHeight(e.Y);                                   // 목표 camOff = camTarget(L, Y) (§3)
-    for (const c of flags.crossed(maxH, H)) flags.popup(c, performance.now());
-    maxH = Math.max(maxH, H);
-  });
-  run.on('land', p => burstAt('dust', p.slot));
-  run.on('perfect', p => burstAt('gold', p.slot));
-  run.on('done', () => { screen = 'result'; });
+function onHeight(e) {                                  // v4 subscribe()의 height 본문(구독은 wire.js)
+  H = e.H;
+  cam.setHeight(e.Y);                                   // 목표 camOff = camTarget(L, Y) (§3)
+  for (const c of flags.crossed(maxH, H)) flags.popup(c, performance.now());
+  maxH = Math.max(maxH, H);
+}
+// aim 진입(core 이벤트·start 직후): 낙하 가드 기준 시각·건너뛰기 확인 해제·input.markAim
+function onAim() { aimT = performance.now(); tapT = -Infinity; hud.skipArm(null); markAim(aimT); }
+// core done 1회: 결과 화면 상태 → 공식 판이면 저장 → 훅 result(6단계). 화면 전환은 main의 route
+function onDone() {
+  screen = 'result';
+  const res = R.result();
+  if (mode === 'official') storage.commitResult(set.day, res);
+  hook('result', { res, mode, day: set.day, set });
 }
 
-// m = 'official'|'practice'|'random', s = DailySet(호출자 = debug.pickSet), opts.friendCm = 친구 기록(cm)
+// m = 'official'|'practice'|'random', s = DailySet(호출자 = debug.pickSet), o.friendCm = 친구 기록(cm)
 // 판마다 새 월드(onFirstContact 구독은 해제 불가 → 월드를 재사용하지 않는다)
-export function start(m, s, opts = {}) {
-  if (W) W.destroy();
-  if (!set || set.seed !== s.seed) clearTextures();      // 질감 캐시 키 = seed:i → 세트가 바뀌면 비운다
-  mode = m; set = s;
-  W = createWorld();
+export function start(m, s, o = {}) {
+  teardown();
+  if (texSeed !== s.seed) { clearTextures(); texSeed = s.seed; }   // 질감 캐시 키 = seed:i → 세트가 바뀌면 비운다
+  const st = storage.load(), friend = Number.isFinite(o.friendCm) ? o.friendCm : null;
+  mode = m; set = s; opts = o;
+  W = createWorld(); hookDrop(W);
   R = createRun(s, { mode: m, W });
   H = 0; maxH = 0; skyCm = 0; t = 0; final = false;
   unstable = new Set(); prev = new Map(); ray = null; rayKey = '';
-  fx.clear();
-  flags.reset();
-  guides = guidesFor(s, opts.friendCm ?? null);
-  cam.setHeight(0);
-  cam.snap();
-  subscribe(R);
+  fx.clear(); flags.reset();
+  guides = guidesFor(s, friend);
+  cam.setHeight(0); cam.snap();
+  wire(R, { set: s, mode: m, day: s.day, vibe: st.vibe, onAim, onHeight, burst: burstAt, onDone });
+  hud.reset({ hand: st.hand, ghost: !st.tutDone, friend, best: st.bestEver || 0 });
+  hud.preview(s.stones.slice(1, 3));
   screen = 'play';
+  onAim();                                              // core의 첫 aim은 첫 step/dispatch 때 emit → 여기서 먼저 보장
+  audio.resume(); loop.start();
   return s;
 }
 
@@ -97,10 +130,7 @@ export function step() {
   prev = next; unstable = un;
 }
 
-export function dispatch(a) {
-  if (R) R.dispatch(a);
-  return view();
-}
+export function dispatch(a) { if (R) R.dispatch(a); return view(); }
 
 function updateRay(v) {
   const s = set.stones[v.slot - 1];
@@ -114,9 +144,10 @@ function updateRay(v) {
 // 투영 P: ox·base·w·h는 camera.layout 결과 L, camOff는 camera.js의 cam.camOff
 const proj = () => ({ k: L.k, ox: L.ox, base: L.rockScreenY, camOff: cam.camOff, Hv: L.Hv, w: L.w, h: L.h });
 
-// 매 rAF: fps 표본 → (play 또는 result 전환 1프레임만) 카메라·하늘·파티클 갱신 후 scene.draw
+// 매 rAF(+ dt=0 재그리기: resize·debug step): hud.poll → (play 또는 result 전환 1프레임만) 카메라·하늘·파티클 후 scene.draw
 export function frame(dt, now) {
   if (dt > 0) push(dts, dt);
+  hud.poll(now);
   if (!R || !L) return;
   if (screen !== 'play' && !(screen === 'result' && !final)) return;
   if (screen === 'result') final = true;
@@ -129,21 +160,32 @@ export function frame(dt, now) {
   scene.draw({ Q: proj(), seed: set.seed, set, view: v, skyCm, t, now, unstable, ray, maxH, guides });
 }
 
-export function view() {
-  if (!R) return { state: state() };
-  return { ...R.view(), state: state(), mode, day: set.day, n: set.n, seed: set.seed, camOff: cam.camOff };
+// 일시정지 = loop.stop()(마지막 프레임 유지), 재개 = loop.start()(last=now·acc=0), 가로에서는 재개 거부
+export function pause() { if (running()) { paused = true; loop.stop(); hook('pause'); } return state(); }
+export function resume() {
+  if (paused && !(L && L.landscape)) { paused = false; audio.resume(); hook('resume'); loop.start(); }
+  return state();
 }
-export const layout = () =>
-  (L ? { k: L.k, Hv: L.Hv, R: L.R, S: L.S, camOff: cam.camOff, rockScreenY: L.rockScreenY, landscape: L.landscape } : null);
-export const height = () => H;
-export const seed = () => (set ? set.seed : 0);
-export function stats() {
-  const T = sum(dts);
-  return {
-    fps: T > 0 ? dts.length / T : 0,
-    stepMs: stepMs.length ? sum(stepMs) / stepMs.length : 0,
-    drawMs: scene.drawMs(),
-    particles: fx.count(),
-    caches: scene.caches(),
-    bodies: W ? W.stones().length + 1 : 0};
+export function onHidden() { pause(); audio.suspend(); }       // visible에서 자동 재개 없음
+export function setMute(b) { const r = audio.mute(b); storage.set('sound', !b); return r; }
+
+function skipTap(at) {                                  // 400ms 안 2탭 → core skip, 아니면 금색 확인
+  if (!R || paused || R.view().state !== 'aim' || R.view().skipUsed) return;
+  if (at - tapT < SKIP_MS) { tapT = -Infinity; hud.skipArm(null); dispatch({ t: 'skip' }); }
+  else { tapT = at; hud.skipArm(at); }
+}
+const live = a => { if (R && screen === 'play' && !paused) dispatch(a); };
+
+// keys·input·hud 액션 번역(§6 규칙 4). core에는 core 액션만, drop은 aim 진입 150ms 안이면 버린다(키·포인터 공통, 규칙 8)
+export function onAction(a) {
+  switch (a.t) {
+    case 'pause': return pause();
+    case 'resume': return resume();
+    case 'mute': return setMute(!audio.isMuted());
+    case 'skipTap': return skipTap(a.at ?? performance.now());
+    case 'closeTop': case 'today': case 'share': case 'retry': return hook(a.t);
+    case 'drop': return performance.now() - aimT < DROP_GUARD ? undefined : live(a);
+    case 'move': case 'setX': case 'rot': case 'cancel': return live(a);
+    default: return undefined;
+  }
 }

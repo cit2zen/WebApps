@@ -1,7 +1,7 @@
 // js/debug.js — window.__doltap 테스트 훅. 상시 설치, Object.defineProperty로 동결 객체(§6 테스트 훅)
 // 단계마다 API를 늘린다(§10 3단계 표). 1단계: daily·gen·hashDay·hashRange·setToday / 2단계: store·wipe·tut·contentFallback
 import { daily, todayKST, setToday, addDays, nOf } from './daily.js';
-import { generate } from './stones.js';
+import { generate, rotCW, centroid } from './stones.js';
 import { hashDay, hashRange } from './debug_hash.js';
 import * as storage from './storage.js';
 import * as content from './content.js';
@@ -112,6 +112,26 @@ function liveStats() {
 }
 // ── 4단계 끝 ───────────────────────────────────────────────────────────────
 
+// ── 5단계: lastDrop·speed (§10 3단계 표 5단계분). game·loop 참조는 B의 stageRefs ──────────
+const SPEEDS = [1, 2, 4, 8];
+
+// lastDrop(): 미리보기 점 rotCW(v − centroid, aDeg/15) + (x, spawnY)마다 body 점(y 반전)까지
+// 최근접 거리의 최댓값(§6). raw = game.lastDropRaw() = {stone, x, spawnY, aDeg, cx, verts}
+function lastDropOf(raw) {
+  if (!raw) return null;
+  const k = ((Math.round(raw.aDeg / 15) % 24) + 24) % 24;
+  const [cx, cy] = centroid(raw.stone.verts);
+  let err = 0;
+  for (const v of raw.stone.verts) {
+    const [px, py] = rotCW([v[0] - cx, v[1] - cy], k);
+    let m = Infinity;
+    for (const q of raw.verts) m = Math.min(m, Math.hypot(px + raw.x - q[0], py + raw.spawnY - q[1]));
+    err = Math.max(err, m);
+  }
+  return { aDeg: raw.aDeg, x: raw.x, cx: raw.cx, maxVertErr: err };
+}
+// ── 5단계 끝 ───────────────────────────────────────────────────────────────
+
 export function install({ game = null, loop = null } = {}) {
   stageRefs = { game, loop };
   const api = {
@@ -120,7 +140,7 @@ export function install({ game = null, loop = null } = {}) {
     gen: seed => generate(seed >>> 0, todayKST(), 0),
     hashDay: day => hashDay(day),
     hashRange: (from, days) => hashRange(from, days),
-    setToday: day => setToday(day ?? null),
+    setToday: day => { const t = setToday(day ?? null); if (stageRefs.game) stageRefs.game.hook('lobby'); return t; },
     // 2단계
     store: () => JSON.parse(JSON.stringify(storage.load())),
     wipe: () => storage.wipe(),
@@ -143,6 +163,16 @@ export function install({ game = null, loop = null } = {}) {
     height: () => stageRefs.game.height(),
     seed: () => stageRefs.game.seed(),
     dispatch: a => stageRefs.game.dispatch(a),
+    // 5단계
+    aim: (x, aDeg) => stageRefs.game.aimTo(x, aDeg),
+    drop: () => stageRefs.game.dropNow(),
+    skip: () => stageRefs.game.skipNow(),
+    lastDrop: () => lastDropOf(stageRefs.game.lastDropRaw()),
+    speed: m => { if (SPEEDS.includes(m)) stageRefs.loop.setSpeed(m); return stageRefs.loop.getSpeed(); },
+    pause: () => stageRefs.game.pause(),
+    resume: () => stageRefs.game.resume(),
+    audio: () => stageRefs.game.audioState(),
+    mute: b => stageRefs.game.setMute(!!b),
   };
   Object.defineProperty(window, '__doltap', {
     value: Object.freeze(api), writable: false, configurable: false, enumerable: false,

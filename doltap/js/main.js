@@ -1,5 +1,8 @@
-// main.js — 완성 1차: boot(Matter 5000ms 폴링 + content Promise.all → S1) → 화면 라우팅, rAF 고정 스텝 루프, resize 재그리기
+// main.js — 완성 2차: boot(Matter 5000ms 폴링 + content Promise.all → S1) → 화면 라우팅, rAF 고정 스텝 루프(start/stop),
+// resize 재그리기, 입력(input·keys)·visibilitychange 배선
 import * as game from './game.js';
+import * as input from './input.js';
+import * as keys from './keys.js';
 import { install } from './debug.js';
 import { loadTheme, safeTop } from './theme.js';
 import * as contentMod from './content.js';
@@ -8,9 +11,20 @@ import strings from './strings.js';
 
 // STEP=1000/60, MAX=4 (§2 규칙 4), speed = main 지역 배율(기본 1). debug는 loop.setSpeed(m)로만 바꾼다
 const STEP = 1000 / 60, MAX = 4;
-let last = performance.now(), acc = 0, raf = 0, speed = 1, shown = '';
+let last = performance.now(), acc = 0, raf = 0, speed = 1, shown = '', on = false;
 let content = null;   // contentMod.load() 결과 {wishes, trails}: 6단계 lobby·result가 pick(content, set)으로 쓴다
-const loop = { setSpeed(m) { speed = m; }, getSpeed() { return speed; } };
+// stop/start = game의 일시정지·재개(cancelAnimationFrame 뒤 마지막 프레임 유지 / last=now·acc=0 뒤 rAF)
+const loop = {
+  setSpeed(m) { speed = m; },
+  getSpeed() { return speed; },
+  start() {
+    if (on) return;
+    on = true; last = performance.now(); acc = 0;
+    raf = requestAnimationFrame(frame);
+  },
+  stop() { on = false; cancelAnimationFrame(raf); raf = 0; },
+  active() { return on; },
+};
 const ROOTS = ['boot', 'error', 'lobby', 'game', 'result'];
 const ROOT_OF = { boot: 'boot', error: 'error', lobby: 'lobby', result: 'result' };   // 나머지(aim…paused) = game
 
@@ -18,12 +32,13 @@ function frame(now) {
   const dt = Math.min((now - last) / 1000, 0.25); last = now;
   if (game.running()) {                       // aim·drop·settle·hold 에서만
     acc += dt * 1000 * speed; let n = 0;
-    while (acc >= STEP && n < MAX * speed) { game.step(); acc -= STEP; n++; }
+    while (acc >= STEP && n < MAX * speed && game.running()) { game.step(); acc -= STEP; n++; }
     if (acc >= STEP) acc = 0;                 // 4스텝 초과 잔여분 폐기 → 슬로모션, 시간 도약 없음
   }
-  game.frame(dt, now);                        // 카메라·하늘·fx.update(dt)·scene.draw()
+  input.poll(now); keys.poll(dt);             // 회전 홀드 반복(350ms 후 150ms), 좌우 키 가속
+  game.frame(dt, now);                        // hud.poll·카메라·하늘·fx.update(dt)·scene.draw()
   route(game.state());
-  raf = requestAnimationFrame(frame);
+  if (on) raf = requestAnimationFrame(frame);
 }
 
 // 화면 루트 1개만 보인다(hidden 속성 = DOM 프로퍼티, CSP 무관)
@@ -83,8 +98,13 @@ function onResize() {
     rz = 0;
     loadTheme();
     game.resize(innerWidth, innerHeight, safeTop());
-    if (!raf || game.state() === 'paused') game.frame(0, performance.now());
+    if (!loop.active() || game.state() === 'paused') game.frame(0, performance.now());
   });
+}
+
+// 탭 숨김 → paused + AudioContext suspend. 다시 보여도 자동 재개하지 않는다
+function onVisibility() {
+  if (document.visibilityState === 'hidden') game.onHidden();
 }
 
 async function boot() {
@@ -92,7 +112,7 @@ async function boot() {
   paintBoot();
   route('boot');
   loadTheme();
-  game.init(stageCanvas());
+  game.init(stageCanvas(), { loop, markAim: input.markAim });
   game.resize(innerWidth, innerHeight, safeTop());
   const [ok, c] = await Promise.all([waitMatter(5000), contentMod.load()]);
   content = c;
@@ -102,10 +122,16 @@ async function boot() {
     route('error');
     return;
   }
+  input.init({
+    stage: stageCanvas(), rotCw: game.hudEl('rotCw'), rotCcw: game.hudEl('rotCcw'),
+    onAction: game.onAction, getAim: game.aimInfo, onHint: game.cancelHint,
+  });
+  keys.init({ getEnv: () => ({ state: game.state(), dialog: game.dialogTop() }), onAction: game.onAction });
+  document.addEventListener('visibilitychange', onVisibility);
   game.setScreen('lobby');
   route('lobby');
-  last = performance.now(); acc = 0;
-  raf = requestAnimationFrame(frame);
+  game.hook('lobby');
+  loop.start();
 }
 
 addEventListener('resize', onResize);
