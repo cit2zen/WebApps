@@ -54,7 +54,11 @@ html, body { margin: 0; background: var(--bg-base); }
   #lobby .pol-group { display: grid; grid-template-columns: repeat(2, auto); gap: 16px; justify-content: center; }
   #lobby .pol-group .pol-card.today { grid-column: 1 / -1; justify-self: center; }
 }
-@media (min-width: 641px) { #lobby .pol-group { min-height: 440px; } }
+@media (min-width: 641px) {
+  #lobby .pol-group { min-height: 440px; }
+  /* 200px 오늘 카드의 -5° 회전 모서리가 그룹 위로 2px 삐져나와 6px 내린다(§8 2단계 '그룹 안') */
+  #lobby .pol-group .pol-card { top: calc(40% + 6px); }
+}
 @media (max-height: 740px) {
   #lobby .pol-card.today { --pol-width: 170px; }
   #lobby .pol-card:not(.today) { --pol-width: 140px; }
