@@ -84,7 +84,7 @@ export function commitResult(day, run) {
 // 설정 4종(sound·vibe·hand·tutDone)만 허용
 export function set(field, v) {
   load();
-  if (!Object.hasOwn(SETTINGS, field) || !SETTINGS[field](v)) throw new TypeError(`storage.set: ${field}=${v}`);
+  if (!Object.prototype.hasOwnProperty.call(SETTINGS, field) || !SETTINGS[field](v)) throw new TypeError(`storage.set: ${field}=${v}`);
   S[field] = v;
   write();
   return v;
