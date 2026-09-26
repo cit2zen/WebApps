@@ -8,6 +8,7 @@ import * as content from './content.js';
 import { createWorld, reHulled } from './physics.js';
 import { createRun } from './core.js';
 import { fnv } from './rng.js';
+import * as bot from './bot.js';
 
 // 네트워크 요청 없이 실패하는 fetch 스텁(§5 폴백 경로 검증)
 const failingFetch = () => Promise.reject(new TypeError('contentFallback: fetch 스텁'));
@@ -176,6 +177,8 @@ export function install({ game = null, loop = null } = {}) {
     // 6단계(v6): result.js 값은 main이 game.setHooks로 넣은 훅을 거친다(debug는 result를 import하지 않는다, §6)
     shareText: () => stageRefs.game.hook('shareText') ?? '',
     forceShare: m => stageRefs.game.hook('forceShare', m) ?? null,
+    // 7단계
+    bot: Object.freeze({ run: day => bot.run(day), month: (from, days = 30) => bot.month(from, days) }),
   };
   Object.defineProperty(window, '__doltap', {
     value: Object.freeze(api), writable: false, configurable: false, enumerable: false,

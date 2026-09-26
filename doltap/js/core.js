@@ -2,9 +2,11 @@
 // 모든 타이머는 물리 스텝 수로 센다(§2 규칙 4).
 import { isCalm, fallen, chain, topY, isPerfect } from './judge.js';
 import { createRecord, buildResult, toH, SLOTS } from './record.js';
+import { SPAWN_GAP } from './camera.js';                // 스폰 간격 단일 출처(§3 고정 파라미터)
 
 export const T = { AIM: 600, DROP: 90, CALM: 30, FORCE: 180, HOLD: 180, TICK: 60 };
-export const X_MIN = 25, X_MAX = 365, X0 = 195, SPAWN_GAP = 180, CANDLES = 3;
+export const X_MIN = 25, X_MAX = 365, X0 = 195, CANDLES = 3;
+export { SPAWN_GAP };
 const EVENTS = ['land', 'fall', 'perfect', 'combo0', 'milestone', 'stable', 'aim',
   'skip', 'hold', 'holdTick', 'done', 'firstDrop', 'height'];
 const clampX = x => Math.min(X_MAX, Math.max(X_MIN, x));

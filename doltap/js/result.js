@@ -9,7 +9,7 @@ import { pick } from './content.js';                       // 문구 선택만(�
 import { ROCK, localOf } from './render.js';               // 규칙 5 바위 꼭짓점 · 무게중심 기준 로컬 꼭짓점
 import { toneOf } from './stones.js';                      // Stone.tone → --doltap-stone-* 토큰(정합 #1)
 
-export const GRADE_B = 200;                                // §9 Q2: bot.month 평균을 10cm 단위로 반올림해 교체(구현 7단계)
+export const GRADE_B = 60;                                // §9 Q2: bot.month 평균을 10cm 단위로 반올림해 교체(구현 7단계)
 let cb = {}, cur = null, forced = null;
 export function mount(c) { cb = c; }
 export const grade = (H, B = GRADE_B) => (H < 0.5 * B ? 0 : H < B ? 1 : H < 1.4 * B ? 2 : H < 1.8 * B ? 3 : 4);

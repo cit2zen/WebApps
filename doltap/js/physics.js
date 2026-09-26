@@ -4,7 +4,7 @@ import { centroid, hull } from './stones.js';
 
 // 너럭바위 꼭짓점(월드, y 위쪽 +) — §2 규칙 5
 export const ROCK = [[95, -6], [135, -2], [195, 0], [255, -2], [295, -6], [280, -150], [110, -150]];
-export const STONE_OPTS = { density: 0.0025, friction: 0.85, frictionStatic: 1.2, restitution: 0.02, slop: 0.03, sleepThreshold: 60 };
+export const STONE_OPTS = { density: 0.0025, friction: 0.85, frictionStatic: 1.2, restitution: 0, slop: 0.03, sleepThreshold: 60, frictionAir: 0.05 };
 const ROCK_OPTS = { isStatic: true, friction: 0.85, frictionStatic: 1.2 };
 const STEP_MS = 1000 / 60;
 

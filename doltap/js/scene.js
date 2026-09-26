@@ -5,6 +5,7 @@ import { rotCW } from './stones.js';
 import { mulberry32 } from './rng.js';
 import * as flags from './flags.js';
 import * as fx from './fx.js';
+import { SPAWN_GAP } from './camera.js';
 
 const TAU = 2 * Math.PI;
 const RIDGE = [
@@ -72,7 +73,7 @@ function background(Q, seed, skyCm) {
 function hanging(c, F) {
   const v = F.view, s = F.set.stones[v.slot - 1];
   if (!s || !v.aim) return;
-  const Q = F.Q, spawnY = v.Y + 180, [lx, ly] = lowPoint(s, v.aim.aDeg);
+  const Q = F.Q, spawnY = v.Y + SPAWN_GAP, [lx, ly] = lowPoint(s, v.aim.aDeg);
   const x0 = sx(Q, v.aim.x + lx), y0 = sy(Q, spawnY + ly);
   c.save();
   c.globalAlpha = 0.5;
