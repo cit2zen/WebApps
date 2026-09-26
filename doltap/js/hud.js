@@ -12,7 +12,8 @@ let cb = { onAction() {} }, armT = null, lit = 3;
 const btn = (id, cls, label, text) => h('button', { id, type: 'button', class: cls, 'aria-label': label }, text);
 
 // #game 안: #hud(.hud-candles·.hud-height>#height+#heightSub·.hud-preview·.hud-skip·.hud-combo·
-// .hud-bar>(.hud-zone>⏸↺↻ + .cancel-hint)) + .ghost + #count + .portrait. 표시/숨김은 hidden 속성
+// .hud-bar>(.hud-zone>⏸↺↻ + .cancel-hint)) + .ghost + #count. 표시/숨김은 hidden 속성
+// .portrait는 #game 바로 뒤 형제(body 수준): #game(fixed) 쌓임 맥락 밖이라 S9 .pol-overlay(200) 위(300)에 뜬다
 function build() {
   E.game = document.getElementById('game');
   E.hud = h('div', { id: 'hud' });
@@ -38,7 +39,8 @@ function build() {
   E.ghost = h('div', { id: 'ghost', class: 'ghost', 'aria-hidden': 'true' }, '👆');
   E.count = h('div', { id: 'count', role: 'timer' });
   E.portrait = h('div', { id: 'portrait', class: 'portrait', role: 'alert' }, S.hud.portrait);
-  E.game.append(E.hud, E.ghost, E.count, E.portrait);
+  E.game.append(E.hud, E.ghost, E.count);
+  E.game.after(E.portrait);
 }
 
 export function mount(c) {

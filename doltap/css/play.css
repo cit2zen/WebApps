@@ -71,10 +71,12 @@
   animation: doltap-ghost 1.2s ease-in-out infinite; }
 @keyframes doltap-ghost { 0%, 100% { transform: translateX(-60px); } 50% { transform: translateX(60px); } }
 @media (prefers-reduced-motion: reduce) { .ghost { animation: none; } }
+/* 가로 오버레이: #game 형제(body 수준) → S9 .pol-overlay(200) 위·토스트(400) 아래. #game이 숨으면 같이 숨는다 */
 .portrait {
-  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: auto;
-  background: var(--bg-base); font-family: var(--font-label); font-size: var(--fs-xl); color: var(--ink-warm);
+  position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; pointer-events: auto;
+  background: var(--bg-base); font-family: var(--font-label); font-size: var(--fs-xl); color: var(--ink-warm); touch-action: none;
 }
+.portrait[hidden], #game[hidden] + .portrait { display: none; }
 #game .pol-toast { bottom: auto; top: calc(env(safe-area-inset-top) + 159px); pointer-events: none; }
 /* ── 5단계(T5b) 덧붙임: 4a 훅에 없는 규칙만. hud.js는 표시/숨김을 hidden 속성으로 한다 ── */
 #game [hidden] { display: none !important; }
