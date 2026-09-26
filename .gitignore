@@ -62,3 +62,5 @@ __pycache__/
 fps-api/*.db
 .pytest_cache/
 doltap/tools/ref.json
+doltap/tools/tests/out/
+doltap/tools/tests/__pycache__/

@@ -1,12 +1,13 @@
 // js/debug.js — window.__doltap 테스트 훅. 상시 설치, Object.defineProperty로 동결 객체(§6 테스트 훅)
 // 단계마다 API를 늘린다(§10 3단계 표). 1단계: daily·gen·hashDay·hashRange·setToday / 2단계: store·wipe·tut·contentFallback
-import { daily, todayKST, setToday, addDays } from './daily.js';
+import { daily, todayKST, setToday, addDays, nOf } from './daily.js';
 import { generate } from './stones.js';
 import { hashDay, hashRange } from './debug_hash.js';
 import * as storage from './storage.js';
 import * as content from './content.js';
 import { createWorld, reHulled } from './physics.js';
 import { createRun } from './core.js';
+import { fnv } from './rng.js';
 
 // 네트워크 요청 없이 실패하는 fetch 스텁(§5 폴백 경로 검증)
 const failingFetch = () => Promise.reject(new TypeError('contentFallback: fetch 스텁'));
@@ -60,6 +61,57 @@ const coreStats = () => ({ reHulled: reHulled(), bodies: head ? head.W.stones().
 const coreState = () => (stageRefs.game ? stageRefs.game.state() : 'boot');
 // ── 3단계 끝 ───────────────────────────────────────────────────────────────
 
+// ── 4단계: pickSet·루프 훅 (§10 3단계 표 4단계분). game 참조는 B의 stageRefs만 쓴다 ─────
+// start(mode, {day?, seed?})의 모드·DailySet 결정. official은 오늘·#N≥1·tries<3일 때만, 아니면 practice(§4)
+export function pickSet(mode, { day, seed } = {}, today = todayKST(), S = storage.load()) {
+  if (mode === 'random') return { mode, set: generate((seed ?? fnv(String(Date.now()))) >>> 0, today, 0) };
+  if (mode === 'official') {
+    const d = day ?? today, tries = (S.days && S.days[d] && S.days[d].tries) || 0;
+    return { mode: d === today && nOf(d) >= 1 && tries < 3 ? 'official' : 'practice', set: daily(d) };
+  }
+  return { mode: 'practice', set: seed != null ? generate(seed >>> 0, today, 0) : daily(day ?? today) };
+}
+
+// __doltap.start(mode, {day?, seed?, friendCm?}) → DailySet
+function startHook(mode, o = {}) {
+  const p = pickSet(mode, o);
+  stageRefs.game.start(p.mode, p.set, { friendCm: o.friendCm });
+  return p.set;
+}
+
+// aim·drop·settle·hold에서 최대 n스텝 동기 진행, hold에 진입한 스텝에서 멈춤, 1회 그림
+function step(n = 1) {
+  const G = stageRefs.game;
+  for (let i = 0; i < n && G.running(); i++) {
+    const was = G.state();
+    G.step();
+    if (was !== 'hold' && G.state() === 'hold') break;
+  }
+  G.frame(0, performance.now());
+  return G.state();
+}
+
+// state가 name이 될 때까지 스텝, 1000스텝마다 rAF 양보(B의 nextFrame)
+async function until(name, max = 24000) {
+  const G = stageRefs.game;
+  let steps = 0;
+  while (G.state() !== name && steps < max && G.running()) {
+    G.step();
+    steps++;
+    if (steps % 1000 === 0) await nextFrame();
+  }
+  G.frame(0, performance.now());
+  const state = G.state();
+  return { ok: state === name, steps, state };
+}
+
+// bodies = 라이브 판이 있으면 game 월드, 없으면 B의 헤드리스 core 월드(레지스트리 E-3 결정 → e2e_core 유지)
+function liveStats() {
+  const g = stageRefs.game ? stageRefs.game.stats() : {}, c = coreStats();
+  return { ...c, ...g, bodies: g.bodies || c.bodies, reHulled: reHulled() };
+}
+// ── 4단계 끝 ───────────────────────────────────────────────────────────────
+
 export function install({ game = null, loop = null } = {}) {
   stageRefs = { game, loop };
   const api = {
@@ -81,8 +133,16 @@ export function install({ game = null, loop = null } = {}) {
     // 3단계
     core: coreHook,
     convexCheck,
-    stats: coreStats,
+    stats: liveStats,
     state: coreState,
+    // 4단계
+    start: startHook,
+    step, until,
+    layout: () => stageRefs.game.layout(),
+    view: () => stageRefs.game.view(),
+    height: () => stageRefs.game.height(),
+    seed: () => stageRefs.game.seed(),
+    dispatch: a => stageRefs.game.dispatch(a),
   };
   Object.defineProperty(window, '__doltap', {
     value: Object.freeze(api), writable: false, configurable: false, enumerable: false,
