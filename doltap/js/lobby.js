@@ -1,13 +1,13 @@
 // lobby.js — S0 부트 · S1 오류 · S2 로비 · S3 연습 패널 · S4 기록 패널 (§4)
 // 소원·산길·?c=·?d= 값은 dom.h/fmt → textContent로만 넣는다(§6 보안 규칙). 로비 표시 후 0~900ms 탭 무시(규칙 15).
 import S from './strings.js';
-import { h, setText, fmt } from './dom.js';
+import { h, fmt } from './dom.js';
 import { todayKST, nOf, prevDay, parseParams, daily } from './daily.js';
 import { generate } from './stones.js';
 import { load, persist, displayStreak } from './storage.js';
 import { pick } from './content.js';                       // 문구 선택만(로드는 main). plan A: lobby·result는 pick(c, set)
 import { drawStoneThumb, drawRockMini } from './render.js';
-import { shell, button, openDialog, openSettings, openHelp, closeTop, toast } from './dialogs.js';
+import { shell, button, openDialog, openSettings, openHelp, closeTop, toast, soundButton } from './dialogs.js';
 
 let cb = {}, shownAt = Infinity, onToday = () => {};
 export function mount(c) { cb = c; }
@@ -61,10 +61,7 @@ export function show(content) {
     cb.onStart('practice', opt);
     toast(n < 1 ? S.toast.preLaunch : S.toast.noTries);
   };
-  let sound = st.sound !== false;
-  const snd = button('pol-btn-ghost pol-btn-icon', sound ? '🔊' : '🔇', () => {
-    sound = !sound; cb.onSetting('sound', sound); setText(snd, sound ? '🔊' : '🔇');
-  }, { 'aria-label': S.lobby.sound });
+  const snd = soundButton();                                // 클릭 시점 저장값 기준(M 키와 어긋나지 않음)
   const bar = h('header', { class: 'pol-appbar' }), end = h('div', { class: 'pol-appbar-end' });
   end.append(snd, button('pol-btn-ghost pol-btn-icon', '⚙', e => openSettings(e.currentTarget), { 'aria-label': S.pause.settings }),
     button('pol-btn-ghost pol-btn-icon', '?', e => openHelp(e.currentTarget), { 'aria-label': S.pause.help }));

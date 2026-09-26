@@ -175,7 +175,7 @@ export function resume() {
 export function onHidden() { pause(); audio.suspend(); }       // visible에서 자동 재개 없음
 // ── 6단계: S9a 나가기·결과 로비 = 판 폐기(저장 없음, tries 유지). S5/🔊/M 설정(setting)·S10 요약(summary)은 gametest.js ──
 export const leave = () => setScreen('lobby');
-export function setMute(b) { const r = audio.mute(b); storage.set('sound', !b); return r; }
+export function setMute(b) { const r = audio.mute(b); storage.set('sound', !b); hook('sound'); return r; }   // 훅 sound = 🔊 아이콘 동기화
 
 function skipTap(at) {                                  // 400ms 안 2탭 → core skip, 아니면 금색 확인
   if (!R || paused || R.view().state !== 'aim' || R.view().skipUsed) return;

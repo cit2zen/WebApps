@@ -26,6 +26,10 @@ def goto(page, q=''):
     page.wait_for_function("() => window.__doltap && window.__doltap.state() === 'lobby'", timeout=10000)
 
 
+SND = """() => { const b = document.querySelector('#lobby [data-snd]');
+  return import('./js/audio.js').then(a => [b ? b.textContent : null, window.__doltap.store().sound, a.isMuted()]); }"""
+
+
 def lobby_at(page, day):
     page.evaluate(f"() => window.__doltap.setToday('{day}')")
     page.wait_for_timeout(1000)                            # 로비 0~900ms 탭 무시 가드를 넘긴다
@@ -68,7 +72,9 @@ with page_session(port=PORT, viewport=(390, 844), path='/doltap/', query='') as 
     page.wait_for_selector('#dlg-settings')
     page.click('#dlg-settings [aria-label="소리"] button:has-text("끔")')
     check(page.evaluate('() => window.__doltap.store().sound') is False, 'S5 소리 끔 저장')
+    check(page.evaluate(SND) == ['🔇', False, True], f'S5 끔 → 로비 🔊 아이콘 동기화 {page.evaluate(SND)}')
     page.click('#dlg-settings [aria-label="소리"] button:has-text("켬")')
+    check(page.evaluate(SND) == ['🔊', True, False], f'S5 켬 → 로비 🔊 아이콘 동기화 {page.evaluate(SND)}')
     page.click('#dlg-settings [aria-label="손잡이"] button:has-text("왼손")')
     check(page.evaluate('() => window.__doltap.store().hand') == 'L', 'S5 손잡이 L 저장')
     page.click('#dlg-settings [aria-label="손잡이"] button:has-text("오른손")')
@@ -77,6 +83,16 @@ with page_session(port=PORT, viewport=(390, 844), path='/doltap/', query='') as 
     check(page.evaluate('() => window.__doltap.store().tutDone') is False, 'S5 tutDone=false')
     page.keyboard.press('Escape')
     check(page.locator('#dlg-settings').count() == 0, 'S5 Esc로 닫힘')
+    # 최종 리뷰 #3: 로비에서 M → 🔊 버튼이 음소거 표시, 버튼 클릭 = 현재 저장값 기준 토글(소리 켜짐)
+    check(page.evaluate(SND) == ['🔊', True, False], f'M 전 {page.evaluate(SND)}')
+    page.keyboard.press('m')
+    check(page.evaluate(SND) == ['🔇', False, True], f'M → 음소거 표시 {page.evaluate(SND)}')
+    page.click('#lobby [data-snd]')
+    check(page.evaluate(SND) == ['🔊', True, False], f'🔊 클릭 → 소리 켜짐 {page.evaluate(SND)}')
+    page.click('#lobby [data-snd]')
+    check(page.evaluate(SND) == ['🔇', False, True], f'🔊 다시 클릭 → 음소거 {page.evaluate(SND)}')
+    page.keyboard.press('m')
+    check(page.evaluate(SND) == ['🔊', True, False], f'M 다시 → 소리 켜짐 {page.evaluate(SND)}')
     # S6 — 도움말 3장
     page.click('#lobby .pol-appbar button[aria-label="도움말"]')
     page.wait_for_selector('#dlg-help')

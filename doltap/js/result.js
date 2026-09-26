@@ -1,10 +1,9 @@
 // result.js — S10 결과 · S10a 공유 폴백, 탑 스냅샷(setSnapshot: toDataURL→img), 배지, 등급(B=200) (§4)
 // HTML 문자열 삽입 없음. img.src는 이 파일의 setSnapshot 한 곳에서만 넣는다(§6 보안 예외 1곳).
 import S from './strings.js';
-import { h, setText, fmt } from './dom.js';
+import { h, fmt } from './dom.js';
 import { buildShareText, shareFlow, gridRows } from './share.js';
-import { shell, button, openDialog, closeTop, toast } from './dialogs.js';
-import { load } from './storage.js';
+import { shell, button, openDialog, closeTop, toast, soundButton } from './dialogs.js';
 import { pick } from './content.js';                       // 문구 선택만(로드는 main)
 import { ROCK, localOf } from './render.js';               // 규칙 5 바위 꼭짓점 · 무게중심 기준 로컬 꼭짓점
 import { toneOf } from './stones.js';                      // Stone.tone → --doltap-stone-* 토큰(정합 #1)
@@ -90,12 +89,7 @@ export function show(sum) {
   cur = { text: buildShareText({ run: top, set, mode, streak, tries }) };
   const day = { m: +set.day.slice(4, 6), d: +set.day.slice(6, 8) };
   const { wish, trail } = pick(content || {}, set);
-  let sound = load().sound !== false;
-  const snd = button('pol-btn-ghost pol-btn-icon', sound ? '🔊' : '🔇', () => {
-    sound = !sound;
-    if (cb.onSetting) cb.onSetting('sound', sound);
-    setText(snd, sound ? '🔊' : '🔇');
-  }, { 'aria-label': S.lobby.sound });
+  const snd = soundButton();                                // 클릭 시점 저장값 기준(M 키와 어긋나지 않음)
   const bar = h('header', { class: 'pol-appbar' }), end = h('div', { class: 'pol-appbar-end' });
   end.appendChild(snd);
   bar.append(h('span', { class: 'pol-appbar-title' }, off ? fmt(S.result.header, { n: set.n }) : S.result.headerPractice), end);

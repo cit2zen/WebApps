@@ -150,7 +150,7 @@ game.setHooks({
   dialogTop: () => (dialogs.topId() === 'dlg-pause' ? 'S9' : dialogs.topId()),
   pause: info => dialogs.openPause(info), resume: () => dialogs.closePause(),
   result: () => showResult(), lobby: () => { if (game.state() === 'lobby') lobby.show(content); },
-  shareText: result.shareText, forceShare: result.forceShare,
+  shareText: result.shareText, forceShare: result.forceShare, sound: dialogs.syncSound,
 });
 addEventListener('resize', onResize);
 boot();

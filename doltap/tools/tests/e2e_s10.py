@@ -59,6 +59,13 @@ with page_session(port=PORT, viewport=(390, 844), path='/doltap/', query='') as 
           '그리드 4행×6칸')
     check(text(page, '#result .share-btn') == f"오늘 최고 {v['H']:.1f}cm 공유", '공유 버튼 라벨')
     check(page.evaluate(GRADES) == [0, 1, 1, 2, 2, 3, 3, 4], '등급 경계 0.5B/1.0B/1.4B/1.8B')
+    # 최종 리뷰 #3: 결과 화면 M → 🔊 버튼 음소거 표시, 클릭 = 현재 저장값 기준 토글
+    snd = lambda: page.evaluate("() => [document.querySelector('#result [data-snd]')?.textContent, window.__doltap.store().sound]")  # noqa: E731
+    check(snd() == ['🔊', True], f'S10 🔊 초기 {snd()}')
+    page.keyboard.press('m')
+    check(snd() == ['🔇', False], f'S10 M → 음소거 표시 {snd()}')
+    page.click('#result [data-snd]')
+    check(snd() == ['🔊', True], f'S10 🔊 클릭 → 소리 켜짐 {snd()}')
     # S10a — 폴백 강제
     page.evaluate("() => window.__doltap.forceShare('fallback')")
     page.click('#result .share-btn')

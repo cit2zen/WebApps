@@ -19,6 +19,13 @@ export function button(cls, text, fn, props = {}) {
   b.addEventListener('click', fn);
   return b;
 }
+// 🔊 버튼(S2·S9·S10 공통): 클릭 시점 저장값을 뒤집고, syncSound()가 [data-snd] 전부를 저장값에 맞춘다(M·S5·훅 mute 뒤)
+const icon = () => (load().sound !== false ? '🔊' : '🔇');
+export function syncSound() { for (const b of document.querySelectorAll('[data-snd]')) setText(b, icon()); }
+export const soundButton = () => button('pol-btn-ghost pol-btn-icon', icon(), () => {
+  if (cb.onSetting) cb.onSetting('sound', load().sound === false);
+  syncSound();
+}, { 'aria-label': S.lobby.sound, 'data-snd': '' });
 export function shell(id, name) {
   const ov = h('div', { class: 'pol-overlay', id });
   const dl = h('div', { class: 'pol-dialog', role: 'dialog', 'aria-modal': 'true', 'aria-label': name });
@@ -77,6 +84,7 @@ function seg(title, field, opts, cur, off) {
   for (const [text, v] of opts) {
     const b = button('', text, () => {
       if (cb.onSetting) cb.onSetting(field, v);
+      syncSound();
       for (const x of g.children) x.setAttribute('aria-pressed', String(x === b));
     }, { 'aria-pressed': String(v === cur) });
     b.disabled = !!off;
@@ -162,12 +170,7 @@ export function openHelp(opener) {
 export function openPause(info = {}) {
   closeDialog('dlg-pause');
   const [ov, dl] = shell('dlg-pause', S.pause.title);
-  let sound = load().sound !== false;
-  const snd = button('pol-btn-ghost pol-btn-icon', sound ? '🔊' : '🔇', () => {
-    sound = !sound;
-    if (cb.onSetting) cb.onSetting('sound', sound);
-    setText(snd, sound ? '🔊' : '🔇');
-  }, { 'aria-label': S.lobby.sound });
+  const snd = soundButton();
   const toLobby = button('pol-btn-ghost', S.pause.toLobby, () => {
     if (info.needConfirm) openLeave(toLobby); else if (cb.onLeave) cb.onLeave();
   });
