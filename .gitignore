@@ -61,3 +61,4 @@ __pycache__/
 # fps-api 로컬 SQLite·캐시
 fps-api/*.db
 .pytest_cache/
+doltap/tools/ref.json
