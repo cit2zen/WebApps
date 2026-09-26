@@ -1,0 +1,78 @@
+/* play.css — 인게임 크롬 전부: canvas·HUD 앵커 R/L·보조 줄 말줄임·취소 힌트·#game .pol-toast·가로 오버레이·고스트·focus-visible (§4, §6 정합 #8) */
+#game {
+  position: fixed; inset: 0; overflow: hidden; background: var(--bg-base);
+  touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+#stage { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* HUD 컨테이너: 폭 min(innerWidth, 585) 가운데 정렬. 앵커는 모두 이 컨테이너 기준(오른손 기본) */
+#hud { position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100%, 585px); pointer-events: none; }
+#hud button { pointer-events: auto; }
+.hud-candles { position: absolute; left: 16px; top: env(safe-area-inset-top); width: 84px; height: 48px; display: flex; align-items: center; }
+.candle { width: 28px; text-align: center; font-size: 20px; transition: opacity 300ms, filter 300ms; }
+.candle.off { opacity: .3; filter: grayscale(1); }
+.hud-candles.shake { animation: doltap-shake var(--dur-fast) linear; }
+@keyframes doltap-shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+.hud-height {
+  position: absolute; left: 108px; right: 120px; top: env(safe-area-inset-top); height: 48px;
+  text-align: center; font-family: var(--font-display); font-style: italic; font-size: var(--fs-xl); color: var(--ink-warm);
+}
+.hud-sub { display: block; font-family: var(--font-label); font-style: normal; font-size: var(--fs-2xs); color: var(--ink-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hud-preview {
+  position: absolute; right: 16px; top: env(safe-area-inset-top); width: 96px; height: 48px; box-sizing: border-box;
+  display: flex; gap: 4px; align-items: center; justify-content: center; border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--bg-card) 85%, transparent);
+}
+.hud-preview canvas { width: 40px; height: 40px; }
+.hud-preview canvas + canvas { opacity: .6; }
+.hud-skip {
+  position: absolute; left: 16px; top: calc(env(safe-area-inset-top) + 56px); width: 48px; height: 48px; padding: 0;
+  border: 2px solid transparent; border-radius: 50%; background: var(--bg-card); box-shadow: var(--shadow-soft);
+  font-family: var(--font-label); font-size: var(--fs-2xs); color: var(--ink-warm);
+}
+.hud-skip.confirm { border-color: var(--gold-mid); }
+.hud-skip[aria-disabled="true"] { opacity: .35; }
+.hud-combo { position: absolute; left: 72px; right: 72px; top: calc(env(safe-area-inset-top) + 56px); height: 48px; line-height: 48px;
+  text-align: center; font-family: var(--font-label); color: var(--gold-text); transition: opacity 200ms; }
+.hud-combo.off { opacity: 0; }
+
+/* 하단 버튼 바 150 = 버튼 존(150 − safe 아래) + safe. 버튼은 존 안 세로 가운데 */
+.hud-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 150px; border-top: 1px solid var(--cream-300); }
+.hud-bar.cancel { background: var(--pol-danger-line); border-top: 2px solid var(--pol-danger); }
+.hud-zone { position: absolute; left: 0; right: 0; top: 0; height: calc(150px - env(safe-area-inset-bottom)); }
+.hud-zone button {
+  position: absolute; top: 50%; transform: translateY(-50%); padding: 0; border: 0; border-radius: 50%;
+  background: var(--bg-card); box-shadow: var(--shadow-soft); color: var(--ink-warm); font-size: 22px;
+}
+.btn-pause { left: 16px; width: 48px; height: 48px; }
+.btn-ccw { right: 88px; width: 52px; height: 52px; }
+.btn-cw { right: 16px; width: 64px; height: 64px; }
+.cancel-hint {
+  position: absolute; left: 72px; right: 152px; top: -44px; height: 36px; line-height: 36px; text-align: center;
+  border-radius: var(--r-md); background: var(--bg-card); color: var(--pol-danger); font-family: var(--font-label); font-size: var(--fs-2xs);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* 왼손 모드: ↻ left 16 · ↺ left 88 · ⏸ right 16 · 건너뛰기 right 16 · 취소 힌트 left 152 right 72 */
+#hud.hand-l .btn-cw { right: auto; left: 16px; }
+#hud.hand-l .btn-ccw { right: auto; left: 88px; }
+#hud.hand-l .btn-pause { left: auto; right: 16px; }
+#hud.hand-l .hud-skip { left: auto; right: 16px; }
+#hud.hand-l .cancel-hint { left: 152px; right: 72px; }
+/* S8 버티기: ↺↻·건너뛰기 .35, ⏸만 활성 */
+#hud.hold .btn-ccw, #hud.hold .btn-cw, #hud.hold .hud-skip { opacity: .35; pointer-events: none; }
+#hud :focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+#count {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;
+  font-family: var(--font-display); font-style: italic; font-size: var(--fs-hero); color: var(--ink-warm);
+}
+.ghost { position: absolute; left: 50%; top: 55%; font-size: 40px; opacity: .55; pointer-events: none;
+  animation: doltap-ghost 1.2s ease-in-out infinite; }
+@keyframes doltap-ghost { 0%, 100% { transform: translateX(-60px); } 50% { transform: translateX(60px); } }
+@media (prefers-reduced-motion: reduce) { .ghost { animation: none; } }
+.portrait {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: auto;
+  background: var(--bg-base); font-family: var(--font-label); font-size: var(--fs-xl); color: var(--ink-warm);
+}
+#game .pol-toast { bottom: auto; top: calc(env(safe-area-inset-top) + 159px); pointer-events: none; }

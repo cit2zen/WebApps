@@ -1,0 +1,94 @@
+/* doltap.css — 게임 전용 토큰 21개 + 공통·부트·오류·로비·결과·대화상자·짧은 화면·터치 48·.fs-probe (§4, §6 정합 #8) */
+:root {
+  --doltap-stone-gray: #8a8580; --doltap-stone-gray-dk: #5f5a55;
+  --doltap-stone-ochre: #a88a5c; --doltap-stone-ochre-dk: #7a6240;
+  --doltap-stone-slate: #6f7d86; --doltap-stone-slate-dk: #4a5760;
+  --doltap-moss: #6b7d3a;
+  --doltap-sky-dawn: #f3e3c8; --doltap-sky-day: #cfdde0; --doltap-sky-dusk: #e8b98a; --doltap-sky-glow: #b8747a;
+  --doltap-ridge-far: #b9b3a3; --doltap-ridge-mid: #8f8a78; --doltap-ridge-near: #5e6152;
+  --doltap-rock: #7b766b;
+  --doltap-ribbon-blue: #2f5d8a; --doltap-ribbon-red: #b04030; --doltap-ribbon-yellow: #d9b44a;
+  --doltap-ribbon-white: #f4f1ea; --doltap-ribbon-black: #2a2622;
+  --doltap-dust: #b8a888;
+}
+
+[hidden] { display: none !important; }
+html, body { margin: 0; background: var(--bg-base); }
+.fs-probe { position: absolute; visibility: hidden; font-size: var(--fs-hero); }
+
+/* safe-area: 로비·부트·결과는 상태바·홈 인디케이터만큼 내려온다 */
+#boot, #lobby, #result {
+  padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box; min-height: 100dvh;
+}
+
+/* S0 부트 · S1 오류 */
+#boot, #error { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+#error { min-height: 100dvh; padding: 0 16px; box-sizing: border-box; text-align: center; }
+.boot-msg, .err-hint { font-family: var(--font-label); color: var(--ink-muted); margin: 0; }
+.err-title { font-family: var(--font-label); font-size: var(--fs-xl); color: var(--ink-warm); margin: 0; }
+.boot-stones { display: flex; gap: 8px; align-items: flex-end; height: 28px; }
+.boot-stone {
+  width: 22px; height: 14px; border-radius: 45% 55% 40% 50%;
+  background: var(--doltap-stone-gray); animation: doltap-wobble 1.2s ease-in-out infinite;
+}
+.boot-stone:nth-child(2) { background: var(--doltap-stone-ochre); animation-delay: .2s; }
+.boot-stone:nth-child(3) { background: var(--doltap-stone-slate); animation-delay: .4s; }
+@keyframes doltap-wobble { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+@media (prefers-reduced-motion: reduce) { .boot-stone { animation: none; } }
+
+/* S2 로비 */
+#lobby .pol-appbar, #result .pol-appbar { height: 56px; }
+.pol-card .pol-num { margin-top: 4px; line-height: 12px; }
+.pol-card .pol-caption { margin-top: 0; line-height: 18px; }
+#lobby .pol-card.today { --pol-width: 200px; }
+#lobby .pol-card:not(.today) { --pol-width: 150px; }
+#lobby .pol-card:not(.today) .pol-caption { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#lobby .pol-group { margin: 24px auto 81px; }
+#lobby .pol-group .pol-card { transition-duration: 600ms; transition-delay: 300ms; }
+#lobby .badge { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+#lobby .sub-row { height: 48px; display: flex; align-items: center; justify-content: center; padding: 0 16px; }
+#lobby .foot { height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: var(--font-label); font-size: var(--fs-2xs); color: var(--ink-muted); }
+@media (max-width: 640px) {
+  #lobby .pol-group { display: grid; grid-template-columns: repeat(2, auto); gap: 16px; justify-content: center; }
+  #lobby .pol-group .pol-card.today { grid-column: 1 / -1; justify-self: center; }
+}
+@media (min-width: 641px) { #lobby .pol-group { min-height: 440px; } }
+@media (max-height: 740px) {
+  #lobby .pol-card.today { --pol-width: 170px; }
+  #lobby .pol-card:not(.today) { --pol-width: 140px; }
+  #lobby .pol-group { row-gap: 12px; margin: 8px auto; }
+  #lobby .foot { height: 32px; }
+  #lobby .foot .foot-2 { display: none; }
+}
+
+/* S6 도움말 카드 */
+.help-card.pol-card { --pol-width: 240px; }
+
+/* S10 결과 */
+#result .result-card.pol-card { --pol-width: 280px; margin: 12px auto 0; position: relative; }
+#result .result-card .pol-caption { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#result .sticker { position: absolute; top: -6px; right: -10px; transform: rotate(-6deg); }
+#score { margin-top: 12px; height: 72px; text-align: center; }
+#score .h { font-size: var(--fs-display); line-height: 40px; }
+#score .sub { line-height: 16px; }
+#score .note { line-height: 16px; font-size: var(--fs-2xs); color: var(--ink-muted); }
+#grid { font-size: 24px; line-height: 26px; letter-spacing: 4px; margin: 0; text-align: center; }
+#result .share-note { height: 16px; line-height: 16px; font-size: var(--fs-2xs); color: var(--ink-muted); text-align: center; }
+#result .share-note.off { visibility: hidden; }
+#result .retry-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+#result .retry-label { height: 16px; line-height: 16px; font-size: var(--fs-2xs); color: var(--ink-muted); }
+@media (max-height: 740px) {
+  #result .result-card.pol-card { --pol-width: 200px; margin-top: 8px; }
+  #result .result-card .pol-caption { white-space: normal; }
+}
+@media (max-height: 660px) {
+  #result .result-card.pol-card { --pol-width: 170px; }
+  #score { margin-top: 8px; }
+  #grid { font-size: 20px; line-height: 22px; }
+}
+
+/* 터치 타깃 48 (공유 기본값 pol-btn 42.8·pol-chip 36.8 덮어쓰기) */
+.pol-btn-primary, .pol-btn-ghost, .pol-chip, .pol-seg > button { min-height: 48px; }
+.pol-btn-icon { width: 48px; height: 48px; padding: 0; }
