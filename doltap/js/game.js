@@ -113,6 +113,7 @@ export function start(m, s, o = {}) {
   screen = 'play';
   onAim();                                              // core의 첫 aim은 첫 step/dispatch 때 emit → 여기서 먼저 보장
   audio.resume(); loop.start();
+  if (L.landscape) { hud.portrait(true); pause(); }     // 가로에서 시작한 판도 오버레이 + 일시정지(§4 k < 0.75)
   return s;
 }
 
