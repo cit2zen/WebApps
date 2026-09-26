@@ -69,6 +69,25 @@ test('onKey: 2px 즉시 이동·가속 poll·keyup 정지', () => {
   assert.equal(out.length, 2);
 });
 
+test('onKey: 플레이 밖(일시정지·대화상자·결과)에서 뗀 좌우 키도 누름 상태를 비운다', () => {
+  for (const [code, away] of [
+    ['ArrowRight', env('paused')],
+    ['ArrowRight', env('paused', { dialog: 'S9' })],
+    ['KeyA', env('result', { dialog: 'S5' })],
+  ]) {
+    const out = [];
+    let cur = AIM;
+    init({ getEnv: () => cur, onAction: a => out.push(a), target: null });
+    onKey(ev(code));
+    assert.equal(out.length, 1, code);
+    cur = away;
+    onKey(ev(code, { type: 'keyup' }));
+    cur = AIM;
+    poll(0.5); poll(0.5);
+    assert.equal(out.filter(a => a.t === 'move').length, 1, `${code} ${away.state}/${away.dialog}`);
+  }
+});
+
 test('onKey: 회전 auto-repeat 150ms 제한', () => {
   const out = [];
   init({ getEnv: () => AIM, onAction: a => out.push(a), target: null });

@@ -51,6 +51,8 @@ function focusOf() {
 }
 
 export function onKey(e) {
+  // 좌우 키를 떼면 상태·대화상자와 무관하게 누름 상태를 비운다(일시정지 중 뗀 키가 재개 뒤 계속 미는 것 방지)
+  if (e.type === 'keyup') held.delete(LEFT.has(e.code) ? -1 : RIGHT.has(e.code) ? 1 : 0);
   const env = { focus: focusOf(), ...getEnv() };
   const a = mapKey(e, env);
   if (a) {
