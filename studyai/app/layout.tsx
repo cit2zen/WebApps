@@ -43,7 +43,7 @@ const nanumPen = Nanum_Pen_Script({
 const fontVars = [fraunces, notoSansKr, notoSerifKr, spaceMono, nanumPen].map(f => f.variable).join(' ')
 
 export const metadata: Metadata = {
-  title: 'StudyAI · cityzen',
+  title: 'StudyAI · hs',
   description: '개념을 직관부터 수식까지 구조화해서 설명하는 학습 AI',
 }
 

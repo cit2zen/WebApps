@@ -36,7 +36,7 @@ export default function Home() {
     <>
       <header className="pol-appbar">
         <a className="pol-brand" href="https://cityzen.kr">
-          cityzen
+          hs
         </a>
         <span className="pol-appbar-sep" aria-hidden />
         <span className="pol-appbar-title">ShopScout</span>

@@ -8,7 +8,7 @@ import Link from 'next/link'
 function ReviewBar({ children }: { children?: React.ReactNode }) {
   return (
     <header className="pol-appbar">
-      <a className="pol-brand" href="https://cityzen.kr">cityzen</a>
+      <a className="pol-brand" href="https://cityzen.kr">hs</a>
       <span className="pol-appbar-sep" aria-hidden="true" />
       <Link href="/" className={`pol-appbar-title ${styles.appLink}`}>StudyAI</Link>
       <span className="pol-badge">복습</span>

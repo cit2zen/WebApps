@@ -108,7 +108,7 @@ export default function Home() {
     <div className={styles.app}>
       {/* Top bar */}
       <header className={`pol-appbar ${styles.topbar}`}>
-        <a className="pol-brand" href="https://cityzen.kr">cityzen</a>
+        <a className="pol-brand" href="https://cityzen.kr">hs</a>
         <span className="pol-appbar-sep" aria-hidden="true" />
         <span className="pol-appbar-title">StudyAI</span>
         <button

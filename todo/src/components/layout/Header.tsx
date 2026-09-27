@@ -55,7 +55,7 @@ export function Header() {
     <>
       <header className="pol-appbar">
         <a className="pol-brand" href="https://cityzen.kr">
-          cityzen
+          hs
         </a>
         <span className="pol-appbar-sep" aria-hidden="true" />
         <span className="pol-appbar-title">할 일</span>
