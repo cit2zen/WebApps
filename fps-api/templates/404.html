@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}404 · Overclock Arena API{% endblock %}
+
+{% block content %}
+<section class="fa-404">
+  <div class="pol-panel fa-404-card">
+    <span class="pol-eyebrow">찾을 수 없는 경로</span>
+    <p class="t-display fa-404-num" aria-hidden="true">404</p>
+    <h1 class="t-title fa-ko-title">페이지를 찾을 수 없습니다</h1>
+    <p class="t-body fa-404-text">주소가 바뀌었거나 없는 경로입니다. 안내 페이지에서 공개 엔드포인트를 확인해 보세요.</p>
+    <div class="pol-row fa-404-actions">
+      <a class="pol-btn-primary" href="{{ url_for('pages.landing') }}">API 안내로</a>
+      <a class="pol-btn-ghost" href="{{ game_url }}">게임 플레이</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

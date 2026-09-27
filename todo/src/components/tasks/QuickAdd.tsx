@@ -23,7 +23,8 @@ export function QuickAdd() {
         }
       }}
       placeholder="할 일을 입력하고 Enter"
-      className="w-full rounded-2xl bg-white px-4 py-3 text-base shadow-sm outline-none placeholder:text-muted focus:ring-2 focus:ring-mint-200 sm:text-sm"
+      aria-label="할 일 빠른 추가"
+      className="pol-input td-quick"
     />
   );
 }

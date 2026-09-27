@@ -3,9 +3,9 @@ import { ddayInfo } from '../../utils/date';
 import { useToday } from '../../utils/useToday';
 
 const toneClasses: Record<DdayTone, string> = {
-  overdue: 'bg-rose-pastel-100 text-rose-pastel-500',
-  soon: 'bg-amber-pastel-100 text-amber-pastel-600',
-  normal: 'bg-ink/5 text-muted',
+  overdue: 'is-overdue',
+  soon: 'is-soon',
+  normal: 'is-normal',
 };
 
 export function Badge({ deadline }: { deadline?: string }) {
@@ -13,10 +13,6 @@ export function Badge({ deadline }: { deadline?: string }) {
   if (!deadline) return null;
   const { label, tone } = ddayInfo(deadline, today);
   return (
-    <span
-      className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${toneClasses[tone]}`}
-    >
-      {label}
-    </span>
+    <span className={`td-badge ${toneClasses[tone]}`}>{label}</span>
   );
 }

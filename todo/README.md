@@ -38,8 +38,10 @@ npx vitest run     # 유닛 테스트
 
 ## 스택
 
-Vite · React · TypeScript · Tailwind CSS v4 · Zustand(persist) · Motion · day.js
+Vite · React · TypeScript · Tailwind CSS v4(레이아웃 유틸리티만) · Zustand(persist) · Motion · day.js
+
+디자인: cityzen 공통 **Polaroid Editorial v2** — 키트 4종(`src/styles/design-tokens·typography·polaroid·pol-ui.css`, 직접 수정 금지·`develop_web/scripts/sync_design.py`로 동기) + 앱 전용 `src/styles/app.css`(색은 토큰 var()만, 글자 크기는 `--fs-*`만).
 
 ## 배포
 
-Railway — nginx 정적 서빙 (`Dockerfile` 멀티스테이지 빌드), https://todo.cityzen.kr
+GitHub Pages — `.github/workflows/deploy-todo-pages.yml`(main의 `todo/**` 푸시 시 자동 빌드·배포), https://todo.cityzen.kr. `Dockerfile`(nginx 정적 서빙)은 컨테이너 호스팅 복귀 대비로 보존.

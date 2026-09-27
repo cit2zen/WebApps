@@ -64,6 +64,16 @@ def make_engine(url: str):
     return engine
 
 
+def ping(engine) -> bool:
+    """DB 연결 확인(SELECT 1) — /healthz·안내 페이지 공용. 원인 대신 상태만"""
+    try:
+        with engine.connect() as conn:
+            conn.exec_driver_sql("SELECT 1")
+        return True
+    except Exception:  # noqa: BLE001
+        return False
+
+
 # ── 점수 ─────────────────────────────────────────────────────────────
 def find_run_score(conn, board, run_id):
     return conn.execute(select(scores).where(and_(scores.c.board == board, scores.c.run_id == run_id))).mappings().first()

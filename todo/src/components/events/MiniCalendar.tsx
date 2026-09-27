@@ -11,8 +11,7 @@ interface MiniCalendarProps {
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
-const navButtonClass =
-  'flex h-8 w-8 items-center justify-center rounded-full text-muted transition-colors hover:bg-cream hover:text-ink';
+const navButtonClass = 'td-icon-btn';
 
 export function MiniCalendar({ selected, onSelect }: MiniCalendarProps) {
   const events = useAppStore((s) => s.events);
@@ -36,14 +35,14 @@ export function MiniCalendar({ selected, onSelect }: MiniCalendarProps) {
   ];
 
   const dayClass = (date: string): string => {
-    if (date === selected) return 'bg-peach-400 font-semibold text-white';
-    if (date === today) return 'bg-peach-100 font-semibold text-peach-500';
-    return 'hover:bg-cream';
+    if (date === selected) return 'is-selected';
+    if (date === today) return 'is-today';
+    return '';
   };
 
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-sm">
-      <div className="mb-3 flex items-center justify-between">
+    <div className="pol-panel td-cal">
+      <div className="td-cal-head">
         <button
           type="button"
           aria-label="이전 달"
@@ -53,7 +52,7 @@ export function MiniCalendar({ selected, onSelect }: MiniCalendarProps) {
           ‹
         </button>
         <div className="flex items-center gap-2">
-          <p className="text-sm font-bold">{month.format('YYYY년 M월')}</p>
+          <p className="td-cal-month">{month.format('YYYY년 M월')}</p>
           {(selected !== today || !month.isSame(dayjs(today), 'month')) && (
             <button
               type="button"
@@ -61,7 +60,7 @@ export function MiniCalendar({ selected, onSelect }: MiniCalendarProps) {
                 onSelect(today);
                 setMonth(dayjs(today).startOf('month'));
               }}
-              className="rounded-full bg-peach-50 px-2 py-0.5 text-xs font-medium text-peach-500 transition-colors hover:bg-peach-100"
+              className="pol-chip td-chip"
             >
               오늘
             </button>
@@ -76,9 +75,12 @@ export function MiniCalendar({ selected, onSelect }: MiniCalendarProps) {
           ›
         </button>
       </div>
-      <div className="grid grid-cols-7 gap-y-1 text-center">
-        {WEEKDAYS.map((day) => (
-          <span key={day} className="text-xs text-muted">
+      <div className="td-cal-grid">
+        {WEEKDAYS.map((day, i) => (
+          <span
+            key={day}
+            className={`td-cal-wd${i === 0 ? ' is-sun' : i === 6 ? ' is-sat' : ''}`}
+          >
             {day}
           </span>
         ))}
@@ -90,15 +92,12 @@ export function MiniCalendar({ selected, onSelect }: MiniCalendarProps) {
               key={date}
               type="button"
               onClick={() => onSelect(date)}
-              className={`relative mx-auto flex h-9 w-9 items-center justify-center rounded-full text-sm transition-colors ${dayClass(date)}`}
+              aria-pressed={date === selected}
+              className={`td-cal-day ${dayClass(date)}`}
             >
               {dayjs(date).date()}
               {dots.has(date) && (
-                <span
-                  className={`absolute bottom-1 h-1 w-1 rounded-full ${
-                    date === selected ? 'bg-white' : 'bg-peach-400'
-                  }`}
-                />
+                <span className="td-cal-dot" aria-hidden="true" />
               )}
             </button>
           ),

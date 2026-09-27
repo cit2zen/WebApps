@@ -1,11 +1,12 @@
 """fps-api — Overclock Arena(games.cityzen.kr/fps · CrazyGames) 글로벌 랭킹 + 익명 판 텔레메트리.
-진입점 wsgi:app. 정적 페이지 없음(JSON API 전용)."""
+진입점 wsgi:app. API는 JSON 전용 — 사람용 안내 페이지(GET /)와 브라우저용 404만 HTML(pages.py, Polaroid v2)."""
 import re
 
 from flask import Flask, jsonify, request
 
 import config
 import db
+import pages
 from routes import api_bp
 from security import TokenBucket
 from stats import stats_bp
@@ -35,15 +36,13 @@ def create_app(test_config: dict | None = None) -> Flask:
     }
     app.register_blueprint(api_bp)
     app.register_blueprint(stats_bp)
+    app.register_blueprint(pages.pages_bp)
 
     @app.get("/healthz")
     def healthz():
-        try:
-            with app.extensions["fps_engine"].connect() as conn:
-                conn.exec_driver_sql("SELECT 1")
+        if db.ping(app.extensions["fps_engine"]):   # 헬스체크는 원인 대신 상태만
             return jsonify({"ok": True, "db": True})
-        except Exception:  # noqa: BLE001 — 헬스체크는 원인 대신 상태만
-            return jsonify({"ok": False, "db": False}), 503
+        return jsonify({"ok": False, "db": False}), 503
 
     # CORS: 허용 오리진만 그대로 반사(자격 증명 없음). OPTIONS 프리플라이트는 Flask 자동 응답 + 아래 헤더
     @app.after_request
@@ -59,9 +58,16 @@ def create_app(test_config: dict | None = None) -> Flask:
         resp.headers["X-Content-Type-Options"] = "nosniff"
         return resp
 
+    # HTML 응답(안내 페이지·브라우저 404)에만 CSP 등 — JSON API 응답은 그대로
+    app.after_request(pages.html_security_headers)
+
     @app.errorhandler(404)
     def not_found(_e):
-        return jsonify({"error": "not_found"}), 404
+        if pages.wants_html():   # 브라우저(Accept가 text/html 우선)만 Polaroid 404, API 클라이언트는 JSON 그대로
+            return pages.not_found_page()
+        resp = jsonify({"error": "not_found"})
+        resp.headers.add("Vary", "Accept")
+        return resp, 404
 
     @app.errorhandler(405)
     def not_allowed(_e):

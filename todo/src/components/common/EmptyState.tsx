@@ -1,8 +1,11 @@
 export function EmptyState({ emoji, message }: { emoji: string; message: string }) {
   return (
-    <div className="flex flex-col items-center gap-3 py-16 text-center">
-      <span className="text-4xl">{emoji}</span>
-      <p className="text-sm text-muted">{message}</p>
+    <div className="td-empty">
+      <div className="pol-card td-empty-card" aria-hidden="true">
+        <div className="pol-photo td-empty-photo">{emoji}</div>
+        <span className="pol-caption">nothing yet</span>
+      </div>
+      <p className="td-empty-msg">{message}</p>
     </div>
   );
 }

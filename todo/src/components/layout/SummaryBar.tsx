@@ -13,24 +13,25 @@ export function SummaryBar() {
   );
 
   const items = [
-    { label: '미완료 할 일', value: `${incompleteCount}개`, valueClass: 'text-mint-500' },
+    { label: '미완료 할 일', num: incompleteCount, unit: '개', valueClass: '' },
     {
       label: '오늘 마감',
-      value: `${dueTodayCount}개`,
-      valueClass: dueTodayCount > 0 ? 'text-amber-pastel-600' : 'text-ink',
+      num: dueTodayCount,
+      unit: '개',
+      valueClass: dueTodayCount > 0 ? 'is-alert' : '',
     },
-    { label: '평균 달성률', value: `${avgProgress}%`, valueClass: 'text-lavender-500' },
+    { label: '평균 달성률', num: avgProgress, unit: '%', valueClass: 'is-gold' },
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-2 sm:gap-3">
+    <div className="td-stats">
       {items.map((item) => (
-        <div
-          key={item.label}
-          className="rounded-2xl bg-white px-3 py-3 text-center shadow-sm"
-        >
-          <p className={`text-lg font-bold ${item.valueClass}`}>{item.value}</p>
-          <p className="text-xs text-muted">{item.label}</p>
+        <div key={item.label} className="pol-tile td-stat">
+          <p className={`td-stat-value ${item.valueClass}`}>
+            <span className="td-stat-num">{item.num}</span>
+            <span className="td-stat-unit">{item.unit}</span>
+          </p>
+          <p className="td-stat-label">{item.label}</p>
         </div>
       ))}
     </div>

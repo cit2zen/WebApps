@@ -10,8 +10,7 @@ interface ProjectFormModalProps {
   onClose: () => void;
 }
 
-const inputClass =
-  'w-full rounded-xl bg-cream px-3 py-2 text-base outline-none focus:ring-2 focus:ring-lavender-200 sm:text-sm';
+const inputClass = 'pol-input td-input-compact';
 
 export function ProjectFormModal({ open, project, onClose }: ProjectFormModalProps) {
   const addProject = useAppStore((s) => s.addProject);
@@ -47,34 +46,43 @@ export function ProjectFormModal({ open, project, onClose }: ProjectFormModalPro
   return (
     <Modal open={open} title={project ? '프로젝트 수정' : '새 프로젝트'} onClose={onClose}>
       <form
-        className="flex flex-col gap-3"
+        className="td-form"
         onSubmit={(e) => {
           e.preventDefault();
           submit();
         }}
       >
-        <input
-          autoFocus
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="프로젝트 이름"
-          className={inputClass}
-        />
-        <textarea
-          value={memo}
-          onChange={(e) => setMemo(e.target.value)}
-          placeholder="메모 (선택)"
-          rows={2}
-          className={inputClass}
-        />
-        <input
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          placeholder="태그 (쉼표로 구분)"
-          className={inputClass}
-        />
-        <label className="flex flex-col gap-1 text-xs text-muted">
-          마감일 (선택)
+        <label className="pol-field">
+          <span className="pol-field-label">이름</span>
+          <input
+            autoFocus
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="프로젝트 이름"
+            className={inputClass}
+          />
+        </label>
+        <label className="pol-field">
+          <span className="pol-field-label">메모</span>
+          <textarea
+            value={memo}
+            onChange={(e) => setMemo(e.target.value)}
+            placeholder="메모 (선택)"
+            rows={2}
+            className="pol-textarea td-input-compact"
+          />
+        </label>
+        <label className="pol-field">
+          <span className="pol-field-label">태그</span>
+          <input
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            placeholder="태그 (쉼표로 구분)"
+            className={inputClass}
+          />
+        </label>
+        <label className="pol-field">
+          <span className="pol-field-label">마감일 (선택)</span>
           <input
             type="date"
             value={deadline}
@@ -82,18 +90,14 @@ export function ProjectFormModal({ open, project, onClose }: ProjectFormModalPro
             className={inputClass}
           />
         </label>
-        <div className="mt-1 flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-xl px-4 py-2 text-sm text-muted hover:bg-cream"
-          >
+        <div className="td-form-actions">
+          <button type="button" onClick={onClose} className="pol-btn-ghost td-btn">
             취소
           </button>
           <button
             type="submit"
             disabled={!title.trim()}
-            className="rounded-xl bg-lavender-400 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-lavender-500 disabled:opacity-40"
+            className="pol-btn-primary td-btn"
           >
             저장
           </button>

@@ -7,21 +7,14 @@ interface CheckboxProps {
 }
 
 export function Checkbox({ checked, onChange, accent = 'lavender' }: CheckboxProps) {
-  const checkedClass =
-    accent === 'lavender'
-      ? 'border-lavender-400 bg-lavender-400'
-      : 'border-mint-400 bg-mint-400';
-  const idleClass =
-    accent === 'lavender' ? 'border-lavender-200 bg-white' : 'border-mint-200 bg-white';
+  const toneClass = accent === 'lavender' ? 'tone-projects' : 'tone-tasks';
   return (
     <button
       type="button"
       role="checkbox"
       aria-checked={checked}
       onClick={onChange}
-      className={`relative flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors after:absolute after:-inset-2.5 after:content-[''] ${
-        checked ? checkedClass : idleClass
-      }`}
+      className={`td-check ${toneClass}${checked ? ' is-checked' : ''}`}
     >
       {checked && (
         <motion.svg
@@ -29,7 +22,7 @@ export function Checkbox({ checked, onChange, accent = 'lavender' }: CheckboxPro
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 500, damping: 25 }}
           viewBox="0 0 12 10"
-          className="h-3 w-3 fill-none stroke-white stroke-2"
+          aria-hidden="true"
         >
           <path d="M1 5l3 3 7-7" strokeLinecap="round" strokeLinejoin="round" />
         </motion.svg>

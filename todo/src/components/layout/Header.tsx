@@ -10,8 +10,7 @@ import {
 import { todayStr } from '../../utils/date';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 
-const buttonClass =
-  'rounded-xl bg-white px-3 py-1.5 text-xs font-medium shadow-sm transition-colors hover:bg-lavender-50';
+const buttonClass = 'pol-btn-ghost pol-btn-sm td-btn-sm';
 
 export function Header() {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -53,29 +52,34 @@ export function Header() {
     : '';
 
   return (
-    <header className="flex items-center justify-between pt-6">
-      <h1 className="text-2xl font-extrabold tracking-tight">
-        todo<span className="text-lavender-400">.</span>
-      </h1>
-      <div className="flex gap-2">
-        <button type="button" onClick={handleExport} className={buttonClass}>
-          내보내기
-        </button>
-        <button
-          type="button"
-          onClick={() => fileRef.current?.click()}
-          className={buttonClass}
-        >
-          가져오기
-        </button>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="application/json,.json"
-          className="hidden"
-          onChange={(e) => void handleImport(e.target.files?.[0])}
-        />
-      </div>
+    <>
+      <header className="pol-appbar">
+        <a className="pol-brand" href="https://cityzen.kr">
+          cityzen
+        </a>
+        <span className="pol-appbar-sep" aria-hidden="true" />
+        <span className="pol-appbar-title">할 일</span>
+        <div className="pol-appbar-end">
+          <button type="button" onClick={handleExport} className={buttonClass}>
+            내보내기
+          </button>
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            className={buttonClass}
+          >
+            가져오기
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={(e) => void handleImport(e.target.files?.[0])}
+          />
+        </div>
+      </header>
+      {/* 앱바의 backdrop-filter가 fixed 오버레이를 가두지 않도록 header 밖에 둔다 */}
       <ConfirmDialog
         open={pendingImport !== null}
         message={`현재 데이터를 가져온 파일(${pendingSummary})로 전부 교체할까요? 기존 데이터는 사라집니다.`}
@@ -86,6 +90,6 @@ export function Header() {
         }}
         onCancel={() => setPendingImport(null)}
       />
-    </header>
+    </>
   );
 }

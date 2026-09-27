@@ -4,462 +4,410 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>cityzen — portfolio</title>
-<meta name="description" content="cityzen의 온라인 작업물 모음 — AI · 게임 · 툴">
+<meta name="description" content="cityzen의 온라인 작업물 모음 — AI · 게임 · 학습 도구">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,100;1,200;1,300;1,400&family=Space+Mono&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,100..400&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500&family=Space+Mono&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="design-tokens.css">
 <link rel="stylesheet" href="typography.css">
 <link rel="stylesheet" href="polaroid.css">
+<link rel="stylesheet" href="pol-ui.css">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  background: var(--bg-base);
-  color: var(--ink-warm);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* ── Masthead ── */
-.masthead {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding: 40px 48px 28px;
-  border-bottom: 1px solid var(--rule-color);
-}
-.masthead-brand {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 100;
-  font-size: clamp(2.4rem, 5vw, 3.8rem);
-  color: var(--ink-warm);
-  letter-spacing: -0.02em;
-  line-height: 1;
-}
-.masthead-meta {
-  text-align: right;
-}
-.masthead-meta .t-label { display: block; }
-.masthead-meta .t-label + .t-label { margin-top: 4px; }
+*, *::before, *::after { box-sizing: border-box; }
+h1, h2, p, dl, dd { margin: 0; }
+main { overflow-x: clip; }
 
 /* ── Hero ── */
 .hero {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(620px, 1.35fr);
   align-items: center;
-  gap: 40px;
-  padding: 60px 48px 40px;
-  min-height: 480px;
+  gap: var(--space-6);
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-7);
 }
-.hero-copy {
-  max-width: 280px;
-  word-break: keep-all;
+.hero-copy { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-5); word-break: keep-all; }
+.hero-title { font-size: var(--fs-hero); line-height: 1.04; }
+.hero-title .ko { display: block; font-weight: 400; }
+.hero-title em { display: block; font-size: var(--fs-display); font-weight: 300; color: var(--gold-dark); }
+.hero-lead { max-width: 30em; }
+.hero-stats.pol-lstats {
+  justify-content: flex-start;
+  gap: var(--space-6);
+  width: 100%;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--rule-color);
 }
-.hero-copy .t-display {
-  line-height: 0.95;
-  margin-bottom: 20px;
-}
-.hero-copy .t-body {
-  max-width: 240px;
-}
-.hero-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 16px;
-  max-width: 280px;
-}
-.hero-count {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 100;
-  font-size: clamp(3rem, 6vw, 4.8rem);
-  color: var(--gold-mid);
-  line-height: 1;
-}
+
+/* Stage: 5장 캐스케이드 ↔ 부채꼴 (polaroid.css .pol-group 확장) */
+.hero-stage { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); min-width: 0; }
+.hero-group { --pol-width: 162px; width: 100%; min-height: 460px; }
+.hero-group .pol-card { top: 48%; color: inherit; text-decoration: none; }
+.hero-group .pol-card:nth-child(1) { transform: translate(-32px, -18px) rotate(-11deg); z-index: 1; }
+.hero-group .pol-card:nth-child(2) { transform: translate(-12px, 12px) rotate(6deg); z-index: 2; }
+.hero-group .pol-card:nth-child(3) { transform: translate(8px, -14px) rotate(-4deg); z-index: 3; }
+.hero-group .pol-card:nth-child(4) { transform: translate(28px, 8px) rotate(8deg); z-index: 4; }
+.hero-group .pol-card:nth-child(5) { transform: translate(4px, -2px) rotate(-2deg); z-index: 5; }
+.hero-group.open .pol-card:nth-child(1) { transform: translate(-220px, 18px) rotate(-16deg); }
+.hero-group.open .pol-card:nth-child(2) { transform: translate(-110px, -52px) rotate(-8deg); }
+.hero-group.open .pol-card:nth-child(3) { transform: translate(0, -82px) rotate(0deg); }
+.hero-group.open .pol-card:nth-child(4) { transform: translate(110px, -52px) rotate(8deg); }
+.hero-group.open .pol-card:nth-child(5) { transform: translate(220px, 18px) rotate(16deg); }
+.hero-group.open .pol-card { cursor: pointer; }
+.hero-group.open a.pol-card:hover .pol-caption { color: var(--gold-text); }
+.hero-group .pol-caption { font-size: var(--fs-sm); color: var(--ink-warm); }
+.hero-group .pol-tag { display: block; margin-top: 2px; text-align: center; }
 .hero-hint {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 200;
-  font-size: 0.72rem;
-  color: var(--ink-light);
-  transition: opacity .3s;
-  text-align: right;
+  font-family: var(--font-label);
+  font-size: var(--fs-xs);
+  color: var(--ink-muted);
+  text-align: center;
   white-space: pre-line;
   word-break: keep-all;
 }
 
-/* Hero pol-group: 5 cards */
-.hero-group {
-  --pol-width: 162px;
-  min-height: 460px;
-  min-width: 680px;
-}
-/* Anchor point override for 5-card layout */
-.hero-group .pol-card {
-  top: 48%;
-}
-
-/* ── Cascade: 5장 겹치기 ── */
-.hero-group .pol-card:nth-child(1) { transform: translate(-32px, -18px) rotate(-11deg); z-index:1; }
-.hero-group .pol-card:nth-child(2) { transform: translate(-12px,  12px) rotate(  6deg); z-index:2; }
-.hero-group .pol-card:nth-child(3) { transform: translate(  8px, -14px) rotate( -4deg); z-index:3; }
-.hero-group .pol-card:nth-child(4) { transform: translate( 28px,   8px) rotate(  8deg); z-index:4; }
-.hero-group .pol-card:nth-child(5) { transform: translate(  4px,  -2px) rotate( -2deg); z-index:5; }
-
-/* ── Expanded: 부채꼴 아크 ── */
-.hero-group.open .pol-card:nth-child(1) { transform: translate(-220px,  18px) rotate(-16deg); }
-.hero-group.open .pol-card:nth-child(2) { transform: translate(-110px, -52px) rotate( -8deg); }
-.hero-group.open .pol-card:nth-child(3) { transform: translate(   0px, -82px) rotate(  0deg); }
-.hero-group.open .pol-card:nth-child(4) { transform: translate( 110px, -52px) rotate(  8deg); }
-.hero-group.open .pol-card:nth-child(5) { transform: translate( 220px,  18px) rotate( 16deg); }
-/* Card links in expanded hero */
-a.pol-card {
-  color: inherit;
-  text-decoration: none;
-}
-.hero-group.open .pol-card {
-  cursor: pointer;
-}
-.hero-group.open .pol-card:not(.is-pending):hover .pol-caption {
-  color: var(--gold-mid);
-}
-.hero-group.open .pol-card.is-pending {
-  cursor: default;
-}
-.hero-group.open .pol-card.is-pending:hover {
-  box-shadow: var(--shadow-card-open);
-  filter: none;
-}
-
-/* ── 준비 중 (pending) badge ── */
-.is-pending .pol-photo { position: relative; }
-.pol-badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  font-family: var(--font-mono);
-  font-size: 0.5rem;
-  letter-spacing: 0.08em;
-  color: var(--ink-mid);
-  background: var(--cream-200);
-  border: 1px solid var(--rule-color);
-  padding: 3px 7px;
-  word-break: keep-all;
-  white-space: nowrap;
-}
-
-/* ── Section divider ── */
-.divider {
+/* ── Photos ── */
+.pol-photo img { object-position: 50% 0; } /* 세로 스크린샷 — 상단(앱 바) 기준 크롭 */
+.ph-type {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 20px;
-  padding: 0 48px;
-  margin: 8px 0 48px;
+  justify-content: center;
+  gap: var(--space-2);
+  background: var(--paper-light) no-repeat, linear-gradient(145deg, var(--cream-100), var(--cream-400));
+  box-shadow: inset 0 0 0 1px var(--rule-color);
+  text-align: center;
+  user-select: none;
 }
-.divider::before, .divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--rule-color);
-}
-.divider-label {
+.ph-glyph { font-size: var(--fs-heading); line-height: 1; } /* 장식 이모지 */
+.ph-word {
   font-family: var(--font-display);
   font-style: italic;
-  font-weight: 100;
-  font-size: 0.8rem;
-  color: var(--gold-mid);
-  letter-spacing: 0.12em;
+  font-synthesis: none;
+  font-weight: 300;
+  font-size: var(--fs-xl);
+  line-height: 1;
+  color: var(--ink-mid);
+}
+.ph-word::after { content: ""; display: block; width: 28px; height: 1px; margin: var(--space-2) auto 0; background: var(--gold-mid); }
+
+.pol-tag {
+  font-family: var(--font-label);
+  font-style: normal;
+  font-size: var(--fs-2xs);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
   white-space: nowrap;
 }
 
-/* ── Service grid ── */
-.grid-section {
-  padding: 0 48px 80px;
-}
-.grid-header {
+/* ── All projects ── */
+.works { padding-top: var(--space-6); }
+.works-head {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 36px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-4) var(--space-6);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--rule-color);
 }
-.grid-header::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--rule-color);
-}
+.works-head .pol-stack { gap: var(--space-3); }
+.works-title { font-size: var(--fs-heading); }
+.works-title .t-num { font-size: var(--fs-title); margin-left: var(--space-2); }
+.works-filter .pol-chip { min-height: 40px; }
+
 .service-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 32px 24px;
-  justify-items: center;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-7) var(--space-5);
+  margin-top: var(--space-7);
 }
-
-/* Individual service card (not in group) */
 .service-link {
-  text-decoration: none;
   display: block;
-  transition: transform .3s var(--pol-ease);
+  color: inherit;
+  text-decoration: none;
+  transition: transform var(--dur-base) var(--ease-out);
 }
-.service-link:hover {
-  transform: translateY(-4px);
-}
-.service-link:hover .pol-card {
-  box-shadow: var(--shadow-card-lift);
-}
+.service-link[hidden] { display: none; }
 .service-card {
-  --rot: 0deg;
-  transform: rotate(var(--rot));
-  transition: transform .3s var(--pol-ease), box-shadow .3s;
-}
-.service-link:hover .service-card {
-  transform: rotate(0deg);
-}
-.service-link.is-pending { cursor: default; }
-.service-link.is-pending:hover { transform: none; }
-.service-link.is-pending:hover .pol-card { box-shadow: var(--shadow-card); }
-.service-link.is-pending:hover .service-card { transform: rotate(var(--rot)); }
-
-/* Photo gradients (fallback only) */
-.ph-aurora{ background: linear-gradient(145deg, var(--cream-200), var(--cream-500)); }
-
-/* Screenshot thumbnails */
-.pol-photo img {
+  position: relative;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  padding: var(--space-2) var(--space-2) var(--space-4);
+  transform: rotate(var(--rot, 0deg));
+  transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
 }
-
-/* Category tag in caption */
-.pol-tag {
-  font-family: var(--font-mono);
-  font-size: 0.48rem;
-  color: var(--ink-light);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  display: block;
-  margin-top: 2px;
-  text-align: center;
+a.service-link:hover, a.service-link:focus-visible { transform: translateY(-4px); }
+a.service-link:hover .service-card,
+a.service-link:focus-visible .service-card { transform: rotate(0deg); box-shadow: var(--shadow-card-lift); }
+.card-meta { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-2); margin-top: var(--space-3); }
+.card-meta .pol-num { margin-top: 0; }
+.service-card .pol-caption {
+  margin-top: var(--space-1);
+  text-align: left;
+  font-size: var(--fs-lg);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--ink-warm);
 }
-
-/* ── Footer ── */
-footer {
-  border-top: 1px solid var(--rule-color);
-  padding: 28px 48px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.card-desc {
+  margin-top: var(--space-1);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  color: var(--ink-muted);
+  word-break: keep-all;
 }
-.footer-link {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 200;
-  font-size: 0.85rem;
-  color: var(--gold-mid);
-  text-decoration: none;
-  transition: color .2s;
+/* ── Responsive ── */
+@media (max-width: 1080px) {
+  .hero { grid-template-columns: minmax(0, 1fr); padding-top: var(--space-7); }
+  .service-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-.footer-link:hover { color: var(--ink-warm); }
-
-/* ── Mobile ── */
-@media (max-width: 900px) {
-  .hero {
-    grid-template-columns: 1fr;
-    text-align: center;
-    padding: 40px 24px 32px;
-  }
-  .hero-copy { max-width: none; }
-  .hero-copy .t-body { max-width: none; }
-  .hero-group { min-width: auto; }
-  .hero-right { align-items: center; }
-  .service-grid { grid-template-columns: repeat(2, 1fr); }
-  .masthead { padding: 28px 24px 20px; }
-  .grid-section { padding: 0 24px 60px; }
-  .divider { padding: 0 24px; }
-  footer { padding: 24px; flex-direction: column; gap: 12px; text-align: center; }
+@media (max-width: 760px) {
+  .hero-group { --pol-width: 140px; min-height: 420px; }
+  .hero-group.open .pol-card:nth-child(1) { transform: translate(-170px, 16px) rotate(-16deg); }
+  .hero-group.open .pol-card:nth-child(2) { transform: translate(-85px, -46px) rotate(-8deg); }
+  .hero-group.open .pol-card:nth-child(3) { transform: translate(0, -72px) rotate(0deg); }
+  .hero-group.open .pol-card:nth-child(4) { transform: translate(85px, -46px) rotate(8deg); }
+  .hero-group.open .pol-card:nth-child(5) { transform: translate(170px, 16px) rotate(16deg); }
+  .service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-4); }
 }
 @media (max-width: 640px) {
-  /* polaroid.css flat list 모드(≤640px)에서 5장용 데스크톱 transform이
-     이겨서 카드가 화면 밖으로 클립됨 → 전부 리셋 */
-  .hero-group { min-height: auto; min-width: auto; }
-  .hero-group .pol-card { top: auto; }
-  .hero-group .pol-card:nth-child(1) { transform: rotate(-3deg); }
-  .hero-group .pol-card:nth-child(2) { transform: rotate(2deg); }
-  .hero-group .pol-card:nth-child(3) { transform: rotate(-1deg); }
-  .hero-group .pol-card:nth-child(4) { transform: rotate(2.5deg); }
-  .hero-group .pol-card:nth-child(5) { transform: rotate(-2deg); }
-  .hero-group.open .pol-card:nth-child(1),
-  .hero-group.open .pol-card:nth-child(2),
-  .hero-group.open .pol-card:nth-child(3),
-  .hero-group.open .pol-card:nth-child(4),
-  .hero-group.open .pol-card:nth-child(5) {
-    transform: none;
-    box-shadow: var(--shadow-card);
-  }
+  /* polaroid.css 모바일 flat list 대신 작은 부채꼴 — 각 카드가 바로 링크(JS 토글 없음) */
+  .hero { padding-top: var(--space-6); padding-bottom: var(--space-4); gap: var(--space-5); }
+  .works { padding-top: var(--space-5); }
+  .hero-stats.pol-lstats { gap: var(--space-5); }
+  .hero-group { --pol-width: 96px; display: block; min-height: 260px; cursor: default; }
+  .hero-group .pol-card { position: absolute; left: 50%; top: 50%; margin-left: calc(var(--pol-width) / -2); margin-top: -84px; }
+  .hero-group .pol-card:nth-child(1),
+  .hero-group.open .pol-card:nth-child(1) { transform: translate(-100px, 16px) rotate(-14deg); }
+  .hero-group .pol-card:nth-child(2),
+  .hero-group.open .pol-card:nth-child(2) { transform: translate(-50px, -8px) rotate(-7deg); }
+  .hero-group .pol-card:nth-child(3),
+  .hero-group.open .pol-card:nth-child(3) { transform: translate(0, -18px) rotate(0deg); }
+  .hero-group .pol-card:nth-child(4),
+  .hero-group.open .pol-card:nth-child(4) { transform: translate(50px, -8px) rotate(7deg); }
+  .hero-group .pol-card:nth-child(5),
+  .hero-group.open .pol-card:nth-child(5) { transform: translate(100px, 16px) rotate(14deg); }
+  .hero-group.open .pol-card { box-shadow: var(--shadow-card); }
+  .hero-group .pol-caption { font-size: var(--fs-2xs); }
+  .hero-group .pol-tag { display: none; } /* 96px 카드 — 태그가 제목을 덮지 않게 제목만 */
+  .hero-hint { display: none; }
+  .service-grid { gap: var(--space-5) var(--space-3); margin-top: var(--space-5); }
+  .service-card .pol-caption { font-size: var(--fs-base); }
+  .card-meta { flex-wrap: wrap; row-gap: 0; }
 }
-@media (max-width: 480px) {
-  .service-grid { grid-template-columns: 1fr 1fr; gap: 20px 12px; }
+@media (max-width: 360px) {
+  .hero-group .pol-card:nth-child(1),
+  .hero-group.open .pol-card:nth-child(1) { transform: translate(-88px, 16px) rotate(-14deg); }
+  .hero-group .pol-card:nth-child(2),
+  .hero-group.open .pol-card:nth-child(2) { transform: translate(-44px, -8px) rotate(-7deg); }
+  .hero-group .pol-card:nth-child(4),
+  .hero-group.open .pol-card:nth-child(4) { transform: translate(44px, -8px) rotate(7deg); }
+  .hero-group .pol-card:nth-child(5),
+  .hero-group.open .pol-card:nth-child(5) { transform: translate(88px, 16px) rotate(14deg); }
 }
 </style>
 </head>
-<body>
+<body class="pol-body">
 
-<!-- ── Masthead ── -->
-<header class="masthead">
-  <div class="masthead-brand">cityzen</div>
-  <div class="masthead-meta">
-    <span class="t-label">portfolio</span>
-    <span class="t-label">2026</span>
-  </div>
+<header class="pol-appbar">
+  <a class="pol-brand" href="https://cityzen.kr">cityzen</a>
+  <span class="pol-appbar-sep" aria-hidden="true"></span>
+  <span class="pol-appbar-title">Portfolio</span>
+  <div class="pol-appbar-end"><span class="t-label is-mono">14 works</span></div>
 </header>
 
+<main>
 <!-- ── Hero ── -->
-<section class="hero">
+<section class="pol-page hero" aria-labelledby="hero-title">
   <div class="hero-copy">
-    <h1 class="t-display">Works<br>living<br>online.</h1>
-    <p class="t-body" style="margin-top:20px">
-      직접 만들어 운영하는<br>
-      AI · 게임 · 툴의 작업물 모음.
-    </p>
-    <p class="t-caption" style="margin-top:28px">← 카드를 클릭해서 펼치기</p>
+    <span class="pol-eyebrow">직접 만들어 운영하는 작업물</span>
+    <h1 class="t-display hero-title" id="hero-title">
+      <span class="ko">살아 있는 작업물,</span>
+      <em>works living online.</em>
+    </h1>
+    <p class="t-lead hero-lead">집 서버에서 직접 만들어 운영하는 AI · 게임 · 학습 도구 모음. 카드를 눌러 바로 방문해 보세요.</p>
+    <div class="pol-row">
+      <a class="pol-btn-primary" href="#all">전체 작업물 보기 ↓</a>
+      <a class="pol-btn-ghost" href="https://cityzen.kr">cityzen.kr →</a>
+    </div>
+    <dl class="pol-lstats hero-stats">
+      <div class="pol-lstat"><dt>작업물</dt><dd>14</dd></div>
+      <div class="pol-lstat"><dt>게임</dt><dd>8</dd></div>
+      <div class="pol-lstat"><dt>AI</dt><dd>4</dd></div>
+      <div class="pol-lstat"><dt>광고</dt><dd>0</dd></div>
+    </dl>
   </div>
 
-  <div class="pol-group hero-group" id="heroGroup">
-    <!-- Card 1: Jarvis (AI) — 준비 중 -->
-    <div class="pol-card is-pending" aria-disabled="true">
-      <div class="pol-photo"><img src="thumbs/jarvis.jpg" alt="Jarvis"><span class="pol-badge">준비 중</span></div>
-      <span class="pol-num">01</span>
-      <p class="pol-caption">Jarvis<span class="pol-tag">AI · Voice</span></p>
-    </div>
-    <!-- Card 2: ShopScout (Tool) — 준비 중 -->
-    <div class="pol-card is-pending" aria-disabled="true">
-      <div class="pol-photo"><img src="thumbs/shopscout.jpg" alt="ShopScout"><span class="pol-badge">준비 중</span></div>
-      <span class="pol-num">02</span>
-      <p class="pol-caption">ShopScout<span class="pol-tag">Tool · Chat</span></p>
-    </div>
-    <!-- Card 3: Onmantle (Game) -->
-    <a class="pol-card" href="https://onmantle.cityzen.kr" target="_blank" rel="noopener">
-      <div class="pol-photo"><img src="thumbs/onmantle.jpg" alt="Onmantle"></div>
-      <span class="pol-num">03</span>
-      <p class="pol-caption">Onmantle<span class="pol-tag">Game · Words</span></p>
-    </a>
-    <!-- Card 4: Aura (AI TTS) — 준비 중 -->
-    <div class="pol-card is-pending" aria-disabled="true">
-      <div class="pol-photo"><img src="thumbs/aura.jpg" alt="Aura"><span class="pol-badge">준비 중</span></div>
-      <span class="pol-num">04</span>
-      <p class="pol-caption">Aura<span class="pol-tag">AI · TTS</span></p>
-    </div>
-    <!-- Card 5: Aurora Hands (AI Vision) -->
-    <a class="pol-card" href="https://games.cityzen.kr/aurora-hands/" target="_blank" rel="noopener">
-      <div class="pol-photo ph-aurora"></div>
-      <span class="pol-num">05</span>
-      <p class="pol-caption">Aurora Hands<span class="pol-tag">AI · Vision</span></p>
-    </a>
-  </div>
-
-  <div class="hero-right">
-    <div>
-      <div class="hero-count">13</div>
-      <span class="t-label" style="display:block;margin-top:4px">projects</span>
+  <div class="hero-stage">
+    <div class="pol-group hero-group" id="heroGroup">
+      <a class="pol-card" href="https://jarvis.cityzen.kr" target="_blank" rel="noopener">
+        <div class="pol-photo"><img src="thumbs/jarvis.jpg" alt="Jarvis 화면"></div>
+        <span class="pol-num">01</span>
+        <p class="pol-caption">Jarvis<span class="pol-tag">AI · Voice</span></p>
+      </a>
+      <a class="pol-card" href="https://shopscout.cityzen.kr" target="_blank" rel="noopener">
+        <div class="pol-photo"><img src="thumbs/shopscout.jpg" alt="ShopScout 화면"></div>
+        <span class="pol-num">02</span>
+        <p class="pol-caption">ShopScout<span class="pol-tag">AI · Chat</span></p>
+      </a>
+      <a class="pol-card" href="https://onmantle.cityzen.kr" target="_blank" rel="noopener">
+        <div class="pol-photo"><img src="thumbs/onmantle.jpg" alt="Onmantle 화면"></div>
+        <span class="pol-num">03</span>
+        <p class="pol-caption">Onmantle<span class="pol-tag">Game · Words</span></p>
+      </a>
+      <a class="pol-card" href="https://aura.cityzen.kr" target="_blank" rel="noopener">
+        <div class="pol-photo"><img src="thumbs/aura.jpg" alt="Aura 화면"></div>
+        <span class="pol-num">04</span>
+        <p class="pol-caption">Aura<span class="pol-tag">AI · TTS</span></p>
+      </a>
+      <a class="pol-card" href="https://games.cityzen.kr" target="_blank" rel="noopener">
+        <div class="pol-photo"><img src="thumbs/games.jpg" alt="Games Hub 화면"></div>
+        <span class="pol-num">14</span>
+        <p class="pol-caption">Games Hub<span class="pol-tag">Game · Hub</span></p>
+      </a>
     </div>
     <p class="hero-hint" id="heroHint">클릭 → 펼치기<br>다시 클릭 → 접기</p>
   </div>
 </section>
 
-<!-- ── Divider ── -->
-<div class="divider">
-  <span class="divider-label">AI · Games · Tools</span>
-</div>
-
-<!-- ── Service Grid ── -->
-<section class="grid-section">
-  <div class="grid-header">
-    <span class="t-label">All projects</span>
-  </div>
-  <div class="service-grid">
-
-    <!-- StudyAI — 준비 중 -->
-    <div class="service-link is-pending" aria-disabled="true">
-      <div class="pol-card service-card" style="--rot:-3deg">
-        <div class="pol-photo"><img src="thumbs/study.jpg" alt="StudyAI"><span class="pol-badge">준비 중</span></div>
-        <span class="pol-num">06</span>
-        <p class="pol-caption">StudyAI<span class="pol-tag">Tool · Learn</span></p>
-      </div>
+<!-- ── All projects ── -->
+<section class="pol-page works" id="all" aria-labelledby="all-title">
+  <div class="works-head">
+    <div class="pol-stack">
+      <span class="pol-eyebrow">전체 작업물</span>
+      <h2 class="t-display works-title" id="all-title">All projects<span class="t-num">14</span></h2>
+      <p class="t-small">카드를 누르면 새 탭에서 바로 열립니다.</p>
     </div>
+    <div class="pol-row works-filter" role="group" aria-label="분류로 걸러 보기">
+      <button type="button" class="pol-chip" data-filter="all" aria-pressed="true">전체</button>
+      <button type="button" class="pol-chip" data-filter="ai" aria-pressed="false">AI</button>
+      <button type="button" class="pol-chip" data-filter="game" aria-pressed="false">게임</button>
+      <button type="button" class="pol-chip" data-filter="study" aria-pressed="false">학습</button>
+    </div>
+  </div>
 
-    <!-- Doom Shooter -->
-    <a class="service-link" href="https://games.cityzen.kr/doom-shooter/" target="_blank" rel="noopener">
-      <div class="pol-card service-card" style="--rot:2.5deg">
-        <div class="pol-photo"><img src="thumbs/doom-shooter.jpg" alt="Doom Shooter"></div>
-        <span class="pol-num">07</span>
-        <p class="pol-caption">Doom Shooter<span class="pol-tag">Game · FPS</span></p>
-      </div>
-    </a>
-
-    <!-- Pacman -->
-    <a class="service-link" href="https://games.cityzen.kr/pacman/" target="_blank" rel="noopener">
+  <div class="service-grid">
+    <a class="service-link" data-cat="ai" href="https://jarvis.cityzen.kr" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:-2deg">
-        <div class="pol-photo"><img src="thumbs/pacman.jpg" alt="Pacman"></div>
-        <span class="pol-num">08</span>
-        <p class="pol-caption">Pacman<span class="pol-tag">Game · Arcade</span></p>
+        <div class="pol-photo"><img src="thumbs/jarvis.jpg" alt="Jarvis 화면" loading="lazy"></div>
+        <div class="card-meta"><span class="pol-num">No. 01</span><span class="pol-tag">AI · Voice</span></div>
+        <p class="pol-caption">Jarvis</p>
+        <p class="card-desc">말로 대화하는 자비스풍 AI 비서</p>
       </div>
     </a>
-
-    <!-- Tetris -->
-    <a class="service-link" href="https://games.cityzen.kr/tetris/" target="_blank" rel="noopener">
+    <a class="service-link" data-cat="ai" href="https://shopscout.cityzen.kr" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:1.5deg">
-        <div class="pol-photo"><img src="thumbs/tetris.jpg" alt="Tetris"></div>
-        <span class="pol-num">09</span>
-        <p class="pol-caption">Tetris<span class="pol-tag">Game · Puzzle</span></p>
+        <div class="pol-photo"><img src="thumbs/shopscout.jpg" alt="ShopScout 화면" loading="lazy"></div>
+        <div class="card-meta"><span class="pol-num">No. 02</span><span class="pol-tag">AI · Chat</span></div>
+        <p class="pol-caption">ShopScout</p>
+        <p class="card-desc">대화로 좁혀 가는 구매 추천</p>
       </div>
     </a>
-
-    <!-- Apple Game -->
-    <a class="service-link" href="https://games.cityzen.kr/apple-game/" target="_blank" rel="noopener">
-      <div class="pol-card service-card" style="--rot:-2.5deg">
-        <div class="pol-photo"><img src="thumbs/apple-game.jpg" alt="Apple Game"></div>
-        <span class="pol-num">10</span>
-        <p class="pol-caption">Apple Game<span class="pol-tag">Game · Puzzle</span></p>
+    <a class="service-link" data-cat="game" href="https://onmantle.cityzen.kr" target="_blank" rel="noopener">
+      <div class="pol-card service-card" style="--rot:-1deg">
+        <div class="pol-photo"><img src="thumbs/onmantle.jpg" alt="Onmantle 화면" loading="lazy"></div>
+        <div class="card-meta"><span class="pol-num">No. 03</span><span class="pol-tag">Game · Words</span></div>
+        <p class="pol-caption">Onmantle</p>
+        <p class="card-desc">뜻이 가까울수록 점수가 오르는 단어 추리</p>
       </div>
     </a>
-
-    <!-- Yaong -->
-    <a class="service-link" href="https://games.cityzen.kr/yaong/" target="_blank" rel="noopener">
+    <a class="service-link" data-cat="ai" href="https://aura.cityzen.kr" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:2deg">
-        <div class="pol-photo"><img src="thumbs/yaong.jpg" alt="Yaong"></div>
-        <span class="pol-num">11</span>
-        <p class="pol-caption">Yaong<span class="pol-tag">Game · Cat</span></p>
+        <div class="pol-photo"><img src="thumbs/aura.jpg" alt="Aura 화면" loading="lazy"></div>
+        <div class="card-meta"><span class="pol-num">No. 04</span><span class="pol-tag">AI · TTS</span></div>
+        <p class="pol-caption">Aura</p>
+        <p class="card-desc">신경망 목소리로 답하는 음성 AI</p>
       </div>
     </a>
-
-    <!-- Deep Learning -->
-    <a class="service-link" href="https://games.cityzen.kr/deeplearning/" target="_blank" rel="noopener">
-      <div class="pol-card service-card" style="--rot:-1.5deg">
-        <div class="pol-photo"><img src="thumbs/deeplearning.jpg" alt="Deep Learning"></div>
-        <span class="pol-num">12</span>
-        <p class="pol-caption">Deep Learning<span class="pol-tag">Study · AI</span></p>
+    <a class="service-link" data-cat="ai" href="https://games.cityzen.kr/aurora-hands/" target="_blank" rel="noopener">
+      <div class="pol-card service-card" style="--rot:-2.5deg">
+        <div class="pol-photo ph-type"><span class="ph-glyph" aria-hidden="true">✋</span><span class="ph-word">aurora</span></div>
+        <div class="card-meta"><span class="pol-num">No. 05</span><span class="pol-tag">AI · Vision</span></div>
+        <p class="pol-caption">Aurora Hands</p>
+        <p class="card-desc">손동작으로 그리는 빛 인터랙션</p>
       </div>
     </a>
-
-    <!-- Games Hub -->
-    <a class="service-link" href="https://games.cityzen.kr" target="_blank" rel="noopener">
+    <a class="service-link" data-cat="study" href="https://studyai.cityzen.kr" target="_blank" rel="noopener">
       <div class="pol-card service-card" style="--rot:1deg">
-        <div class="pol-photo"><img src="thumbs/games.jpg" alt="Games Hub"></div>
-        <span class="pol-num">13</span>
-        <p class="pol-caption">Games Hub<span class="pol-tag">Game · Hub</span></p>
+        <div class="pol-photo"><img src="thumbs/studyai.jpg" alt="StudyAI 화면" loading="lazy"></div>
+        <div class="card-meta"><span class="pol-num">No. 06</span><span class="pol-tag">Study · AI</span></div>
+        <p class="pol-caption">StudyAI</p>
+        <p class="card-desc">AI와 함께 정리하고 복습하기</p>
       </div>
     </a>
-
+    <a class="service-link" data-cat="game" href="https://balancegame.cityzen.kr" target="_blank" rel="noopener">
+      <div class="pol-card service-card" style="--rot:-1.5deg">
+        <div class="pol-photo"><img src="thumbs/balancegame.jpg" alt="밸런스 게임 화면" loading="lazy"></div>
+        <div class="card-meta"><span class="pol-num">No. 07</span><span class="pol-tag">Game · VS</span></div>
+        <p class="pol-caption">Balance Game</p>
+        <p class="card-desc">양자택일 토너먼트, 남들의 선택까지</p>
+      </div>
+    </a>
+    <a class="service-link" data-cat="game" href="https://games.cityzen.kr/doom-shooter/" target="_blank" rel="noopener">
+      <div class="pol-card service-card" style="--rot:2.5deg">
+        <div class="pol-photo ph-type"><span class="ph-glyph" aria-hidden="true">🔫</span><span class="ph-word">doom</span></div>
+        <div class="card-meta"><span class="pol-num">No. 08</span><span class="pol-tag">Game · FPS</span></div>
+        <p class="pol-caption">Doom Shooter</p>
+        <p class="card-desc">브라우저에서 즐기는 레트로 FPS</p>
+      </div>
+    </a>
+    <a class="service-link" data-cat="game" href="https://games.cityzen.kr/pacman/" target="_blank" rel="noopener">
+      <div class="pol-card service-card" style="--rot:-2deg">
+        <div class="pol-photo ph-type"><span class="ph-glyph" aria-hidden="true">👻</span><span class="ph-word">pac-man</span></div>
+        <div class="card-meta"><span class="pol-num">No. 09</span><span class="pol-tag">Game · Arcade</span></div>
+        <p class="pol-caption">Pacman</p>
+        <p class="card-desc">먹고, 피하고, 도망치는 아케이드</p>
+      </div>
+    </a>
+    <a class="service-link" data-cat="game" href="https://games.cityzen.kr/tetris/" target="_blank" rel="noopener">
+      <div class="pol-card service-card" style="--rot:1.5deg">
+        <div class="pol-photo ph-type"><span class="ph-glyph" aria-hidden="true">🧱</span><span class="ph-word">tetris</span></div>
+        <div class="card-meta"><span class="pol-num">No. 10</span><span class="pol-tag">Game · Puzzle</span></div>
+        <p class="pol-caption">Tetris</p>
+        <p class="card-desc">줄을 채워 지우는 블록 퍼즐</p>
+      </div>
+    </a>
+    <a class="service-link" data-cat="game" href="https://games.cityzen.kr/apple-game/" target="_blank" rel="noopener">
+      <div class="pol-card service-card" style="--rot:-2.5deg">
+        <div class="pol-photo ph-type"><span class="ph-glyph" aria-hidden="true">🍎</span><span class="ph-word">apple</span></div>
+        <div class="card-meta"><span class="pol-num">No. 11</span><span class="pol-tag">Game · Puzzle</span></div>
+        <p class="pol-caption">Apple Game</p>
+        <p class="card-desc">합이 10이 되도록 사과를 묶는 숫자 퍼즐</p>
+      </div>
+    </a>
+    <a class="service-link" data-cat="game" href="https://games.cityzen.kr/yaong/" target="_blank" rel="noopener">
+      <div class="pol-card service-card" style="--rot:2deg">
+        <div class="pol-photo ph-type"><span class="ph-glyph" aria-hidden="true">🐱</span><span class="ph-word">yaong</span></div>
+        <div class="card-meta"><span class="pol-num">No. 12</span><span class="pol-tag">Game · Cat</span></div>
+        <p class="pol-caption">Yaong</p>
+        <p class="card-desc">목소리로 고양이를 점프시키는 게임</p>
+      </div>
+    </a>
+    <a class="service-link" data-cat="study" href="https://deeplearning.cityzen.kr" target="_blank" rel="noopener">
+      <div class="pol-card service-card" style="--rot:-1.5deg">
+        <div class="pol-photo"><img src="thumbs/deeplearning.jpg" alt="딥러닝 노트 화면" loading="lazy"></div>
+        <div class="card-meta"><span class="pol-num">No. 13</span><span class="pol-tag">Study · Notes</span></div>
+        <p class="pol-caption">Deep Learning</p>
+        <p class="card-desc">딥러닝 완전 이해 — 강의 노트</p>
+      </div>
+    </a>
+    <a class="service-link" data-cat="game" href="https://games.cityzen.kr" target="_blank" rel="noopener">
+      <div class="pol-card service-card" style="--rot:1deg">
+        <div class="pol-photo"><img src="thumbs/games.jpg" alt="Games Hub 화면" loading="lazy"></div>
+        <div class="card-meta"><span class="pol-num">No. 14</span><span class="pol-tag">Game · Hub</span></div>
+        <p class="pol-caption">Games Hub</p>
+        <p class="card-desc">설치 없이 바로 하는 브라우저 게임 모음</p>
+      </div>
+    </a>
   </div>
 </section>
+</main>
 
-<!-- ── Footer ── -->
-<footer>
-  <a class="footer-link" href="https://cityzen.kr">← cityzen.kr</a>
-  <span class="t-label">© 2026 cityzen</span>
+<footer class="pol-appfoot">
+  <a href="https://cityzen.kr">← cityzen.kr</a>
+  <span>© 2026 cityzen · 직접 만들어 운영하는 작업물 모음</span>
 </footer>
 
 <script>
@@ -468,7 +416,7 @@ footer {
   const flatList  = window.matchMedia('(max-width: 640px)');
 
   heroGroup.addEventListener('click', function(e) {
-    // 모바일 flat list: 토글 없이 링크 기본 동작 그대로
+    // 모바일 부채꼴: 토글 없이 링크 기본 동작 그대로
     if (flatList.matches) return;
     const isOpen = heroGroup.classList.contains('open');
     const link = e.target.closest('a.pol-card');
@@ -479,13 +427,22 @@ footer {
       heroHint.textContent = '카드 클릭 → 방문\n빈 곳 클릭 → 접기';
       return;
     }
-    // 펼침 상태: 라이브 카드(<a>)는 브라우저 기본 이동
+    // 펼침 상태: 카드(<a>)는 브라우저 기본 이동
     if (link) return;
-    // 준비 중 카드 클릭: 무시
-    if (e.target.closest('.pol-card')) return;
     // 빈 곳 클릭: 접기
     heroGroup.classList.remove('open');
     heroHint.textContent = '클릭 → 펼치기\n다시 클릭 → 접기';
+  });
+
+  // 분류 칩 — 클래스/속성 토글만 (마크업 삽입 없음)
+  const chips = document.querySelectorAll('.works-filter .pol-chip');
+  const works = document.querySelectorAll('.service-grid .service-link');
+  chips.forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      const f = chip.dataset.filter;
+      chips.forEach(function(c) { c.setAttribute('aria-pressed', String(c === chip)); });
+      works.forEach(function(w) { w.hidden = f !== 'all' && w.dataset.cat !== f; });
+    });
   });
 </script>
 </body>

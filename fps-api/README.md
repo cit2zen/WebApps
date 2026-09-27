@@ -12,6 +12,9 @@ Flask JSON API (`wsgi:app`). 클라이언트 = Unity WebGL `develop_web/UnityFPS
 | POST | `/api/runs` | 판 텔레메트리(개인정보 없음) — `run_id`당 1줄, 부활 후 재전송은 교체 |
 | GET | `/api/stats?key=<FPS_ADMIN_KEY>[&days=30&version=]` | 밸런싱 집계(아레나·모드별 중앙 생존 시간·웨이브 분포·무기·모듈·사망 원인). 키 미설정이면 404 |
 | GET | `/healthz` | DB 연결 확인 |
+| GET | `/[?board=std-neon\|std-foundry\|std-rooftop\|daily]` | 사람용 안내 페이지(HTML, Polaroid v2 — `pages.py` + `templates/` + `static/`): 상태·TOP 10·공개 엔드포인트. 읽기 레이트 리밋 공유, DB 장애 시에도 200 |
+
+브라우저(Accept가 text/html 우선)의 404는 Polaroid HTML, 그 밖(헤더 없음·`*/*`·JSON)은 `{"error":"not_found"}` 그대로. HTML 응답에만 CSP(`default-src 'none'`, 스타일 self + Google Fonts)·`X-Frame-Options: DENY`. `static/`의 키트 4종은 `sync_design.py`가 동기하는 정본 사본(직접 수정 금지), 앱 전용 스타일은 `static/fps-api.css`.
 
 오류는 `{"error": 코드}` — 400 형식 · 401 `bad_signature` · 409 `duplicate` · 422 `implausible`(+`reason`) · 429 `rate_limited`(+`Retry-After`).
 

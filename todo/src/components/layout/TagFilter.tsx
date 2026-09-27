@@ -11,17 +11,14 @@ export function TagFilter() {
   if (tags.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className="td-tags-filter" aria-label="태그 필터">
       {tags.map((tag) => (
         <button
           key={tag}
           type="button"
+          aria-pressed={selectedTag === tag}
           onClick={() => toggleTag(tag)}
-          className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-            selectedTag === tag
-              ? 'bg-lavender-400 text-white'
-              : 'bg-white text-muted shadow-sm hover:bg-lavender-50'
-          }`}
+          className="pol-chip td-chip"
         >
           #{tag}
         </button>

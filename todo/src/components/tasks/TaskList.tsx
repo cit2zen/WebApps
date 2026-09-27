@@ -18,13 +18,19 @@ export function TaskList() {
   const doneRecentFirst = [...done].reverse();
 
   return (
-    <section className="flex flex-col gap-3">
+    <section className="td-section">
+      <div className="td-section-head">
+        <div>
+          <p className="pol-eyebrow">빠른 한 줄 추가 · 마감일 · 태그</p>
+          <h2 className="td-section-title">To-do</h2>
+        </div>
+      </div>
       <QuickAdd />
       {pending.length === 0 && done.length === 0 ? (
         <EmptyState emoji="🌿" message="할 일이 없어요. 위 입력창에 추가해 보세요!" />
       ) : (
         <LayoutGroup>
-          <ul className="flex flex-col gap-2">
+          <ul className="td-list">
             <AnimatePresence initial={false}>
               {pending.map((task) => (
                 <TaskItem key={task.id} task={task} />
@@ -32,13 +38,13 @@ export function TaskList() {
             </AnimatePresence>
           </ul>
           {done.length > 0 && (
-            <div className="mt-2">
-              <div className="mb-2 flex items-center justify-between">
+            <div>
+              <div className="td-done-head">
                 <button
                   type="button"
                   onClick={() => setDoneCollapsed(!doneCollapsed)}
                   aria-expanded={!doneCollapsed}
-                  className="text-xs font-semibold text-muted hover:text-ink"
+                  className="td-text-btn is-strong"
                 >
                   완료됨 ({done.length}) {doneCollapsed ? '▸' : '▾'}
                 </button>
@@ -46,14 +52,14 @@ export function TaskList() {
                   <button
                     type="button"
                     onClick={() => setClearConfirmOpen(true)}
-                    className="px-1.5 py-1 text-xs text-muted/70 hover:text-rose-pastel-500"
+                    className="td-text-btn is-danger"
                   >
                     모두 비우기
                   </button>
                 )}
               </div>
               {!doneCollapsed && (
-                <ul className="flex flex-col gap-2">
+                <ul className="td-list">
                   <AnimatePresence initial={false}>
                     {doneRecentFirst.map((task) => (
                       <TaskItem key={task.id} task={task} />

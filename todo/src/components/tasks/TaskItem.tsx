@@ -7,8 +7,7 @@ import { Badge } from '../common/Badge';
 import { Checkbox } from '../common/Checkbox';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 
-const inputClass =
-  'w-full rounded-xl bg-cream px-3 py-1.5 text-base outline-none focus:ring-2 focus:ring-mint-200 sm:text-sm';
+const inputClass = 'pol-input td-input-compact';
 
 export function TaskItem({ task }: { task: SimpleTask }) {
   const toggleTask = useAppStore((s) => s.toggleTask);
@@ -41,26 +40,27 @@ export function TaskItem({ task }: { task: SimpleTask }) {
       initial={false}
       exit={{ opacity: 0, height: 0, marginBottom: 0 }}
       transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }}
-      className="rounded-2xl bg-white p-3 shadow-sm"
+      className="td-item"
     >
-      <div className="flex items-center gap-2.5">
+      <div className="td-item-row">
         <Checkbox checked={task.done} onChange={() => toggleTask(task.id)} accent="mint" />
         <button
           type="button"
           onClick={toggleExpanded}
           aria-expanded={expanded}
-          className="flex min-w-0 flex-1 items-center gap-2 text-left"
+          className="td-item-main"
         >
           <span
-            className={`flex-1 text-sm ${expanded ? 'break-words [overflow-wrap:anywhere]' : 'truncate'} ${
-              task.done ? 'text-muted line-through' : ''
+            className={`td-item-title ${expanded ? 'break-words [overflow-wrap:anywhere]' : 'truncate'}${
+              task.done ? ' is-done' : ''
             }`}
           >
             {task.title}
           </span>
           {!task.done && <Badge deadline={task.deadline} />}
           <span
-            className={`shrink-0 text-xs text-muted/60 transition-transform ${expanded ? 'rotate-180' : ''}`}
+            className={`td-chevron${expanded ? ' is-open' : ''}`}
+            aria-hidden="true"
           >
             ▾
           </span>
@@ -69,16 +69,16 @@ export function TaskItem({ task }: { task: SimpleTask }) {
           type="button"
           aria-label="할 일 삭제"
           onClick={() => setConfirmOpen(true)}
-          className="-my-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted/60 transition-colors hover:bg-rose-pastel-100/50 hover:text-rose-pastel-500"
+          className="td-icon-btn is-danger"
         >
           ×
         </button>
       </div>
 
       {expanded && (
-        <div className="mt-3 flex flex-col gap-2 border-t border-cream pt-3">
-          <label className="flex flex-col gap-1 text-xs text-muted">
-            제목
+        <div className="td-item-edit">
+          <label className="pol-field">
+            <span className="pol-field-label">제목</span>
             <input
               value={titleDraft}
               onChange={(e) => setTitleDraft(e.target.value)}
@@ -94,8 +94,8 @@ export function TaskItem({ task }: { task: SimpleTask }) {
               className={inputClass}
             />
           </label>
-          <label className="flex flex-col gap-1 text-xs text-muted">
-            마감일
+          <label className="pol-field">
+            <span className="pol-field-label">마감일</span>
             <input
               type="date"
               value={task.deadline ?? ''}
@@ -105,8 +105,8 @@ export function TaskItem({ task }: { task: SimpleTask }) {
               className={inputClass}
             />
           </label>
-          <label className="flex flex-col gap-1 text-xs text-muted">
-            태그 (쉼표로 구분)
+          <label className="pol-field">
+            <span className="pol-field-label">태그 (쉼표로 구분)</span>
             <input
               value={tagsDraft}
               onChange={(e) => setTagsDraft(e.target.value)}
@@ -122,8 +122,8 @@ export function TaskItem({ task }: { task: SimpleTask }) {
               className={inputClass}
             />
           </label>
-          <label className="flex flex-col gap-1 text-xs text-muted">
-            메모
+          <label className="pol-field">
+            <span className="pol-field-label">메모</span>
             <textarea
               value={memoDraft}
               onChange={(e) => setMemoDraft(e.target.value)}
@@ -136,7 +136,7 @@ export function TaskItem({ task }: { task: SimpleTask }) {
                 if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) e.currentTarget.blur();
               }}
               rows={2}
-              className={inputClass}
+              className="pol-textarea td-input-compact"
             />
           </label>
         </div>

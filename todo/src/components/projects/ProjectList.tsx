@@ -15,24 +15,30 @@ export function ProjectList() {
   const visible = sortProjects(filterByTag(projects, selectedTag));
 
   return (
-    <section className="flex flex-col gap-3">
-      <button
-        type="button"
-        onClick={() => {
-          setEditing(undefined);
-          setModalOpen(true);
-        }}
-        className="self-end rounded-xl bg-lavender-400 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-lavender-500"
-      >
-        + 새 프로젝트
-      </button>
+    <section className="td-section">
+      <div className="td-section-head">
+        <div>
+          <p className="pol-eyebrow">세부 체크리스트 · 진행률</p>
+          <h2 className="td-section-title">Projects</h2>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setEditing(undefined);
+            setModalOpen(true);
+          }}
+          className="pol-btn-primary pol-btn-sm td-btn-sm"
+        >
+          + 새 프로젝트
+        </button>
+      </div>
       {visible.length === 0 ? (
         <EmptyState
           emoji="🗂️"
           message="아직 프로젝트가 없어요. 첫 프로젝트를 만들어 보세요!"
         />
       ) : (
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {visible.map((project) => (
             <ProjectCard
               key={project.id}

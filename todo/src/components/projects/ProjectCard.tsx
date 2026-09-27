@@ -29,28 +29,20 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
   };
 
   return (
-    <article
-      className={`flex flex-col gap-3 rounded-2xl p-5 shadow-sm ${
-        done ? 'bg-lavender-50' : 'bg-white'
-      }`}
-    >
+    <article className={`pol-tile td-project${done ? ' is-done' : ''}`}>
       <div className="flex items-start justify-between gap-2">
-        <h3 className="min-w-0 font-bold break-words [overflow-wrap:anywhere]">
-          {done && <span className="mr-1 text-lavender-500">✓</span>}
+        <h3 className="td-card-title">
+          {done && <span className="td-done-mark">✓</span>}
           {project.title}
         </h3>
-        <div className="flex shrink-0 gap-1 text-xs">
-          <button
-            type="button"
-            onClick={onEdit}
-            className="-my-1 px-1.5 py-1.5 text-muted hover:text-ink"
-          >
+        <div className="td-actions">
+          <button type="button" onClick={onEdit} className="td-text-btn">
             수정
           </button>
           <button
             type="button"
             onClick={() => setConfirmOpen(true)}
-            className="-my-1 px-1.5 py-1.5 text-muted hover:text-rose-pastel-500"
+            className="td-text-btn is-danger"
           >
             삭제
           </button>
@@ -58,16 +50,14 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
       </div>
 
       {(done || project.deadline || project.tags.length > 0) && (
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="td-tags">
           {done ? (
-            <span className="rounded-full bg-lavender-100 px-2 py-0.5 text-xs font-medium text-lavender-500">
-              완료
-            </span>
+            <span className="pol-badge pol-badge-gold">완료</span>
           ) : (
             <Badge deadline={project.deadline} />
           )}
           {project.tags.map((tag) => (
-            <span key={tag} className="rounded-full bg-cream px-2 py-0.5 text-xs text-muted">
+            <span key={tag} className="td-tag">
               #{tag}
             </span>
           ))}
@@ -75,15 +65,13 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
       )}
 
       {project.memo && (
-        <p className="text-xs break-words whitespace-pre-wrap text-muted [overflow-wrap:anywhere]">
-          {project.memo}
-        </p>
+        <p className="td-memo">{project.memo}</p>
       )}
 
       <ProgressBar percent={percent} />
 
       {project.subtasks.length > 0 && (
-        <ul className="flex flex-col gap-1.5">
+        <ul className="td-subtasks">
           {project.subtasks.map((subtask) => (
             <SubtaskItem key={subtask.id} projectId={project.id} subtask={subtask} />
           ))}
@@ -100,7 +88,8 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
         placeholder="+ 세부 할 일 추가 (Enter)"
         autoComplete="off"
         enterKeyHint="done"
-        className="rounded-xl bg-cream px-3 py-1.5 text-base outline-none placeholder:text-muted focus:ring-2 focus:ring-lavender-200 sm:text-sm"
+        aria-label="세부 할 일 추가"
+        className="pol-input td-input-compact"
       />
 
       <ConfirmDialog

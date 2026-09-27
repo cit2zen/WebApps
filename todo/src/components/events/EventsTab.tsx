@@ -7,7 +7,7 @@ export function EventsTab() {
   const [selected, setSelected] = useState(todayStr());
 
   return (
-    <section className="flex flex-col gap-3">
+    <section className="td-events">
       <MiniCalendar selected={selected} onSelect={setSelected} />
       <EventList date={selected} onSelectDate={setSelected} />
     </section>

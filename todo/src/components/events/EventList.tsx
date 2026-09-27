@@ -22,57 +22,49 @@ export function EventList({ date, onSelectDate }: EventListProps) {
   const list = eventsOn(events, date);
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold">{dayjs(date).format('M월 D일 (ddd)')} 일정</h3>
+    <div className="td-section">
+      <div className="td-list-head">
+        <h3 className="td-list-title">{dayjs(date).format('M월 D일 (ddd)')} 일정</h3>
         <button
           type="button"
           onClick={() => {
             setEditing(undefined);
             setModalOpen(true);
           }}
-          className="rounded-xl bg-peach-400 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-peach-500"
+          className="pol-btn-primary pol-btn-sm td-btn-sm"
         >
           + 일정 추가
         </button>
       </div>
       {list.length === 0 ? (
-        <EmptyState emoji="🍑" message="이 날엔 일정이 없어요." />
+        <EmptyState emoji="📅" message="이 날엔 일정이 없어요." />
       ) : (
-        <ul className="flex flex-col gap-2">
+        <ul className="td-list">
           {list.map((event) => (
-            <li
-              key={event.id}
-              className="flex items-start gap-3 rounded-2xl bg-white p-3 shadow-sm"
-            >
-              <span className="w-12 shrink-0 pt-0.5 text-xs font-semibold text-peach-500">
+            <li key={event.id} className="td-item td-event">
+              {/* 시간(숫자)만 모노, 종일(한글)은 라벨 폰트 */}
+              <span className={`td-event-time ${event.time ? 'is-mono' : 'is-allday'}`}>
                 {event.time ?? '종일'}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium break-words [overflow-wrap:anywhere]">
-                  {event.title}
-                </p>
-                {event.memo && (
-                  <p className="mt-0.5 text-xs break-words whitespace-pre-wrap text-muted [overflow-wrap:anywhere]">
-                    {event.memo}
-                  </p>
-                )}
+                <p className="td-event-title">{event.title}</p>
+                {event.memo && <p className="td-memo mt-0.5">{event.memo}</p>}
               </div>
-              <div className="flex shrink-0 gap-1 text-xs">
+              <div className="td-actions">
                 <button
                   type="button"
                   onClick={() => {
                     setEditing(event);
                     setModalOpen(true);
                   }}
-                  className="-my-1 px-1.5 py-1.5 text-muted hover:text-ink"
+                  className="td-text-btn"
                 >
                   수정
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmId(event.id)}
-                  className="-my-1 px-1.5 py-1.5 text-muted hover:text-rose-pastel-500"
+                  className="td-text-btn is-danger"
                 >
                   삭제
                 </button>

@@ -29,7 +29,7 @@ export function SubtaskItem({
   };
 
   return (
-    <li className="group flex items-center gap-2">
+    <li className="group td-subtask">
       <Checkbox
         checked={subtask.done}
         onChange={() => toggleSubtask(projectId, subtask.id)}
@@ -49,15 +49,14 @@ export function SubtaskItem({
               setEditing(false);
             }
           }}
-          className="min-w-0 flex-1 rounded-lg border border-lavender-200 px-2 py-0.5 text-base outline-none sm:text-sm"
+          aria-label="세부 할 일 이름"
+          className="pol-input td-input-inline"
         />
       ) : (
         <span
           onDoubleClick={startEditing}
           title="더블클릭 또는 ✎ 버튼으로 수정"
-          className={`min-w-0 flex-1 text-sm break-words [overflow-wrap:anywhere] ${
-            subtask.done ? 'text-muted line-through' : ''
-          }`}
+          className={`td-subtask-text${subtask.done ? ' is-done' : ''}`}
         >
           {subtask.title}
         </span>
@@ -67,7 +66,7 @@ export function SubtaskItem({
           type="button"
           aria-label="세부 할 일 이름 수정"
           onClick={startEditing}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs text-muted/60 transition-colors hover:text-ink sm:opacity-0 sm:group-hover:opacity-100"
+          className="td-icon-btn is-small sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
         >
           ✎
         </button>
@@ -76,7 +75,7 @@ export function SubtaskItem({
         type="button"
         aria-label="세부 할 일 삭제"
         onClick={() => deleteSubtask(projectId, subtask.id)}
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm text-muted/60 transition-colors hover:bg-rose-pastel-100/50 hover:text-rose-pastel-500"
+        className="td-icon-btn is-danger"
       >
         ×
       </button>

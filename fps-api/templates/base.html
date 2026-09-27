@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Overclock Arena API{% endblock %}</title>
+  <meta name="description" content="Overclock Arena(games.cityzen.kr/fps) 글로벌 랭킹·익명 판 기록 JSON API">
+  <link rel="icon" href="data:,">
+  <!-- Polaroid Editorial v2 — 키트 4종은 static/에 정본 사본(sync_design.py가 동기), 앱 전용은 fps-api.css -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,100..400&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500&family=Space+Mono&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='design-tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='typography.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='polaroid.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='pol-ui.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fps-api.css') }}">
+</head>
+<body class="pol-body">
+  <header class="pol-appbar">
+    <a class="pol-brand" href="https://cityzen.kr">cityzen</a>
+    <span class="pol-appbar-sep" aria-hidden="true"></span>
+    <span class="pol-appbar-title">Overclock Arena API</span>
+    <div class="pol-appbar-end">{% block appbar_end %}{% endblock %}</div>
+  </header>
+
+  <main class="pol-page">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="pol-appfoot">
+    <a href="https://cityzen.kr">← cityzen.kr</a>
+    <span>© 2026 cityzen · 오버클럭 아레나 글로벌 랭킹 API</span>
+  </footer>
+</body>
+</html>

@@ -11,8 +11,7 @@ interface EventFormModalProps {
   onSaved?: (date: string) => void;
 }
 
-const inputClass =
-  'w-full rounded-xl bg-cream px-3 py-2 text-base outline-none focus:ring-2 focus:ring-peach-200 sm:text-sm';
+const inputClass = 'pol-input td-input-compact';
 
 export function EventFormModal({
   open,
@@ -55,22 +54,25 @@ export function EventFormModal({
   return (
     <Modal open={open} title={event ? '일정 수정' : '새 일정'} onClose={onClose}>
       <form
-        className="flex flex-col gap-3"
+        className="td-form"
         onSubmit={(e) => {
           e.preventDefault();
           submit();
         }}
       >
-        <input
-          autoFocus
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="일정 제목"
-          className={inputClass}
-        />
-        <div className="flex gap-2">
-          <label className="flex flex-1 flex-col gap-1 text-xs text-muted">
-            날짜
+        <label className="pol-field">
+          <span className="pol-field-label">제목</span>
+          <input
+            autoFocus
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="일정 제목"
+            className={inputClass}
+          />
+        </label>
+        <div className="td-form-row">
+          <label className="pol-field">
+            <span className="pol-field-label">날짜</span>
             <input
               type="date"
               value={date}
@@ -78,8 +80,8 @@ export function EventFormModal({
               className={inputClass}
             />
           </label>
-          <label className="flex flex-1 flex-col gap-1 text-xs text-muted">
-            시간 (선택)
+          <label className="pol-field">
+            <span className="pol-field-label">시간 (선택)</span>
             <input
               type="time"
               value={time}
@@ -88,25 +90,24 @@ export function EventFormModal({
             />
           </label>
         </div>
-        <textarea
-          value={memo}
-          onChange={(e) => setMemo(e.target.value)}
-          placeholder="메모 (선택)"
-          rows={2}
-          className={inputClass}
-        />
-        <div className="mt-1 flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-xl px-4 py-2 text-sm text-muted hover:bg-cream"
-          >
+        <label className="pol-field">
+          <span className="pol-field-label">메모</span>
+          <textarea
+            value={memo}
+            onChange={(e) => setMemo(e.target.value)}
+            placeholder="메모 (선택)"
+            rows={2}
+            className="pol-textarea td-input-compact"
+          />
+        </label>
+        <div className="td-form-actions">
+          <button type="button" onClick={onClose} className="pol-btn-ghost td-btn">
             취소
           </button>
           <button
             type="submit"
             disabled={!title.trim() || !date}
-            className="rounded-xl bg-peach-400 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-peach-500 disabled:opacity-40"
+            className="pol-btn-primary td-btn"
           >
             저장
           </button>
