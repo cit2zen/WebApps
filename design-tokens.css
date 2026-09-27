@@ -43,22 +43,23 @@
   --rule-color: rgba(192, 160, 96, 0.3);
   --rule-strong: rgba(192, 160, 96, 0.6);
   --ruled-line: rgba(184, 152, 90, 0.4);
-  --focus-ring: 0 0 0 3px rgba(192, 160, 96, 0.35);
+  --focus-ring: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--gold-text); /* 흰 여백 + gold-text 링: 모든 바탕에서 3:1 이상 */
   --hairline-gold: linear-gradient(90deg, var(--gold-mid), rgba(192, 160, 96, 0));
 
   /* Paper — 인화지 결(그레인)·조명 */
   --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.06 0 0 0 0 0.02 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --paper-light: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255, 252, 244, 0.7), rgba(255, 252, 244, 0));
 
-  /* Status */
-  --pol-ok: #5a7d45;
-  --pol-ok-soft: rgba(90, 125, 69, 0.08);
-  --pol-ok-line: rgba(90, 125, 69, 0.35);
-  --pol-danger: #b04030;
-  --pol-danger-soft: rgba(176, 64, 48, 0.06);
-  --pol-danger-line: rgba(176, 64, 48, 0.3);
-  --pol-info: #4a6a8a;
-  --pol-info-soft: rgba(74, 106, 138, 0.08);
+  /* Status — 알림 틴트 위에서도 bg-base 기준 4.5:1 이상 (2026-09-27 보정) */
+  --pol-ok: #4b6839;
+  --pol-ok-soft: rgba(75, 104, 57, 0.08);
+  --pol-ok-line: rgba(75, 104, 57, 0.35);
+  --pol-danger: #a83d2e;
+  --pol-danger-soft: rgba(168, 61, 46, 0.06);
+  --pol-danger-line: rgba(168, 61, 46, 0.3);
+  --pol-info: #456280;
+  --pol-info-soft: rgba(69, 98, 128, 0.08);
+  --pol-info-line: rgba(69, 98, 128, 0.3);
 
   /* Shadows */
   --shadow-card: 0 3px 12px rgba(0, 0, 0, 0.18);

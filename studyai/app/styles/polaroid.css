@@ -9,6 +9,7 @@
   padding: var(--pol-pad);
   box-shadow: var(--shadow-card);
   width: var(--pol-width);
+  box-sizing: border-box; /* 전역 리셋 없이도 160px */
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -22,7 +23,8 @@
   background: var(--cream-400);
 }
 
-.pol-photo img {
+.pol-photo img,
+.pol-photo svg {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -48,13 +50,15 @@
   font-size: var(--fs-xs);
   color: var(--ink-muted);
   text-align: center;
-  margin-top: 2px;
+  margin: 2px 0 0;
 }
 
 /* ─────────────────────────────────────────
    Group: cascade ↔ inverted pyramid toggle
    Usage: <div class="pol-group"> × 3 .pol-card
           JS: group.classList.toggle('open')
+   펼친 역삼각형은 기준점 위아래로 약 420px를 차지한다 — min-height 300px 밖으로
+   넘치므로 위아래 여백을 두거나 앱 CSS에서 min-height를 늘린다.
 ───────────────────────────────────────── */
 .pol-group {
   position: relative;
@@ -130,10 +134,15 @@
   .pol-group .pol-card:nth-child(1) { transform: rotate(-3deg); }
   .pol-group .pol-card:nth-child(2) { transform: rotate(2deg); }
   .pol-group .pol-card:nth-child(3) { transform: rotate(-1deg); }
+  /* 펼침(.open) = 정돈 — 모바일에선 기울기 없이 반듯한 목록 (doltap 로비가 이 동작에 기대고 있다) */
   .pol-group.open .pol-card:nth-child(1),
   .pol-group.open .pol-card:nth-child(2),
   .pol-group.open .pol-card:nth-child(3) {
     transform: none;
     box-shadow: var(--shadow-card);
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pol-group .pol-card { transition: none; }
 }
