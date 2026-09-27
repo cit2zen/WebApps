@@ -17,7 +17,7 @@ ARENAS = (("neon", "Neon"), ("foundry", "Foundry"), ("rooftop", "Rooftop"))   # 
 
 # HTML 응답 전용 — 앱 스크립트 없음, 외부 리소스는 Google Fonts(그레인 텍스처 = CSS data: 이미지)와
 # Cloudflare가 엣지에서 자동 삽입하는 Web Analytics 비콘 한 출처만(다른 cityzen 사이트와 동일, 차단 시 콘솔 오류)
-CSP = ("default-src 'none'; script-src https://static.cloudflareinsights.com; connect-src https://cloudflareinsights.com; "
+CSP = ("default-src 'none'; script-src https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com; "
        "style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; "
        "img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'")
 
