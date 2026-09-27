@@ -33,6 +33,7 @@
 !/subway
 !/hanbut
 !/voice-planner
+!/doltap
 
 # 의존성/빌드 산출물은 어느 앱이든 추적 제외
 node_modules/
@@ -61,3 +62,6 @@ __pycache__/
 # fps-api 로컬 SQLite·캐시
 fps-api/*.db
 .pytest_cache/
+doltap/tools/ref.json
+doltap/tools/tests/out/
+doltap/tools/tests/__pycache__/
