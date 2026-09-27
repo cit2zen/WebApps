@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>보이스 플래너</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,340..680&display=swap" />
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+<div class="app">
+
+  <header class="app__header">
+    <div class="header__date">
+      <span id="headerDate" class="header__date-text">날짜를 불러오는 중</span>
+    </div>
+    <div class="header__account">
+      <span id="headerAccount" class="header__account-text">로그인 필요</span>
+      <button id="btnSettings" class="iconbtn" type="button" aria-label="설정 열기">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 13.6l1.6.9-1 1.7-1.8-.5a6.9 6.9 0 01-1.6 1l-.3 1.9h-2l-.3-1.9a6.9 6.9 0 01-1.6-1l-1.8.5-1-1.7 1.6-.9a6.9 6.9 0 010-1.8l-1.6-.9 1-1.7 1.8.5a6.9 6.9 0 011.6-1l.3-1.9h2l.3 1.9a6.9 6.9 0 011.6 1l1.8-.5 1 1.7-1.6.9c.1.6.1 1.2 0 1.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="app__main" id="appMain">
+
+    <div id="dataPanels">
+    <section class="panel panel--events" aria-labelledby="eventsTitle">
+      <div class="panel__head">
+        <h2 id="eventsTitle" class="panel__title">일정</h2>
+        <button id="btnRefresh" class="textbtn" type="button">새로고침</button>
+      </div>
+      <p id="eventsCountdown" class="events__countdown" hidden></p>
+      <ul id="eventsList" class="events__list"></ul>
+      <p id="eventsEmpty" class="empty-note" hidden></p>
+    </section>
+
+    <section class="panel panel--todos" aria-labelledby="todosTitle">
+      <div class="panel__head">
+        <h2 id="todosTitle" class="panel__title">할 일</h2>
+      </div>
+      <ol id="todosList" class="todos__list"></ol>
+      <p id="todosEmpty" class="empty-note" hidden>아직 할 일이 없어요. 아래에서 추가해보세요.</p>
+
+      <form id="quickAddForm" class="quickadd" autocomplete="off">
+        <input id="quickAddInput" class="quickadd__input" type="text" placeholder="할 일 추가하기" maxlength="140" />
+        <button class="quickadd__btn" type="submit" aria-label="추가">+</button>
+      </form>
+
+      <button id="btnToggleDone" class="donetoggle" type="button" hidden>
+        <span id="doneToggleLabel">완료됨</span>
+        <span id="doneToggleArrow" class="donetoggle__arrow">▸</span>
+      </button>
+      <ol id="doneList" class="todos__list todos__list--done" hidden></ol>
+    </section>
+    </div>
+
+    <section id="onboarding" class="onboarding" hidden>
+      <p class="onboarding__title">Google 계정을 연결하면<br />일정과 할 일이 여기에 모여요</p>
+      <button id="btnOnboardSettings" class="onboarding__btn" type="button">설정 열기</button>
+    </section>
+
+  </main>
+
+  <div class="voicebar">
+    <div id="voiceStatus" class="voicebar__status" aria-live="polite"></div>
+    <div id="voiceBubble" class="voicebar__bubble" hidden></div>
+    <form id="textCmdForm" class="voicebar__textform" hidden autocomplete="off">
+      <input id="textCmdInput" class="voicebar__textinput" type="text" placeholder="명령을 입력하세요" />
+      <button class="voicebar__textsend" type="submit" aria-label="전송">전송</button>
+    </form>
+    <div class="voicebar__row">
+      <button id="btnToggleText" class="voicebar__kbdbtn" type="button" aria-label="텍스트로 명령 입력">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="7" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 11h.01M9 11h.01M12 11h.01M15 11h.01M18 11h.01M7 15h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+      <button id="btnMic" class="micbtn" type="button" aria-label="음성 명령 시작">
+        <span class="micbtn__ring micbtn__ring--1"></span>
+        <span class="micbtn__ring micbtn__ring--2"></span>
+        <svg class="micbtn__icon" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M12 15a3.5 3.5 0 003.5-3.5V6a3.5 3.5 0 00-7 0v5.5A3.5 3.5 0 0012 15z" fill="currentColor"/><path d="M6.5 11v.5a5.5 5.5 0 0011 0V11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M12 17v3.2M9.2 20.2h5.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+      <div class="voicebar__spacer" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <div id="sheetBackdrop" class="sheet-backdrop" hidden></div>
+  <section id="settingsSheet" class="sheet" aria-labelledby="settingsTitle" hidden>
+    <div class="sheet__grabber"></div>
+    <h2 id="settingsTitle" class="sheet__title">설정</h2>
+    <p id="settingsMsg" class="sheet__msg" hidden></p>
+
+    <label class="field">
+      <span class="field__label">Anthropic API 키</span>
+      <input id="fieldApiKey" class="field__input" type="password" autocomplete="off" placeholder="sk-ant-..." />
+    </label>
+
+    <label class="field">
+      <span class="field__label">Google Web Client ID</span>
+      <input id="fieldGoogleClientId" class="field__input" type="text" autocomplete="off" placeholder="xxxx.apps.googleusercontent.com" />
+    </label>
+
+    <label class="field">
+      <span class="field__label">알림 (분 전)</span>
+      <input id="fieldReminderMinutes" class="field__input" type="number" min="0" max="180" />
+    </label>
+
+    <div class="sheet__account">
+      <span id="sheetAccountText" class="sheet__account-text">로그인되어 있지 않아요</span>
+      <button id="btnGoogleAuth" class="sheet__authbtn" type="button">Google 로그인</button>
+    </div>
+
+    <button id="btnNotifPermission" class="sheet__permbtn" type="button">알림 권한 요청</button>
+
+    <p class="sheet__note">API 키는 이 기기에만 저장되며 외부로 전송되지 않아요.</p>
+
+    <div class="sheet__actions">
+      <button id="btnSettingsCancel" class="sheet__cancelbtn" type="button">닫기</button>
+      <button id="btnSettingsSave" class="sheet__savebtn" type="button">저장</button>
+    </div>
+  </section>
+
+</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

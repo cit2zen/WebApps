@@ -1,0 +1,16 @@
+{
+  "appId": "io.github.cit2zen.voiceplanner",
+  "appName": "보이스 플래너",
+  "webDir": "www",
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon_config_sample",
+      "iconColor": "#488AFF"
+    },
+    "SocialLogin": {
+      "google": {
+        "webClientId": "200946765758-fp7stf1ksfc2vgsobeueqqmhi5r10efn.apps.googleusercontent.com"
+      }
+    }
+  }
+}

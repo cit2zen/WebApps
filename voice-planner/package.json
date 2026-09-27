@@ -1,0 +1,22 @@
+{
+  "name": "voice-planner",
+  "version": "1.0.0",
+  "private": true,
+  "description": "보이스 플래너 - 음성 제어 할 일 + 구글 캘린더 앱",
+  "scripts": {
+    "sync": "cap sync android",
+    "open": "cap open android"
+  },
+  "dependencies": {
+    "@capacitor-community/speech-recognition": "^7.0.1",
+    "@capacitor-community/text-to-speech": "^8.0.2",
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/local-notifications": "^8.3.1",
+    "@capacitor/preferences": "^8.0.1",
+    "@capgo/capacitor-social-login": "^8.5.11"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.2"
+  }
+}
