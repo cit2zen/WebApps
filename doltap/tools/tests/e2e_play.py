@@ -132,7 +132,8 @@ with page_session(port=PORT, viewport=(390, 844), path='/doltap/', query='') as 
     page.wait_for_timeout(1000)
     s2 = hook(page, 'view().aim.stepsLeft')
     page.keyboard.press('Escape')
-    check(hook(page, 'state()') == 'aim' and s1 == s2 == hook(page, 'view().aim.stepsLeft'), f'12 stepsLeft {s1} {s2}')
+    s3 = hook(page, 'view().aim.stepsLeft')                # 재개 직후 프레임이 1~2스텝 돌 수 있다
+    check(hook(page, 'state()') == 'aim' and s1 == s2 and s2 - 3 <= s3 <= s2, f'12 stepsLeft {s1} {s2} {s3}')
     # 13 — visibilitychange hidden → paused·suspended, visible이어도 유지, 계속 → aim·running
     page.evaluate(VIS, False)
     page.wait_for_timeout(100)
@@ -141,7 +142,7 @@ with page_session(port=PORT, viewport=(390, 844), path='/doltap/', query='') as 
     page.wait_for_timeout(100)
     check(hook(page, 'state()') == 'paused', '13 visible이어도 자동 재개 없음')
     page.click('#dlg-pause .pol-btn-primary')
-    page.wait_for_timeout(100)                            # resume()도 suspend()처럼 비동기(§8 자동화 우회 visibilitychange)
+    page.wait_for_function("() => window.__doltap.audio() === 'running'", timeout=3000)  # resume()은 비동기 — 부하 시 100ms 초과
     check(hook(page, 'state()') == 'aim' and hook(page, 'audio()') == 'running', '13 계속')
     # 14 — 가로 화면 → paused + 오버레이, 세로 복귀 뒤에도 paused, 바위 픽셀 복원
     page.set_viewport_size({'width': 844, 'height': 390})
