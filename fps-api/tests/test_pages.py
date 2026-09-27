@@ -24,7 +24,10 @@ def test_landing_is_polaroid_html(client):
 
 def test_landing_csp_only_on_html(client):
     csp = client.get("/").headers.get("Content-Security-Policy", "")
-    assert "default-src 'none'" in csp and "script-src" not in csp
+    assert "default-src 'none'" in csp
+    # 스크립트는 Cloudflare 비콘 한 출처만 — 인라인·eval·와일드카드 금지
+    assert "script-src https://static.cloudflareinsights.com;" in csp
+    assert "'unsafe-inline'" not in csp and "'unsafe-eval'" not in csp and "*" not in csp
     assert "https://fonts.googleapis.com" in csp and "frame-ancestors 'none'" in csp
     # JSON API 응답 헤더는 바뀌지 않는다
     for path in ("/healthz", "/api/scores?board=std-neon"):
