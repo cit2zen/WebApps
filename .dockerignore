@@ -14,11 +14,8 @@
 !yaong/
 !doom-shooter/
 !aurora-hands/
-!deeplearning/
 !reaction-duel/
 !fps/
 !subway/
 !hanbut/
 hanbut/tools/
-reaction-duel/Dockerfile
-reaction-duel/default.conf.template
