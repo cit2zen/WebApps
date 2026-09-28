@@ -41,11 +41,30 @@ window.SubwayInput = (function () {
       chips.appendChild(b);
     });
   }
+  // 홈: 노선 칩(같은 #chips 줄). 누르면 그 노선으로 바로 시작. 색 견본만 데이터 색(#rrggbb 검증) 인라인.
+  function setLines(list) {
+    chips.textContent = '';
+    list.forEach(function (ln) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'chip chip-line';
+      b.setAttribute('aria-pressed', ln.selected ? 'true' : 'false');
+      b.dataset.line = ln.id;
+      var sw = document.createElement('span');
+      sw.className = 'chip-swatch';
+      if (/^#[0-9a-fA-F]{6}$/.test(ln.color || '')) sw.style.background = ln.color;
+      b.appendChild(sw);
+      b.appendChild(document.createTextNode(ln.name));   // textContent 계열만
+      var pick = function (e) { e.preventDefault(); send('OnSelectLine', ln.id); };
+      b.addEventListener('pointerdown', pick);
+      b.addEventListener('click', function (e) { if (e.detail === 0) pick(e); });   // 키보드(Tab → Space/Enter)
+      chips.appendChild(b);
+    });
+  }
   function clear() { input.value = ''; chips.textContent = ''; }
   // hidden 패널도 CSS상 display:block(출처 줄만 표시) — 표시 여부 판정은 panel.hidden / #answer 가시성으로
   function setVisible(v) { panel.hidden = !v; if (v) input.focus(); }
   function bind(name) { target = name; }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
-  return { bind: bind, setSuggestions: setSuggestions, clear: clear, setVisible: setVisible };
+  return { bind: bind, setSuggestions: setSuggestions, setLines: setLines, clear: clear, setVisible: setVisible };
 })();
