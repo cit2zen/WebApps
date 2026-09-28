@@ -37,3 +37,14 @@ body.is-playing.pol-body::after { display: none; }   /* 플레이 중엔 인화�
 /* 주의: hidden이어도 출처 표기 줄만 남기려 display:block — 패널 표시 여부는 computed display가 아니라 panel.hidden / #answer 가시성으로 판정 */
 #input-panel[hidden] { display: block !important; padding: 0 var(--space-2) calc(var(--space-1) + env(safe-area-inset-bottom)); background: none; border-top: 0; box-shadow: none; pointer-events: none; }
 #input-panel[hidden] > :not(#attribution) { display: none; }
+
+/* 홈 모드 칩(시간제한·무제한·2인 대결) — 고른 모드는 잉크 채움. 노선 칩과는 세로 헤어라인으로 구분 */
+.chip-mode[aria-pressed="true"] { background: var(--ink-warm); border-color: var(--ink-warm); color: var(--bg-card); }
+.chip-sep { flex: 0 0 1px; align-self: stretch; margin: var(--space-1) var(--space-1); background: var(--rule-strong); }
+
+/* 2인 대결: 지금 차례 띠 + 패널 윗선 색(1P = --pol-info, 2P = --pol-ok) */
+#turn { display: inline-flex; align-items: center; min-height: 28px; box-sizing: border-box; margin-bottom: var(--space-2); padding: 0 var(--space-3); border-radius: var(--r-pill); font-family: var(--font-label); font-size: var(--fs-md); font-weight: 700; font-synthesis: none; color: var(--bg-card); background: var(--ink-muted); }
+#input-panel[data-player="1"] { border-top: 3px solid var(--pol-info); }
+#input-panel[data-player="2"] { border-top: 3px solid var(--pol-ok); }
+#input-panel[data-player="1"] #turn { background: var(--pol-info); }
+#input-panel[data-player="2"] #turn { background: var(--pol-ok); }
