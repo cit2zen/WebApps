@@ -21,6 +21,17 @@ export function useAgentStream(onEvent: (e: AgentEvent) => void) {
         body: JSON.stringify({ message, sessionId: sessionId.current }),
         signal: ac.signal,
       });
+      // 세션 만료·비밀번호 변경 → proxy가 401 JSON. 로그인 화면으로.
+      if (res.status === 401) {
+        window.location.href = "/login";
+        return;
+      }
+      const ct = res.headers.get("content-type") ?? "";
+      if (!res.ok && !ct.includes("text/event-stream")) {
+        const body = (await res.json().catch(() => null)) as { message?: string } | null;
+        onEventRef.current({ type: "error", message: body?.message ?? `HTTP ${res.status}` });
+        return;
+      }
       const reader = res.body!.getReader();
       const decoder = new TextDecoder();
       for (;;) {

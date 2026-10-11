@@ -167,3 +167,9 @@ html, body { width: 100%; height: 100dvh; overflow: hidden; }
   .jv-ring-a, .jv-ring-b, .jv-ring-c { animation: none !important; }
   .jv-response { animation: none; }
 }
+
+/* ── 로그인(비밀번호 게이트) ── */
+.jv-login { display: grid; place-items: center; padding: var(--space-4); background: var(--bg-base); }
+.jv-login-card { display: flex; flex-direction: column; gap: 0.75rem; width: min(100%, 360px); padding: 1.75rem 1.5rem; }
+.jv-login-title { font-family: var(--font-display); font-style: italic; font-weight: 300; font-size: var(--fs-title); color: var(--ink-warm); }
+.jv-login-card .pol-btn-primary { justify-content: center; margin-top: 0.25rem; }

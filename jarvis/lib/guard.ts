@@ -5,7 +5,7 @@
 // 단일 인스턴스(standalone Docker) 전제의 인메모리 구현. prod 다중 인스턴스 전이 시 Redis로 교체.
 
 const WINDOW_MS = 60_000;          // 1분 창
-const MAX_PER_WINDOW = Number(process.env.JARVIS_RATE_LIMIT ?? 8); // cid/IP당 분당 요청
+const MAX_PER_WINDOW = Number(process.env.JARVIS_RATE_LIMIT ?? 20); // cid/IP당 분당 요청
 
 type Bucket = { count: number; resetAt: number };
 const buckets = new Map<string, Bucket>();
