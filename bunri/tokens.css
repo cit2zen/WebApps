@@ -1,0 +1,120 @@
+/* 척척 분리수거 — 디자인 토큰 "스티커 재활용 센터" (색 hex는 이 파일에만) */
+:root {
+  color-scheme: light;
+
+  /* 바탕·글자 */
+  --bg: #F2F6EC;
+  --bg-dot: #D6E2CB;
+  --blob-1: #BDEBD3;
+  --blob-2: #FFE59A;
+  --blob-3: #FFD0C8;
+  --surface: #FFFFFF;
+  --surface-2: #F8FBF4;
+  --white: #FFFFFF;
+  --ink: #1E2A24;
+  --ink-2: #55635B;
+  --ink-3: #7D8B83;
+  --line: var(--ink);
+
+  /* 브랜드·상태 */
+  --brand: #1FA97A;
+  --brand-dark: #13805B;
+  --brand-soft: color-mix(in srgb, var(--brand) 18%, var(--white));
+  --sun: #FFC93C;
+  --sun-soft: color-mix(in srgb, var(--sun) 28%, var(--white));
+  --coral: #FF6B5B;
+  --coral-soft: color-mix(in srgb, var(--coral) 18%, var(--white));
+  --ok: #2BB673;
+  --ok-soft: color-mix(in srgb, var(--ok) 18%, var(--white));
+  --scrim: color-mix(in srgb, var(--ink) 45%, transparent);
+
+  /* 수거함 색 */
+  --bin-paper: #3D7BF5;
+  --bin-plastic: #FF8A3D;
+  --bin-can: #E5484D;
+  --bin-glass: #22A863;
+  --bin-general: #59636B;
+  --bin-vinyl: #F5B82E;
+  --bin-food: #A06A3B;
+  --bin-pet: #2DB8D6;
+  --bin-carton: #E86BAA;
+  --bin-styro: #A3B4C8;
+  --bin-special: #8B5CF6;
+
+  --rainbow: linear-gradient(90deg, var(--coral), var(--sun), var(--ok), var(--bin-pet), var(--bin-paper), var(--bin-special), var(--coral));
+
+  /* 글꼴 */
+  --font-display: 'Jua', 'Pretendard Variable', system-ui, sans-serif;
+  --font-body: 'Pretendard Variable', Pretendard, system-ui, -apple-system, sans-serif;
+
+  /* 글자 크기 (최소 11px) */
+  --fs-2xs: 11px;
+  --fs-xs: 12px;
+  --fs-sm: 14px;
+  --fs-base: 16px;
+  --fs-md: 18px;
+  --fs-lg: 22px;
+  --fs-xl: 28px;
+  --fs-2xl: 36px;
+  --fs-3xl: 48px;
+  --fs-hero: 64px;
+
+  /* 간격 */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+
+  /* 모양 */
+  --bw: 2.5px;
+  --r-xs: 10px;
+  --r-sm: 14px;
+  --r-md: 20px;
+  --r-lg: 28px;
+  --r-pill: 999px;
+  --shadow-ink: 0 4px 0 var(--ink);
+  --shadow-ink-sm: 0 2px 0 var(--ink);
+  --shadow-ink-lg: 0 6px 0 var(--ink);
+  --shadow-soft: 0 12px 32px color-mix(in srgb, var(--ink) 16%, transparent);
+  --ring: 0 0 0 3px var(--sun), 0 0 0 5.5px var(--ink);
+
+  /* 움직임 */
+  --dur-fast: 120ms;
+  --dur: 220ms;
+  --dur-slow: 420ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 마스코트 척척이 + 무대 테마 (coder B) */
+:root {
+  --bot-body: #4FC3A1;
+  --bot-body-dark: #2E9C7E;
+  --bot-screen: #1D3B36;
+  --bot-eye: #8FF7D2;
+  --bot-cheek: #FF8FA3;
+  --bot-tear: #6CC4FF;
+  --sky-morning-1: #BFE6FF;
+  --sky-morning-2: #EEF9FF;
+  --sky-noon-1: #FFE2A8;
+  --sky-noon-2: #FFF7E4;
+  --sky-sunset-1: #FF9E7A;
+  --sky-sunset-2: #FFC4D6;
+  --sky-sunset-3: #FFF0E6;
+  --sky-night-1: #1B2453;
+  --sky-night-2: #3A4C8F;
+  --sky-star: #FFF6C8;
+  --paper-grid: #CFE0F5;
+  --paper-margin: #F5A3A3;
+}
+
+/* 스티커북·기록 (coder C) — 다이컷 비닐 스티커 */
+:root {
+  --stk-edge: #FFFFFF;
+  --stk-locked: #E3E8DF;
+  --stk-locked-ink: #A7B2AB;
+  --stk-gloss: color-mix(in srgb, var(--stk-edge) 55%, transparent);
+}

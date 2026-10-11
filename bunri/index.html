@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>척척 분리수거 — 헷갈리는 쓰레기, 어디에 버릴까?</title>
+  <meta name="description" content="컨베이어 벨트 위 쓰레기를 알맞은 수거함으로! 틀리면 이유를 알려주고, 도감으로 복습해요.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%99%BB%EF%B8%8F%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="lobby.css">
+  <link rel="stylesheet" href="play.css">
+  <link rel="stylesheet" href="stage.css">
+  <link rel="stylesheet" href="fx.css">
+  <link rel="stylesheet" href="result.css">
+  <link rel="stylesheet" href="dex.css">
+  <link rel="stylesheet" href="mascot.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="mech.css">
+  <link rel="stylesheet" href="meta.css">
+</head>
+<body>
+  <!-- 로비 -->
+  <section id="lobby" class="screen lobby" aria-label="로비">
+    <div class="lb-top">
+      <a class="pill-link" href="../">← 게임 허브</a>
+      <div class="lb-toggles">
+        <button id="btn-music" class="icon-btn" type="button" aria-pressed="true" aria-label="음악 켜짐">🎵</button>
+        <button id="btn-sound" class="icon-btn" type="button" aria-pressed="true" aria-label="소리 켜짐">🔊</button>
+      </div>
+    </div>
+    <div class="lb-hero">
+      <div class="sticker-cluster">
+        <button id="lb-mascot" class="lb-mascot" type="button" aria-label="척척이에게 분리배출 팁 듣기"></button>
+        <span class="sticker" aria-hidden="true" style="--x:-118px;--y:-70px;--r:-12deg;--d:0s">🧴</span>
+        <span class="sticker" aria-hidden="true" style="--x:112px;--y:-78px;--r:10deg;--d:.4s">📰</span>
+        <span class="sticker" aria-hidden="true" style="--x:-142px;--y:22px;--r:8deg;--d:.8s">🥫</span>
+        <span class="sticker" aria-hidden="true" style="--x:140px;--y:16px;--r:-9deg;--d:1.2s">🍾</span>
+        <span class="sticker sm" aria-hidden="true" style="--x:-70px;--y:78px;--r:-6deg;--d:.6s">🛍️</span>
+        <span class="sticker sm" aria-hidden="true" style="--x:76px;--y:80px;--r:12deg;--d:1s">🥛</span>
+        <span class="sticker sm" aria-hidden="true" style="--x:-6px;--y:-104px;--r:4deg;--d:1.4s">🔋</span>
+      </div>
+      <h1 class="lb-title"><span class="marker">척척</span> 분리수거</h1>
+      <p class="lb-sub">헷갈리는 쓰레기, 어디에 버릴까?</p>
+    </div>
+    <ul class="rule-chips" aria-label="분리배출 4대 원칙">
+      <li><span aria-hidden="true">🫙</span>비운다</li>
+      <li><span aria-hidden="true">💧</span>헹군다</li>
+      <li><span aria-hidden="true">✂️</span>분리한다</li>
+      <li><span aria-hidden="true">🚫</span>섞지 않는다</li>
+    </ul>
+    <div class="lb-actions">
+      <button id="btn-title" class="title-pill" type="button">🌱 분리수거 새싹</button>
+      <button id="btn-start" class="btn btn-primary btn-lg" type="button">게임 시작</button>
+      <div class="lb-pills">
+        <button id="btn-daily" class="pill-btn daily-pill" type="button">📅 오늘의 도전</button>
+        <button id="btn-review" class="pill-btn review-pill" type="button" hidden><span>📝 복습</span><b id="review-n">0</b></button>
+      </div>
+      <div class="lb-row lb-row3">
+        <button id="btn-dex" class="btn btn-sm" type="button">📖 도감</button>
+        <button id="btn-stickers" class="btn btn-sm" type="button">🏅<span class="lb-word"> 스티커</span> <span id="stk-n">0</span></button>
+        <button id="btn-help" class="btn btn-sm" type="button">❓ 도움말</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 단계 선택 -->
+  <section id="stages" class="screen" aria-label="단계 선택" hidden>
+    <header class="sc-head">
+      <button class="icon-btn js-home" type="button" aria-label="처음으로">←</button>
+      <h2 class="sc-title">단계를 골라요</h2>
+    </header>
+    <div id="stage-list" class="stage-list"></div>
+    <p class="sc-note">앞 단계를 깨면 다음 단계가 열려요.</p>
+  </section>
+
+  <!-- 플레이 -->
+  <section id="play" aria-label="플레이" hidden>
+    <header class="hud">
+      <div class="hud-row">
+        <button id="btn-exit" class="icon-btn" type="button" aria-label="일시정지 (Esc)">✕</button>
+        <span id="hud-stage" class="hud-stage"></span>
+        <span id="hud-hearts" class="hearts" role="img"></span><span id="hud-shield" class="hud-shield" role="img" aria-label="방패 있음" hidden>🛡️</span>
+        <span id="hud-score" class="hud-score" aria-label="점수">0</span>
+      </div>
+      <div class="hud-row">
+        <div class="timer" aria-hidden="true"><div id="hud-timer" class="timer-fill"></div><span id="hud-time" class="timer-text"></span></div>
+        <div id="hud-power" class="hud-power" hidden><span id="hud-power-icon"></span></div>
+        <div class="fever" aria-hidden="true"><div id="hud-fever" class="fever-fill"></div><span id="hud-combo" class="fever-text">콤보</span></div>
+      </div>
+    </header>
+    <div id="stage-area" class="stage-area">
+      <div class="belt-sky"><span class="pipe" aria-hidden="true"></span><div id="play-mascot" class="play-mascot"></div></div>
+      <div class="belt">
+        <div class="pit" aria-hidden="true">🕳️</div>
+        <div class="chute" aria-hidden="true"><span class="chute-light"></span><span class="chute-plate">♻️</span><span class="chute-mouth"></span></div>
+        <div id="belt-band" class="belt-band" aria-hidden="true"></div>
+        <div id="belt-items" class="belt-items" aria-live="polite"></div>
+      </div>
+      <p id="combo-pop" class="combo-pop" aria-hidden="true"></p>
+      <p id="rush-banner" class="rush-banner" role="status" hidden>🔥 러시 타임! 점수 ×1.5</p>
+      <div id="bonus" class="bonus" hidden>
+        <div class="bonus-card" role="group" aria-label="보너스 OX 퀴즈">
+          <div class="bonus-head"><span class="tag tag-sun">⭐ 보너스 OX 퀴즈</span><span id="bonus-ring" class="ring"><span id="bonus-sec">6</span></span></div>
+          <p id="bonus-q" class="bonus-q"></p>
+          <div class="ox">
+            <button id="btn-o" class="ox-btn ox-o" type="button" aria-label="맞아요 (O)">⭕<span>맞아요</span></button>
+            <button id="btn-x" class="ox-btn ox-x" type="button" aria-label="아니에요 (X)">❌<span>아니에요</span></button>
+          </div>
+        </div>
+      </div>
+      <p id="countdown" class="countdown" aria-live="assertive" hidden></p>
+    </div>
+    <div id="bins" class="bins" role="group" aria-label="분리수거함"></div>
+    <div id="coach" class="coach" hidden>
+      <span id="coach-hand" class="coach-hand" aria-hidden="true">👆</span>
+      <div class="coach-box">
+        <p>카드를 알맞은 수거함으로 끌어다 놓아요 · 수거함을 톡 눌러도 돼요</p>
+        <button id="coach-go" class="btn btn-sun btn-sm" type="button">시작!</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 결과 -->
+  <section id="result" class="screen" aria-label="결과" hidden>
+    <div class="res-card">
+      <p id="res-badge" class="res-badge"></p>
+      <div id="res-mascot" class="res-mascot"></div>
+      <div id="res-emoji" class="res-emoji" aria-hidden="true"></div>
+      <h2 id="res-title" class="res-title"></h2>
+      <p id="res-stars" class="res-stars"></p>
+      <p class="res-score"><span id="res-score">0</span><span class="res-unit">점</span></p>
+      <p id="res-best" class="tag tag-sun" hidden>🎉 최고 기록이에요!</p>
+      <ul id="res-stats" class="res-stats"></ul>
+    </div>
+    <div id="res-new" class="res-new" hidden>
+      <p class="res-new-title">새 스티커!</p>
+      <div id="res-new-list" class="res-new-list"></div>
+    </div>
+    <div class="res-actions">
+      <button id="btn-retry" class="btn btn-primary" type="button">다시하기</button>
+      <button id="btn-next" class="btn btn-sun" type="button" hidden>다음 단계</button>
+      <button class="btn js-dex" type="button">📖 도감</button>
+      <button class="btn js-home" type="button">처음으로</button>
+      <button id="btn-share" class="btn res-share" type="button">📤 자랑하기</button>
+    </div>
+    <div id="res-review" class="review" hidden>
+      <h3 class="sec-title">다시 볼 카드</h3>
+      <div id="res-list" class="review-list"></div>
+    </div>
+  </section>
+
+  <!-- 도감 -->
+  <section id="dex" class="screen dex" aria-label="도감" hidden>
+    <header class="dex-head">
+      <button class="icon-btn js-home" type="button" aria-label="처음으로">←</button>
+      <input id="dex-search" class="search" type="search" placeholder="이름이나 수거함으로 찾아요 (예: 페트병)" aria-label="도감 검색" autocomplete="off">
+    </header>
+    <div class="dex-top">
+      <h2 class="sc-title">분리배출 도감</h2>
+      <div class="dex-progress"><p id="dex-count" class="dex-count"></p><div class="mini-bar"><div id="dex-bar" class="mini-bar-fill"></div></div></div>
+    </div>
+    <div class="rules4" aria-label="분리배출 4대 원칙">
+      <span class="r4"><i aria-hidden="true">🫙</i><b>비운다</b></span><span class="r4"><i aria-hidden="true">💧</i><b>헹군다</b></span><span class="r4"><i aria-hidden="true">✂️</i><b>분리한다</b></span><span class="r4"><i aria-hidden="true">🚫</i><b>섞지 않는다</b></span>
+    </div>
+    <div id="dex-chips" class="dex-chips" role="toolbar" aria-label="수거함 필터"></div>
+    <div id="dex-list" class="dex-list"></div>
+    <p id="dex-empty" class="dex-empty" hidden>찾는 카드가 없어요.</p>
+    <h3 class="sec-title">수거함별 규칙</h3>
+    <ul id="dex-rules" class="dex-rules"></ul>
+    <h3 class="sec-title">참고한 자료</h3>
+    <p class="dex-empty">세부 기준은 지역마다 조금 다를 수 있어요. 사는 곳 시·군·구청 안내도 꼭 확인해 주세요.</p>
+    <ul id="dex-sources" class="dex-sources"></ul>
+  </section>
+
+  <!-- 스티커북 -->
+  <section id="stickers" class="screen stk-screen" aria-label="스티커북" hidden>
+    <header class="sc-head">
+      <button class="icon-btn js-home" type="button" aria-label="처음으로">←</button>
+      <h2 class="sc-title">스티커북</h2>
+    </header>
+    <div class="stk-head">
+      <p id="stk-title" class="stk-title"></p>
+      <div class="dex-progress"><p id="stk-count" class="dex-count"></p><div class="mini-bar"><div id="stk-bar" class="mini-bar-fill"></div></div></div>
+    </div>
+    <div id="stk-grid" class="stk-grid"></div>
+    <p class="sc-note">스티커를 누르면 얻는 방법을 볼 수 있어요.</p>
+  </section>
+
+  <div id="overlay" class="overlay" hidden>
+    <div id="dialog" class="sheet" role="dialog" aria-modal="true"></div>
+  </div>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <div id="fx" class="fx-layer" aria-hidden="true"></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

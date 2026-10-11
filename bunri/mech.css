@@ -1,0 +1,57 @@
+/* 새 규칙 — 러시 타임·분해 카드·방패·복습/오늘의 도전 HUD */
+
+/* 🛡️ 방패 — 하트 옆 */
+.hud-shield { font-size: var(--fs-md); line-height: 1; margin-left: -4px; animation: pop-in var(--dur) var(--ease-pop); }
+.hud-shield[hidden] { display: none; }
+/* 복습 — 하트가 줄지 않아요 */
+#play[data-mode="review"] .hearts, #play[data-mode="review"] .hud-shield { display: none; }
+#play[data-mode="review"] .timer-fill { background: var(--ok); }
+
+/* ✂️ 분해 카드 — 점선 + 겹친 카드 + 리본 */
+.is-combo { cursor: pointer; }
+.is-combo .belt-card {
+  border-style: dashed;
+  background: repeating-linear-gradient(135deg, var(--surface) 0 12px, var(--sun-soft) 12px 16px);
+  box-shadow: 5px -5px 0 -1px var(--surface-2), 5px -5px 0 1.5px var(--ink), var(--shadow-ink);
+}
+.is-combo.is-active .belt-card { box-shadow: 5px -5px 0 -1px var(--surface-2), 5px -5px 0 1.5px var(--ink), 0 0 0 4px var(--sun), var(--shadow-ink-lg); }
+.is-combo.is-held .belt-card { box-shadow: var(--shadow-soft), var(--shadow-ink-lg); }
+.bc-ribbon {
+  position: absolute; top: -14px; left: 50%; translate: -50% 0; padding: 2px 8px; z-index: 1;
+  border: 2px solid var(--line); border-radius: var(--r-pill); background: var(--coral); color: var(--white);
+  box-shadow: var(--shadow-ink-sm); font-family: var(--font-display); font-size: var(--fs-xs); white-space: nowrap;
+  animation: nudge 1.2s ease-in-out infinite;
+}
+.bc-parts { margin-top: auto; padding: 1px 6px; border-radius: var(--r-xs); background: var(--surface); border: 1.5px dashed var(--line); font-size: var(--fs-sm); line-height: 1.3; }
+
+/* 분해하지 않고 넣었을 때 — 부품 목록 */
+.combo-parts { list-style: none; margin: var(--sp-1) 0 0; padding: 0; display: grid; gap: 6px; text-align: left; }
+.combo-parts li { padding: 6px var(--sp-2); border: 2px solid var(--line); border-radius: var(--r-sm); background: var(--surface-2); }
+.cp-name { font-family: var(--font-display); font-size: var(--fs-sm); }
+.cp-why { display: block; margin-top: 2px; font-size: var(--fs-xs); line-height: 1.4; }
+
+/* 🔥 러시 타임 — 가장자리 따뜻한 빛(카드·수거함 아래) + 배너 */
+#play.is-rush::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 48%, color-mix(in srgb, var(--coral) 34%, transparent) 78%, color-mix(in srgb, var(--sun) 50%, transparent) 100%);
+  animation: rush-pulse 0.8s ease-in-out infinite alternate;
+}
+.is-rush .belt-band { box-shadow: 0 0 0 4px var(--coral), var(--shadow-ink-sm); }
+.rush-banner {
+  position: absolute; top: 2px; left: 50%; z-index: 6; margin: 0; padding: 3px 14px; translate: -50% 0; pointer-events: none;
+  border: var(--bw) solid var(--line); border-radius: var(--r-pill); background: var(--coral); color: var(--white);
+  box-shadow: var(--shadow-ink-sm); font-family: var(--font-display); font-size: var(--fs-base); white-space: nowrap;
+  animation: rush-in var(--dur-slow) var(--ease-pop), rush-beat 0.8s ease-in-out var(--dur-slow) infinite alternate;
+}
+.rush-banner[hidden] { display: none; }
+@keyframes rush-pulse { from { opacity: 0.55; } to { opacity: 1; } }
+@keyframes rush-in { from { scale: 0.4; opacity: 0; } }
+@keyframes rush-beat { to { scale: 1.06; } }
+
+/* 위험 — 맨 앞 카드가 구덩이 가까이 */
+.is-danger .pit { box-shadow: 0 0 0 4px var(--coral); animation: danger-blink 0.5s ease-in-out infinite alternate; }
+@keyframes danger-blink { to { box-shadow: 0 0 0 8px color-mix(in srgb, var(--coral) 40%, transparent); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .bc-ribbon, .rush-banner, #play.is-rush::before, .is-danger .pit, .hud-shield { animation: none; }
+}

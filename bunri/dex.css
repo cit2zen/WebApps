@@ -1,0 +1,48 @@
+/* 도감 */
+.dex { gap: var(--sp-4); padding-top: 0; }
+@media (min-width: 900px) { .dex { max-width: 960px; } }
+.dex-head {
+  position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: var(--sp-3);
+  margin: 0 calc(var(--sp-4) * -1); padding: calc(var(--sp-3) + env(safe-area-inset-top)) var(--sp-4) var(--sp-3);
+  background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 2px solid var(--line);
+}
+.search {
+  flex: 1; min-width: 0; height: 46px; padding: 0 16px; border: var(--bw) solid var(--line); border-radius: var(--r-pill);
+  background: var(--surface); box-shadow: var(--shadow-ink-sm); font-size: var(--fs-base);
+}
+.search::placeholder { color: var(--ink-3); }
+.dex-top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--sp-3); }
+.dex-progress { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; min-width: 150px; }
+.dex-count { font-family: var(--font-display); font-size: var(--fs-sm); }
+.mini-bar { width: 150px; height: 12px; border: 2px solid var(--line); border-radius: var(--r-pill); background: var(--surface); overflow: hidden; }
+.mini-bar-fill { height: 100%; width: 0; background: var(--brand); }
+.dex-chips { display: flex; gap: var(--sp-2); overflow-x: auto; margin: 0 calc(var(--sp-4) * -1); padding: 4px var(--sp-4) 10px; scrollbar-width: thin; }
+.chip {
+  --c: var(--brand); flex: 0 0 auto; padding: 6px 14px; border: 2px solid var(--line); border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--c) 12%, var(--white)); font-family: var(--font-display); font-size: var(--fs-sm); white-space: nowrap; cursor: pointer;
+}
+.chip[aria-pressed="true"] { background: color-mix(in srgb, var(--c) 45%, var(--white)); box-shadow: var(--shadow-ink-sm); transform: translateY(-2px); }
+.dex-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-3); }
+@media (min-width: 900px) { .dex-list { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 360px) { .dex-list { grid-template-columns: 1fr; } }
+.dex-item {
+  --c: var(--bin-general); position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  padding: var(--sp-3); padding-top: calc(var(--sp-3) + 10px); border: var(--bw) solid var(--line); border-radius: var(--r-md);
+  background: linear-gradient(var(--c) 0 10px, var(--surface) 10px); box-shadow: var(--shadow-ink-sm); overflow: hidden;
+}
+.dex-item:not(.is-seen) .dex-emoji { filter: grayscale(0.7); opacity: 0.75; }
+.dex-emoji { font-size: 40px; line-height: 1.1; }
+.dex-name { font-family: var(--font-display); font-size: var(--fs-md); line-height: 1.25; }
+.dex-item .tag { font-size: var(--fs-2xs); }
+.dex-item .mini-why { font-size: var(--fs-xs); }
+.dex-item .bin-chip { font-size: var(--fs-xs); white-space: normal; }
+.seen-badge { position: absolute; top: 16px; right: 10px; width: 24px; height: 24px; display: grid; place-items: center; border: 2px solid var(--line); border-radius: 50%; background: var(--ok); color: var(--white); font-size: var(--fs-xs); font-weight: 700; }
+.trap-tag { background: var(--coral-soft); }
+.dex-empty { text-align: center; font-size: var(--fs-sm); color: var(--ink-2); }
+.dex-rules, .dex-sources { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--sp-2); }
+.rule-row { --c: var(--bin-general); display: flex; gap: var(--sp-3); align-items: flex-start; padding: var(--sp-3); border: 2px solid var(--line); border-radius: var(--r-sm); background: var(--surface); }
+.rule-dot { flex: 0 0 auto; width: 36px; height: 36px; display: grid; place-items: center; border: 2px solid var(--line); border-radius: 50%; background: var(--c); font-size: var(--fs-md); }
+.rule-body { display: flex; flex-direction: column; gap: 2px; font-size: var(--fs-sm); color: var(--ink-2); line-height: 1.5; }
+.rule-body b { font-family: var(--font-display); font-weight: 400; font-size: var(--fs-md); color: var(--ink); }
+.dex-sources a { font-size: var(--fs-sm); color: var(--ink-2); text-decoration: underline; text-decoration-color: var(--brand); text-decoration-thickness: 2px; text-underline-offset: 3px; word-break: break-all; }
+.dex-sources a:hover { color: var(--ink); }

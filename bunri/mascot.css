@@ -1,0 +1,136 @@
+/* 마스코트 척척이 — 그림·기분·자리 (무대 테마는 theme.css) */
+.bot { --bot-w: 64px; position: relative; width: var(--bot-w); aspect-ratio: 100 / 112; flex: 0 0 auto; }
+.bot-svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.b-headbox, .b-body, .b-limb { fill: var(--bot-body); stroke: var(--ink); stroke-width: 3.2; }
+.b-ear { fill: var(--bot-body-dark); stroke: var(--ink); stroke-width: 2.6; }
+.b-tread { fill: var(--ink); }
+.b-hand { fill: var(--surface); stroke: var(--ink); stroke-width: 3; }
+.b-screen { fill: var(--bot-screen); stroke: var(--ink); stroke-width: 2.5; }
+.b-eye, .b-fillink { fill: var(--bot-eye); }
+.b-glint { fill: var(--white); }
+.b-stroke { fill: none; stroke: var(--bot-eye); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+.b-antenna { stroke: var(--ink); stroke-width: 3; }
+.b-bulb { fill: var(--sun); stroke: var(--ink); stroke-width: 2.5; animation: bot-bulb 1.6s steps(2, jump-none) infinite; }
+.b-cheek { fill: var(--bot-cheek); opacity: 0; transition: opacity var(--dur); }
+.b-badge { fill: var(--surface); stroke: var(--ink); stroke-width: 2.5; }
+.b-badge-txt { fill: var(--brand-dark); font: 700 13px system-ui, sans-serif; }
+.b-shadow { fill: color-mix(in srgb, var(--ink) 18%, transparent); }
+.x-tear, .x-sweat { fill: var(--bot-tear); stroke: var(--ink); stroke-width: 1.5; }
+.b-zz { fill: var(--ink); font-family: var(--font-display); font-size: 12px; }
+.b-zz2 { font-size: 16px; }
+.b-spark { fill: var(--sun); stroke: var(--ink); stroke-width: 1.5; }
+
+/* 기본: 뜬 눈 + 미소, 나머지는 숨김 */
+.e-happy, .e-shut, .e-sad, .m-open, .m-frown, .m-wavy,
+.x-tear, .x-sweat, .x-zz, .x-spark { display: none; }
+.b-all, .b-head, .b-eyes, .e-open { transition: transform var(--dur) var(--ease-out); }
+.b-head { transform-origin: 50px 66px; }
+.e-open { transform-origin: 50px 41px; }
+.b-arm { transition: transform var(--dur) var(--ease-pop); }
+.b-arm-l { transform-origin: 30px 74px; transform: rotate(-55deg); }
+.b-arm-r { transform-origin: 70px 74px; transform: rotate(55deg); }
+.bot[data-mood="idle"] .b-all { animation: bot-bob 2.8s ease-in-out infinite; }
+.bot.is-blink .e-open { transform: scaleY(0.1); }
+
+/* 기쁨 — 웃는 눈, 깡충 */
+.bot[data-mood="happy"] .e-open, .bot[data-mood="cheer"] .e-open,
+.bot[data-mood="happy"] .m-smile, .bot[data-mood="cheer"] .m-smile { display: none; }
+.bot[data-mood="happy"] .e-happy, .bot[data-mood="cheer"] .e-happy,
+.bot[data-mood="happy"] .m-open, .bot[data-mood="cheer"] .m-open { display: inline; }
+.bot[data-mood="happy"] .b-cheek, .bot[data-mood="cheer"] .b-cheek { opacity: 0.85; }
+.bot[data-mood="happy"] .b-all { animation: bot-hop 0.5s var(--ease-out); }
+.bot[data-mood="happy"] .b-arm-l { transform: rotate(-15deg); }
+.bot[data-mood="happy"] .b-arm-r { transform: rotate(15deg); }
+/* 환호 — 두 팔 번쩍, 반짝이 */
+.bot[data-mood="cheer"] .x-spark { display: inline; }
+.bot[data-mood="cheer"] .b-all { animation: bot-jump 0.6s var(--ease-out) 2; }
+.bot[data-mood="cheer"] .b-arm-l { transform: rotate(58deg); }
+.bot[data-mood="cheer"] .b-arm-r { transform: rotate(-58deg); }
+.bot[data-mood="cheer"] .x-spark { animation: bot-twinkle 0.6s ease-in-out infinite alternate; transform-origin: 50px 30px; }
+/* 슬픔 — 축 처짐, 눈물 */
+.bot[data-mood="sad"] .m-smile { display: none; }
+.bot[data-mood="sad"] .m-frown, .bot[data-mood="sad"] .e-sad, .bot[data-mood="sad"] .x-tear { display: inline; }
+.bot[data-mood="sad"] .b-head { transform: translateY(3px) rotate(-6deg); }
+.bot[data-mood="sad"] .b-arm-l { transform: rotate(-80deg); }
+.bot[data-mood="sad"] .b-arm-r { transform: rotate(80deg); }
+.bot[data-mood="sad"] .x-tear { animation: bot-drip 1.2s ease-in infinite; }
+/* 걱정 — 식은땀, 왼쪽(구덩이) 흘끔 */
+.bot[data-mood="worried"] .m-smile { display: none; }
+.bot[data-mood="worried"] .m-wavy, .bot[data-mood="worried"] .x-sweat { display: inline; }
+.bot[data-mood="worried"] .e-open { transform: translateX(-4px); }
+.bot[data-mood="worried"].is-blink .e-open { transform: translateX(-4px) scaleY(0.1); }
+.bot[data-mood="worried"] .b-all { animation: bot-shiver 0.3s linear infinite; }
+.bot[data-mood="worried"] .b-arm-l { transform: rotate(-20deg); }
+/* 잠 — 감은 눈, zZ */
+.bot[data-mood="sleep"] .e-open { display: none; }
+.bot[data-mood="sleep"] .e-shut, .bot[data-mood="sleep"] .x-zz { display: inline; }
+.bot[data-mood="sleep"] .b-head { transform: rotate(-8deg); }
+.bot[data-mood="sleep"] .b-bulb { animation: none; fill: var(--ink-3); }
+.bot[data-mood="sleep"] .x-zz { animation: bot-zz 2s ease-in-out infinite; }
+/* 말하기 — 입 뻥긋 */
+.bot.is-talking:not([data-mood="sad"]) .m-smile, .bot.is-talking .m-wavy { display: none; }
+.bot.is-talking:not([data-mood="sad"]) .m-open { display: inline; animation: bot-talk 0.22s steps(2, jump-none) 6; transform-origin: 50px 51px; }
+/* 손 흔들기 */
+.bot.is-waving .b-arm-r { animation: bot-wave 0.45s ease-in-out 4 alternate; }
+
+/* 말풍선 */
+.bot-bubble {
+  position: absolute; z-index: 8; margin: 0; padding: 4px 10px; width: max-content; max-width: 180px;
+  border: 2px solid var(--line); border-radius: var(--r-sm); background: var(--surface); box-shadow: var(--shadow-ink-sm);
+  font-family: var(--font-display); font-size: var(--fs-sm); line-height: 1.35; color: var(--ink); text-align: center;
+  pointer-events: none; animation: bot-pop 0.28s var(--ease-pop);
+}
+.bot-bubble[hidden] { display: none; }
+.bot-bubble::after {
+  content: ''; position: absolute; width: 10px; height: 10px; background: var(--surface);
+  border: solid var(--line); border-width: 0 2px 2px 0;
+}
+
+/* 로비 — 스티커 묶음 가운데 */
+.lb-mascot {
+  position: absolute; left: 50%; top: 50%; z-index: 3; padding: 0; border: 0; background: none; cursor: pointer;
+  width: calc(132px * var(--s)); margin: calc(-74px * var(--s)) 0 0 calc(-66px * var(--s)); border-radius: var(--r-md);
+}
+.lb-mascot:focus-visible { outline: none; box-shadow: var(--ring); }
+.bot-lobby { --bot-w: 100%; }
+.bot-lobby .bot-bubble { left: 50%; bottom: 96%; transform: translateX(-50%); max-width: min(250px, 78vw); font-size: var(--fs-sm); }
+.bot-lobby .bot-bubble::after { left: calc(50% - 5px); bottom: -6px; transform: rotate(45deg); }
+.lb-toggles { display: flex; gap: var(--sp-2); }
+#btn-music.is-off { position: relative; opacity: 0.55; }
+#btn-music.is-off::after {
+  content: ''; position: absolute; left: 8px; right: 8px; top: 50%; height: 3px; border-radius: 2px;
+  background: var(--coral); transform: rotate(-35deg);
+}
+
+/* 플레이 — 하늘 띠 왼쪽, 벨트 위에 서 있기 */
+.play-mascot { position: absolute; left: 4px; bottom: 10px; z-index: 7; pointer-events: none; }
+.play-mascot::after { /* 벽에 붙은 작은 선반 */
+  content: ''; position: absolute; left: -4px; right: -6px; bottom: -9px; height: 9px;
+  border: 2px solid var(--line); border-radius: 4px; background: var(--bot-body-dark); box-shadow: var(--shadow-ink-sm);
+}
+.bot-play { --bot-w: clamp(44px, 8.6dvh, 64px); }
+.bot-play .bot-bubble { left: calc(100% + 4px); bottom: 48%; white-space: nowrap; max-width: none; }
+.bot-play .bot-bubble::after { left: -6px; bottom: 8px; transform: rotate(135deg); }
+
+/* 결과 — 결과 카드 맨 위 (이모지 대신) */
+.res-mascot { display: flex; justify-content: center; margin-top: var(--sp-2); }
+.res-mascot:not(:empty) + .res-emoji { display: none; }
+.bot-result { --bot-w: clamp(76px, 12dvh, 96px); }
+.bot-result .bot-bubble { left: calc(100% + 2px); top: 4%; max-width: 132px; }
+.bot-result .bot-bubble::after { left: -6px; top: 12px; transform: rotate(135deg); }
+
+@keyframes bot-bob { 50% { transform: translateY(-2.5px); } }
+@keyframes bot-hop { 40% { transform: translateY(-9px); } 70% { transform: translateY(1px); } }
+@keyframes bot-jump { 45% { transform: translateY(-16px) scale(1.04); } 80% { transform: translateY(1px) scaleY(0.96); } }
+@keyframes bot-shiver { 25% { transform: translateX(-0.8px); } 75% { transform: translateX(0.8px); } }
+@keyframes bot-twinkle { to { transform: scale(1.15); opacity: 0.6; } }
+@keyframes bot-drip { from { transform: translateY(0); opacity: 1; } to { transform: translateY(8px); opacity: 0; } }
+@keyframes bot-zz { 50% { transform: translate(2px, -3px); opacity: 0.6; } }
+@keyframes bot-talk { 50% { transform: scaleY(0.35); } }
+@keyframes bot-wave { from { transform: rotate(-40deg); } to { transform: rotate(-95deg); } }
+@keyframes bot-bulb { 50% { fill: var(--coral); } }
+@keyframes bot-pop { from { opacity: 0; scale: 0.6; } }
+@media (prefers-reduced-motion: reduce) {
+  .bot .b-all, .bot .b-bulb, .bot .x-spark, .bot .x-tear, .bot .x-zz, .bot-bubble, .bot.is-waving .b-arm-r, .bot.is-talking .m-open { animation: none !important; }
+  .bot .b-all, .bot .b-head, .bot .b-arm { transition: none; }
+}

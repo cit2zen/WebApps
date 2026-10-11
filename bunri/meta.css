@@ -1,0 +1,109 @@
+/* 기록 — 스티커북·로비 추가 버튼·결과 공유 (coder C) */
+
+/* ── 로비 아래쪽 (≈230px @375×667) ── */
+.lb-actions { width: 100%; max-width: 420px; margin: 0 auto; gap: 10px; }
+.lb-actions .btn-lg { width: 100%; min-height: 58px; padding: 10px 24px; }
+.title-pill {
+  align-self: center; display: inline-flex; align-items: center; gap: 4px; padding: 2px 12px; margin-bottom: -2px;
+  border: 2px solid var(--line); border-radius: var(--r-pill); background: var(--sun-soft); box-shadow: var(--shadow-ink-sm);
+  font-family: var(--font-display); font-size: var(--fs-xs); line-height: 1.6; cursor: pointer; transform: rotate(-2deg);
+}
+.title-pill:active { transform: rotate(-2deg) translateY(2px); box-shadow: none; }
+.lb-pills { display: flex; gap: var(--sp-2); width: 100%; }
+.pill-btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 46px; padding: 4px 14px;
+  border: var(--bw) solid var(--line); border-radius: var(--r-md); background: var(--surface); color: var(--ink);
+  box-shadow: var(--shadow-ink-sm); font-family: var(--font-display); font-size: var(--fs-sm); line-height: 1.25; cursor: pointer;
+  transition: transform var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+}
+.pill-btn:active { transform: translateY(2px); box-shadow: none; }
+.pill-btn:focus-visible { box-shadow: var(--shadow-ink-sm), var(--ring); }
+.daily-pill { flex: 1 1 auto; min-width: 0; flex-direction: column; gap: 0; background: color-mix(in srgb, var(--bin-paper) 14%, var(--white)); }
+.daily-pill.is-locked { background: var(--surface-2); color: var(--ink-2); }
+.pb-main { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 6px; }
+.pb-mod { color: var(--bin-paper); }
+.daily-pill.is-locked .pb-mod { color: var(--ink-3); }
+.pb-sub { font-family: var(--font-body); font-weight: 600; font-size: var(--fs-2xs); color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.review-pill { flex: 0 0 auto; background: var(--coral-soft); }
+.review-pill b {
+  min-width: 24px; height: 24px; padding: 0 6px; display: inline-grid; place-items: center; border: 2px solid var(--line);
+  border-radius: var(--r-pill); background: var(--coral); color: var(--white); font-weight: 400; font-size: var(--fs-xs);
+}
+.lb-row3 { width: 100%; gap: var(--sp-2); }
+.lb-row3 .btn { flex: 1 1 0; min-width: 0; min-height: 44px; padding: 6px 8px; font-size: var(--fs-sm); white-space: nowrap; }
+@media (max-width: 359px) { .lb-word { display: none; } .pill-btn { padding: 4px 10px; } }
+@media (max-height: 660px) { .lb-actions { gap: var(--sp-2); } .lb-actions .btn-lg { min-height: 54px; } }
+
+/* ── 다이컷 비닐 스티커 ── */
+.stk { --c: var(--brand); --size: 76px; display: inline-grid; place-items: center; width: var(--size); height: var(--size); transform: rotate(var(--r, 0deg)); }
+.stk-face {
+  position: relative; width: 100%; height: 100%; display: grid; place-items: center; overflow: hidden;
+  border: 5px solid var(--stk-edge); border-radius: 50% 46% 52% 44% / 46% 52% 44% 50%;
+  background: radial-gradient(circle at 32% 28%, color-mix(in srgb, var(--c) 30%, var(--white)), var(--c) 75%);
+  box-shadow: 0 0 0 var(--bw) var(--ink), 0 5px 0 var(--bw) var(--ink);
+}
+.stk-face::after { /* 비닐 광택 */
+  content: ''; position: absolute; inset: -20% 40% 40% -20%; border-radius: 50%; background: var(--stk-gloss); transform: rotate(-30deg); pointer-events: none;
+}
+.stk-emoji {
+  font-size: calc(var(--size) * 0.46); line-height: 1;
+  filter: drop-shadow(2px 0 0 var(--stk-edge)) drop-shadow(-2px 0 0 var(--stk-edge)) drop-shadow(0 2px 0 var(--stk-edge)) drop-shadow(0 -2px 0 var(--stk-edge));
+}
+.stk.is-locked .stk-face {
+  border-style: dashed; border-color: var(--stk-locked-ink); background: var(--stk-locked);
+  box-shadow: 0 0 0 2px var(--stk-locked-ink);
+}
+.stk.is-locked .stk-face::after { display: none; }
+.stk.is-locked .stk-emoji { filter: none; font-family: var(--font-display); color: var(--stk-locked-ink); }
+.stk.is-fresh { animation: stk-peel 0.7s var(--ease-pop) both; animation-delay: calc(0.6s + var(--i) * 0.25s); }
+.stk.is-fresh .stk-face::before { /* 반짝 지나감 */
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(115deg, transparent 35%, var(--stk-gloss) 50%, transparent 65%);
+  transform: translateX(-120%); animation: stk-shine 0.9s ease-out both; animation-delay: calc(1.1s + var(--i) * 0.25s);
+}
+@keyframes stk-peel {
+  0% { opacity: 0; transform: rotate(calc(var(--r) - 40deg)) scale(0.2) translateY(-30px); }
+  60% { opacity: 1; transform: rotate(calc(var(--r) + 6deg)) scale(1.15); }
+  100% { transform: rotate(var(--r)) scale(1); }
+}
+@keyframes stk-shine { to { transform: translateX(120%); } }
+
+/* ── 스티커북 화면 ── */
+.stk-screen { gap: var(--sp-4); }
+@media (min-width: 900px) { .stk-screen { max-width: 860px; } }
+.stk-head {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4);
+  border: var(--bw) solid var(--line); border-radius: var(--r-md); background: var(--surface); box-shadow: var(--shadow-ink-sm);
+}
+.stk-title { font-family: var(--font-display); font-size: var(--fs-lg); }
+.stk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4) var(--sp-2); }
+@media (min-width: 480px) { .stk-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 900px) { .stk-grid { grid-template-columns: repeat(6, 1fr); } }
+.stk-cell {
+  display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); padding: var(--sp-2) 2px; border: 0; border-radius: var(--r-sm);
+  background: transparent; cursor: pointer; text-align: center;
+}
+.stk-cell:hover .stk:not(.is-locked) { transform: rotate(0deg) scale(1.06); transition: transform var(--dur) var(--ease-pop); }
+.stk-cell:active .stk { transform: scale(0.94); }
+.stk-name { font-family: var(--font-display); font-size: var(--fs-xs); line-height: 1.3; color: var(--ink); }
+.stk-cell.is-locked .stk-name { font-family: var(--font-body); font-size: var(--fs-2xs); color: var(--ink-2); }
+.stk-detail { display: grid; place-items: center; padding: var(--sp-2) 0; }
+.stk-detail .stk { --size: 112px; }
+
+/* ── 결과: 새 스티커·자랑하기·모드 배지 ── */
+.res-badge.is-daily { background: var(--bin-paper); }
+.res-badge.is-review { background: var(--coral); }
+.res-new {
+  display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); padding: var(--sp-4) var(--sp-3) var(--sp-5);
+  border: var(--bw) dashed var(--ink); border-radius: var(--r-lg); background: var(--sun-soft);
+}
+.res-new-title { font-family: var(--font-display); font-size: var(--fs-lg); }
+.res-new-list { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--sp-4); }
+.res-new-item { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); width: 88px; }
+.res-share { background: var(--sun-soft); }
+#btn-next:not([hidden]) ~ .res-share { grid-column: 1 / -1; } /* 버튼이 홀수일 때만 한 줄 전체 */
+
+@media (prefers-reduced-motion: reduce) {
+  .stk.is-fresh, .stk.is-fresh .stk-face::before { animation: none; }
+  .stk-cell:hover .stk:not(.is-locked) { transition: none; }
+}

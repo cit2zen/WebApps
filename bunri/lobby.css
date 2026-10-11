@@ -1,0 +1,91 @@
+/* 로비 + 단계 선택 */
+.lobby { max-width: 720px; justify-content: space-between; gap: var(--sp-4); }
+.lb-top { display: flex; justify-content: space-between; align-items: center; }
+.lb-hero { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--sp-2); }
+/* 스티커 묶음 — 제목 위 자기 상자 안에서만, 화면 높이에 맞춰 --s 배율 */
+.sticker-cluster { --s: 0.6; position: relative; width: 100%; height: calc(260px * var(--s)); margin-bottom: var(--sp-2); flex: 0 0 auto; }
+.recycle-badge, .sticker {
+  position: absolute; left: 50%; top: 50%; display: grid; place-items: center; line-height: 1;
+  border: var(--bw) solid var(--line); border-radius: 50%;
+}
+.recycle-badge {
+  width: calc(116px * var(--s)); height: calc(116px * var(--s)); margin: calc(-58px * var(--s)) 0 0 calc(-58px * var(--s));
+  background: var(--brand-soft); box-shadow: var(--shadow-ink); font-size: calc(64px * var(--s)); animation: spin-slow 18s linear infinite;
+}
+.sticker {
+  --z: 56px; width: calc(var(--z) * var(--s)); height: calc(var(--z) * var(--s)); margin: calc(var(--z) * var(--s) / -2) 0 0 calc(var(--z) * var(--s) / -2);
+  background: var(--surface); box-shadow: var(--shadow-ink-sm); font-size: calc(var(--z) * var(--s) * 0.5);
+  transform: translate(calc(var(--x) * var(--s)), calc(var(--y) * var(--s))) rotate(var(--r));
+  animation: bob 3.2s ease-in-out var(--d) infinite;
+}
+.sticker.sm { --z: 44px; }
+.lb-title { font-size: clamp(var(--fs-2xl), 12vw, 64px); letter-spacing: -0.01em; }
+.marker { position: relative; z-index: 0; padding: 0 4px; }
+.marker::after {
+  content: ''; position: absolute; z-index: -1; left: 0; right: 0; bottom: 0.08em; height: 0.42em;
+  border-radius: 6px; background: color-mix(in srgb, var(--brand) 55%, transparent); transform: rotate(-2deg);
+}
+.lb-sub { font-size: var(--fs-md); font-weight: 600; color: var(--ink-2); }
+.rule-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--sp-2); margin: 0; padding: 0; list-style: none; }
+.rule-chips li {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--line);
+  border-radius: var(--r-pill); background: var(--surface); box-shadow: var(--shadow-ink-sm);
+  font-family: var(--font-display); font-size: var(--fs-sm);
+}
+.rule-chips li:nth-child(odd) { transform: rotate(-2deg); }
+.rule-chips li:nth-child(even) { transform: rotate(1.5deg); background: var(--sun-soft); }
+.lb-actions { display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); }
+.lb-actions .btn-lg { min-width: min(300px, 100%); }
+.lb-row { display: flex; gap: var(--sp-3); }
+.lb-row .btn { min-width: 128px; }
+
+@keyframes bob { 50% { transform: translate(calc(var(--x) * var(--s)), calc(var(--y) * var(--s) - 8px)) rotate(calc(var(--r) * -1)); } }
+@keyframes spin-slow { to { rotate: 360deg; } }
+@media (max-height: 660px) { .sticker-cluster { --s: 0.52; } .lobby { gap: var(--sp-3); } }
+@media (min-height: 740px) { .sticker-cluster { --s: 0.72; } }
+@media (min-height: 820px) { .sticker-cluster { --s: 0.86; } }
+@media (min-height: 900px) and (min-width: 400px) { .sticker-cluster { --s: 1; } }
+@media (min-width: 900px) and (min-height: 760px) { .sticker-cluster { --s: 0.95; } }
+@media (max-width: 359px) { .sticker-cluster { --s: 0.5; } }
+@media (prefers-reduced-motion: reduce) { .sticker, .recycle-badge { animation: none; } }
+
+/* 단계 선택 — 티켓 카드 */
+.stage-list { display: grid; gap: var(--sp-4); }
+@media (min-width: 900px) {
+  #stages { max-width: 1040px; }
+  .stage-list { grid-template-columns: repeat(4, 1fr); }
+}
+.ticket {
+  position: relative; display: grid; grid-template-columns: auto 1fr; gap: var(--sp-2) var(--sp-4); align-items: center;
+  padding: var(--sp-4); border: var(--bw) solid var(--line); border-radius: var(--r-md); background: var(--surface);
+  box-shadow: var(--shadow-ink); text-align: left; cursor: pointer;
+  transition: transform var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+}
+.ticket::before, .ticket::after { /* 티켓 홈 */
+  content: ''; position: absolute; top: 50%; width: 18px; height: 18px; margin-top: -9px; border: var(--bw) solid var(--line);
+  border-radius: 50%; background: var(--bg);
+}
+.ticket::before { left: -10px; clip-path: inset(0 0 0 50%); }
+.ticket::after { right: -10px; clip-path: inset(0 50% 0 0); }
+.ticket:hover:not(:disabled) { transform: translateY(-3px); box-shadow: var(--shadow-ink-lg); }
+.ticket:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.ticket.is-locked { opacity: 0.6; cursor: not-allowed; background: var(--surface-2); }
+.ticket-num {
+  grid-row: span 2; width: 64px; height: 64px; display: grid; place-items: center; border: var(--bw) solid var(--line);
+  border-radius: var(--r-sm); background: var(--brand); color: var(--white); font-family: var(--font-display); font-size: var(--fs-2xl);
+  box-shadow: var(--shadow-ink-sm); transform: rotate(-4deg);
+}
+.ticket.is-endless .ticket-num { background: var(--bin-special); }
+.ticket.is-locked .ticket-num { background: var(--surface-2); color: var(--ink); font-size: var(--fs-xl); }
+.ticket-name { font-family: var(--font-display); font-size: var(--fs-lg); }
+.ticket-desc { font-size: var(--fs-sm); color: var(--ink-2); line-height: 1.45; }
+.ticket-foot { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-2); padding-top: var(--sp-2); border-top: 2px dashed var(--ink-3); }
+.ticket-dots { display: flex; flex-wrap: wrap; gap: 4px; }
+.dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line); background: var(--c, var(--bin-general)); }
+.ticket-stars { font-size: var(--fs-md); color: var(--sun); -webkit-text-stroke: 1px var(--ink); letter-spacing: 0.04em; }
+.ticket-best { font-size: var(--fs-xs); font-weight: 600; color: var(--ink-2); }
+@media (min-width: 900px) {
+  .ticket { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+  .ticket-num { grid-row: auto; }
+  .ticket-foot { justify-content: center; flex-direction: column; }
+}

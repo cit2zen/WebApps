@@ -1,0 +1,49 @@
+/* 무대 테마 — 단계·모드별 공장 벽(하늘) 배경 + 로비 높이 맞춤 (coder B) */
+#play[data-stage="1"] .stage-area::before {
+  background:
+    radial-gradient(circle at 82% 14%, color-mix(in srgb, var(--sun) 55%, transparent) 0 18px, transparent 62px),
+    linear-gradient(var(--sky-morning-1), var(--sky-morning-2) 72%);
+}
+#play[data-stage="2"] .stage-area::before {
+  background:
+    radial-gradient(circle at 70% 8%, color-mix(in srgb, var(--sun) 70%, transparent) 0 22px, transparent 80px),
+    linear-gradient(var(--sky-noon-1), var(--sky-noon-2) 72%);
+}
+#play[data-stage="3"] .stage-area::before {
+  background:
+    radial-gradient(ellipse at 60% 62%, color-mix(in srgb, var(--sun) 60%, transparent) 0 26px, transparent 90px),
+    linear-gradient(var(--sky-sunset-1), var(--sky-sunset-2) 55%, var(--sky-sunset-3));
+}
+#play[data-mode="endless"] .stage-area::before {
+  border-color: color-mix(in srgb, var(--sky-star) 35%, transparent);
+  background:
+    radial-gradient(1.6px 1.6px at 12% 18%, var(--sky-star) 98%, transparent),
+    radial-gradient(1.2px 1.2px at 28% 42%, var(--sky-star) 98%, transparent),
+    radial-gradient(2px 2px at 46% 12%, var(--sky-star) 98%, transparent),
+    radial-gradient(1.2px 1.2px at 63% 34%, var(--sky-star) 98%, transparent),
+    radial-gradient(1.8px 1.8px at 88% 22%, var(--sky-star) 98%, transparent),
+    radial-gradient(1.2px 1.2px at 74% 8%, var(--sky-star) 98%, transparent),
+    radial-gradient(1.4px 1.4px at 36% 66%, var(--sky-star) 98%, transparent),
+    radial-gradient(circle at 18% 10%, var(--sky-star) 0 9px, transparent 10px),
+    linear-gradient(var(--sky-night-1), var(--sky-night-2) 80%);
+}
+#play[data-mode="daily"] .stage-area::before {
+  background:
+    radial-gradient(color-mix(in srgb, var(--sun) 30%, transparent) 2px, transparent 2.5px) 0 0 / 22px 22px,
+    repeating-conic-gradient(from -10deg at 50% 0%, color-mix(in srgb, var(--sun) 22%, transparent) 0 6deg, transparent 6deg 16deg),
+    var(--sun-soft);
+}
+#play[data-mode="review"] .stage-area::before {
+  background:
+    linear-gradient(90deg, transparent 26px, var(--paper-margin) 26px 28px, transparent 28px),
+    repeating-linear-gradient(0deg, var(--paper-grid) 0 1px, transparent 1px 20px),
+    repeating-linear-gradient(90deg, var(--paper-grid) 0 1px, transparent 1px 20px),
+    var(--surface);
+}
+
+/* 로비 — 375×667에서 위 막대 + 그림 + 원칙 칩이 ≈380px 안에 */
+@media (max-height: 760px) {
+  .rule-chips { flex-wrap: nowrap; gap: 4px; }
+  .rule-chips li { gap: 3px; padding: 3px 8px; font-size: var(--fs-xs); box-shadow: none; }
+}
+@media (max-height: 600px) { .rule-chips { display: none; } }
