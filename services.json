@@ -1,5 +1,5 @@
 {
-  "$comment": "cityzen 서비스 레지스트리 — 단일 진실 소스(실제 상태 그대로). status: live(공개 중) · retired(폐기, 소스만 보존) · local(미배포). 갱신 후 커밋·푸시.",
+  "$comment": "cityzen 서비스 레지스트리 — 단일 진실 소스(실제 상태 그대로). status: live(공개 중) · retired(폐기, 소스만 보존) · local(미배포). 갱신 후 커밋·푸시. 업타임 감시는 .github/workflows/uptime.yml (5분 간격, 다운 시 uptime 라벨 이슈로 알림).",
   "$scheme": [
       "1 앱 = 1 폴더 = Coolify 앱 이름 = <name>.cityzen.kr (소문자·하이픈). 루트 cityzen.kr = cityzen-web",
       "게임은 games.cityzen.kr/<name>/ 하위에만 (via: games, 독립 Coolify 앱·DNS 금지)",

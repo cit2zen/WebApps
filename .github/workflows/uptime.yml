@@ -1,0 +1,30 @@
+name: uptime
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            services.json
+            .github
+          sparse-checkout-cone-mode: false
+      - name: Check live services
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/uptime_check.py --services services.json
